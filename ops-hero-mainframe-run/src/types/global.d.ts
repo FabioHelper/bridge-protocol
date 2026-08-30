@@ -3,6 +3,8 @@ interface OpsHeroProbe {
   scene: string;
   lives: number;
   errors: string[];
+  playerX?: number;
+  playerY?: number;
 }
 
 interface Window {

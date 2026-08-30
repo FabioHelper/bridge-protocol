@@ -292,6 +292,8 @@ export class LevelScene extends Phaser.Scene {
       scene: SceneKeys.LEVEL,
       lives: this.interactions.lives,
       errors: [],
+      playerX: this.world.player.x,
+      playerY: this.world.player.y,
     };
   }
 
