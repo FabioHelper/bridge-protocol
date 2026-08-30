@@ -1,6 +1,6 @@
 {
   "$comment": "SINGLE SOURCE OF TRUTH for asset dimensions. v3 applies corrections from intake batch 2 (effects board, enemies/items board, full-fidelity gameplay reference). Read by tools/*.py and by tools/gen_asset_keys.py. Mirrored in ASSET_PIPELINE.md.",
-  "version": 3,
+  "version": 4,
   "chroma_color": "#7CFFB2",
   "chroma_tolerance": 18,
   "logical_resolution": [
@@ -270,38 +270,36 @@
       "kind": "image",
       "source": "HUD_BLOCKS_SOURCE",
       "width": 480,
-      "height": 30,
+      "height": 42,
       "alignment": "none",
-      "notes": "Full-width top strip. PF1-PF12 button labels stay baked; only the active highlight is dynamic. 'ALL SYSTEMS GO' and the activity graph must be cleaned."
+      "notes": "Full-width top bar. Height 42 = 85px board strip at the 2.025 board->logical scale."
     },
     {
       "file": "hud-viewdata.png",
       "kind": "image",
       "source": "HUD_BLOCKS_SOURCE",
       "alignment": "none",
-      "notes": "VIEWDATA 3270 casing. Screen interior is already blank in the source. PROVISIONAL: exact size is set by the crop once the board is on disk.",
-      "size_mode": "max",
-      "max_width": 200,
-      "max_height": 64
+      "notes": "VIEWDATA 3270 casing, 219x120 on the board. Explicit size: a max-mode entry made emit_sheet fall back to 16x16.",
+      "width": 108,
+      "height": 59
     },
     {
       "file": "hud-minimap.png",
       "kind": "image",
       "source": "HUD_BLOCKS_SOURCE",
       "alignment": "none",
-      "notes": "MAP panel with a dotted grid. Already free of markers. PROVISIONAL: exact size is set by the crop once the board is on disk.",
-      "size_mode": "max",
-      "max_width": 160,
-      "max_height": 72
+      "notes": "MAP panel, 187x120 on the board. Explicit size: a max-mode entry made emit_sheet fall back to 16x16.",
+      "width": 92,
+      "height": 59
     },
     {
       "file": "hud-bottom.png",
       "kind": "image",
       "source": "HUD_BLOCKS_SOURCE",
       "width": 480,
-      "height": 56,
+      "height": 47,
       "alignment": "none",
-      "notes": "Full-width bottom strip: CURRENT MISSION, OBJECTIVE, ITEM, AUTOMATION, POWER side by side."
+      "notes": "Full-width bottom bar. Height 47 = 95px board strip at the same scale."
     },
     {
       "file": "env-rack.png",

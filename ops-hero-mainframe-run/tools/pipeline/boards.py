@@ -157,8 +157,15 @@ def emit_sheet(
     from .sheets import pack_horizontal  # local import keeps module import graph shallow
 
     spec = ctx.contract_by_file[filename]
-    fw = int(spec.get("frame_width", spec.get("width", 16)))
-    fh = int(spec.get("frame_height", spec.get("height", 16)))
+    # No silent default: a missing size used to fall back to 16x16 and quietly emit a fragment
+    # instead of a panel. Anything routed through emit_sheet must declare its size.
+    if "frame_width" not in spec and "width" not in spec:
+        raise ValueError(
+            f"{filename}: contract declares no width/frame_width. emit_sheet cannot guess a size; "
+            f"give it explicit dimensions or emit it through a size-aware path."
+        )
+    fw = int(spec.get("frame_width", spec["width"]))
+    fh = int(spec.get("frame_height", spec["height"]))
     frames = normalize_all(ctx, sources, fw, fh, align, filename)
     packed = pack_horizontal(frames, fw, fh) if len(frames) > 1 else frames[0]
     ctx.emit(filename, packed, frames)

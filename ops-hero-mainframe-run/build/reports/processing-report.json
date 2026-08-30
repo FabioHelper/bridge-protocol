@@ -1,9 +1,9 @@
 {
   "counts": {
-    "checks": 152,
-    "errors": 7,
+    "checks": 148,
+    "errors": 3,
     "skipped": 6,
-    "warnings": 62
+    "warnings": 60
   },
   "generated_by": "tools/process_assets.py",
   "ok": false,
@@ -857,15 +857,7 @@
       "target": "HUD_BLOCKS_SOURCE"
     },
     {
-      "actual": "",
-      "check": "hud_panel",
-      "expected": "",
-      "level": "WARN",
-      "message": "auto-picked region r9 (0, 305, 972, 207) by area; set an explicit rect in config/crops.json -> HUD_BLOCKS_SOURCE.panels['hud-top.png']",
-      "target": "hud-top.png"
-    },
-    {
-      "actual": "480x30",
+      "actual": "480x42",
       "check": "emitted",
       "expected": "",
       "level": "OK",
@@ -873,15 +865,7 @@
       "target": "hud-top.png"
     },
     {
-      "actual": "",
-      "check": "hud_panel",
-      "expected": "",
-      "level": "WARN",
-      "message": "auto-picked region r10 (0, 516, 972, 95) by area; set an explicit rect in config/crops.json -> HUD_BLOCKS_SOURCE.panels['hud-viewdata.png']",
-      "target": "hud-viewdata.png"
-    },
-    {
-      "actual": "16x16",
+      "actual": "108x59",
       "check": "emitted",
       "expected": "",
       "level": "OK",
@@ -889,19 +873,19 @@
       "target": "hud-viewdata.png"
     },
     {
-      "actual": "",
-      "check": "hud_panel",
+      "actual": "92x59",
+      "check": "emitted",
       "expected": "",
-      "level": "ERROR",
-      "message": "no rect configured and no large region available",
+      "level": "OK",
+      "message": "",
       "target": "hud-minimap.png"
     },
     {
-      "actual": "",
-      "check": "hud_panel",
+      "actual": "480x47",
+      "check": "emitted",
       "expected": "",
-      "level": "ERROR",
-      "message": "no rect configured and no large region available",
+      "level": "OK",
+      "message": "",
       "target": "hud-bottom.png"
     },
     {
@@ -1199,22 +1183,6 @@
       "level": "OK",
       "message": "",
       "target": "09_backgrounds_source.webp"
-    },
-    {
-      "actual": "",
-      "check": "file_present",
-      "expected": "",
-      "level": "ERROR",
-      "message": "contracted output was not produced",
-      "target": "hud-bottom.png"
-    },
-    {
-      "actual": "",
-      "check": "file_present",
-      "expected": "",
-      "level": "ERROR",
-      "message": "contracted output was not produced",
-      "target": "hud-minimap.png"
     },
     {
       "actual": "",

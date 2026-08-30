@@ -1,5 +1,5 @@
 // GENERATED FILE -- do not edit by hand.
-// Source: assets/config/asset-contract.json (v3)
+// Source: assets/config/asset-contract.json (v4)
 // Regenerate with: npm run gen:keys
 //
 // Generating this file is what enforces two integrity constraints at once:
@@ -113,10 +113,10 @@ export const ASSET_MANIFEST: readonly ManifestEntry[] = [
   { key: AssetKeys.ENV_WARNING_BEACON, path: 'env-warning-beacon.png', fallbackWidth: 96, fallbackHeight: 96 },
   { key: AssetKeys.GAMEPLAY_TILES, path: 'gameplay-tiles.png', frameWidth: 16, frameHeight: 16, frameCount: 9 },
   { key: AssetKeys.HERO, path: 'hero.png', frameWidth: 32, frameHeight: 48, frameCount: 10 },
-  { key: AssetKeys.HUD_BOTTOM, path: 'hud-bottom.png', fallbackWidth: 480, fallbackHeight: 56 },
-  { key: AssetKeys.HUD_MINIMAP, path: 'hud-minimap.png', fallbackWidth: 160, fallbackHeight: 72 },
-  { key: AssetKeys.HUD_TOP, path: 'hud-top.png', fallbackWidth: 480, fallbackHeight: 30 },
-  { key: AssetKeys.HUD_VIEWDATA, path: 'hud-viewdata.png', fallbackWidth: 200, fallbackHeight: 64 },
+  { key: AssetKeys.HUD_BOTTOM, path: 'hud-bottom.png', fallbackWidth: 480, fallbackHeight: 47 },
+  { key: AssetKeys.HUD_MINIMAP, path: 'hud-minimap.png', fallbackWidth: 92, fallbackHeight: 59 },
+  { key: AssetKeys.HUD_TOP, path: 'hud-top.png', fallbackWidth: 480, fallbackHeight: 42 },
+  { key: AssetKeys.HUD_VIEWDATA, path: 'hud-viewdata.png', fallbackWidth: 108, fallbackHeight: 59 },
   { key: AssetKeys.IMPACT_BURST, path: 'impact-burst.png', frameWidth: 32, frameHeight: 32, frameCount: 4 },
   { key: AssetKeys.INVINCIBILITY_AURA, path: 'invincibility-aura.png', frameWidth: 64, frameHeight: 64, frameCount: 7 },
   { key: AssetKeys.INVINCIBILITY_PICKUP, path: 'invincibility-pickup.png', frameWidth: 16, frameHeight: 16, frameCount: 4 },

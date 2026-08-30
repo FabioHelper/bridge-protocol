@@ -133,10 +133,30 @@
       "gameplay-tiles.png": []
     },
     "panels": {
-      "hud-top.png": null,
-      "hud-viewdata.png": null,
-      "hud-minimap.png": null,
-      "hud-bottom.png": null
+      "hud-top.png": [
+        0,
+        305,
+        972,
+        85
+      ],
+      "hud-viewdata.png": [
+        564,
+        392,
+        219,
+        120
+      ],
+      "hud-minimap.png": [
+        785,
+        392,
+        187,
+        120
+      ],
+      "hud-bottom.png": [
+        0,
+        516,
+        972,
+        95
+      ]
     },
     "clean_regions": [],
     "$clean_regions_note": "Each entry: { id, panel, rect: [x,y,w,h], sample_at: [x,y] }. rect is in SOURCE board pixels. sample_at picks the dark fill colour from inside the same panel - the fill is sampled, never invented.",
@@ -146,7 +166,8 @@
       174
     ],
     "chroma_tolerance": 30,
-    "$note": "Detects 11 regions: 9 gameplay tiles plus 2 full-width HUD bands. The four HUD panels are connected through their own backdrop and cannot be split by connectivity, so they need explicit rects in `panels`."
+    "$note": "Detects 11 regions: 9 gameplay tiles plus 2 full-width HUD bands. The four HUD panels are connected through their own backdrop and cannot be split by connectivity, so they need explicit rects in `panels`.",
+    "$panels_note": "Measured from the board by row/column coverage profiling, not connectivity: the four panels are joined through their own dark backdrop so component labelling merges them. Scale to 480 wide is 972/480 = 2.025, so the 85px top bar becomes 42px and the 95px bottom bar becomes 47px -- the contract was updated to those measured heights rather than squashing the art into the originally assumed 30/56."
   },
   "ENVIRONMENT_SOURCE": {
     "min_area": 300,

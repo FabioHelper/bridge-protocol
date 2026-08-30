@@ -22,11 +22,11 @@ export const WORLD = {
 export const VIEWPORT = {
   LOGICAL_WIDTH: 480,
   LOGICAL_HEIGHT: 270,
-  HUD_TOP_HEIGHT: 30,
-  HUD_BOTTOM_HEIGHT: 56,
-  /** 270 - 30 - 56. The gameplay camera occupies exactly this band. */
-  PLAY_HEIGHT: 184,
-  PLAY_Y: 30,
+  HUD_TOP_HEIGHT: 42,
+  HUD_BOTTOM_HEIGHT: 47,
+  /** 270 - 42 - 47. The gameplay camera occupies exactly this band. */
+  PLAY_HEIGHT: 181,
+  PLAY_Y: 42,
 } as const;
 
 export const PLAYER = {
