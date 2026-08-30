@@ -50,6 +50,8 @@ export const PLAYER = {
   BODY_OFFSET_X: 9,
   BODY_OFFSET_Y: 8,
   HIT_INVULN_MS: 1200,
+  /** Visibility toggle period while hit-invulnerable. */
+  HIT_BLINK_INTERVAL_MS: 80,
   RESPAWN_DELAY_MS: 700,
   START_LIVES: 3,
   /** Below this horizontal speed the player is considered idle rather than running. */
@@ -71,6 +73,9 @@ export const ENEMY = {
   STOMP_TOLERANCE_PX: 8,
   /** Frame index of the deactivated pose in every 4-frame enemy sheet. */
   DEACTIVATED_FRAME: 3,
+  /** Ledge-aware patrol: how far ahead of the body, and how far below its feet, to probe for ground. */
+  LEDGE_PROBE_AHEAD_PX: 4,
+  LEDGE_PROBE_DOWN_PX: 6,
   JOB_FAIL_BOT: { SPEED: 30, AGGRO_RANGE: 90, BODY_WIDTH: 20, BODY_HEIGHT: 22, SCORE: 200 },
   ALERT_BOT: { SPEED: 45, ALERTED_SPEED: 70, AGGRO_RANGE: 120, BODY_WIDTH: 22, BODY_HEIGHT: 24, SCORE: 200 },
   ALERT_DRONE: {
@@ -181,4 +186,36 @@ export const HUD = {
 
 export const STORAGE = {
   HIGH_SCORE_KEY: 'opshero.highscore.v1',
+} as const;
+
+/**
+ * Moment-to-moment feedback timings from GDD.md section 6. The GDD names the feel ("squash 1
+ * frame on takeoff", "4-frame freeze"); the millisecond values below convert those frame counts
+ * at 60 fps and are the numbers actually used at runtime.
+ */
+export const JUICE = {
+  JUMP_SQUASH_SCALE_Y: 0.9,
+  JUMP_SQUASH_DURATION_MS: 60,
+  LAND_STRETCH_SCALE_Y: 1.15,
+  LAND_STRETCH_DURATION_MS: 90,
+  /** ~66 ms, i.e. 4 frames at 60 fps. */
+  STOMP_FREEZE_MS: 66,
+  STOMP_SQUASH_SCALE_Y: 0.6,
+  STOMP_SQUASH_DURATION_MS: 120,
+  CHAIN_POPUP_RISE_PX: 14,
+  CHAIN_POPUP_DURATION_MS: 500,
+  TOKEN_COLLECT_SCALE: 1.4,
+  TOKEN_COLLECT_DURATION_MS: 150,
+  PICKUP_COLLECT_SCALE: 1.6,
+  PICKUP_COLLECT_DURATION_MS: 200,
+  HUD_COUNT_FLASH_MS: 120,
+  JOB_COMPLETE_FLASH_MS: 200,
+  /** ~50 ms, i.e. 3 frames at 60 fps. */
+  DAMAGE_FREEZE_MS: 50,
+  DAMAGE_VIGNETTE_DURATION_MS: 320,
+  AURA_POPIN_DURATION_MS: 100,
+  EXIT_SHAKE_PX: 2,
+  EXIT_SHAKE_DURATION_MS: 220,
+  CAMERA_LOOKAHEAD_PX: 24,
+  CAMERA_LOOKAHEAD_EASE_MS: 300,
 } as const;
