@@ -52,6 +52,30 @@ def blank(w: int, h: int) -> Image.Image:
     return Image.new("RGBA", (w, h), (0, 0, 0, 0))
 
 
+MARKER: RGBA = (255, 0, 200, 255)
+"""Unmistakable magenta. Placeholder art MUST be impossible to mistake for real artwork in a
+screenshot -- an earlier version looked plausible enough to be read as the finished game."""
+
+
+def mark_sprite(image: Image.Image) -> Image.Image:
+    """Stamp a magenta pixel in the top-left of a sprite frame."""
+    out = image.copy()
+    ImageDraw.Draw(out).point([(0, 0)], fill=MARKER)
+    return out
+
+
+def watermark(image: Image.Image, label: str = "PLACEHOLDER") -> Image.Image:
+    """Diagonal magenta hatching plus a label, for large panels and backgrounds."""
+    out = image.convert("RGBA").copy()
+    d = ImageDraw.Draw(out)
+    for i in range(-out.height, out.width, 16):
+        d.line([i, 0, i + out.height, out.height], fill=(255, 0, 200, 90), width=2)
+    d.rectangle([0, 0, out.width - 1, out.height - 1], outline=MARKER)
+    if out.width >= 90 and out.height >= 14:
+        d.text((4, max(1, out.height // 2 - 4)), label, fill=MARKER)
+    return out
+
+
 # ---------------------------------------------------------------- characters
 
 def hero_frame(index: int) -> Image.Image:
@@ -441,6 +465,11 @@ def main() -> int:
         if image is None:
             report.error("file_present", filename, "placeholder generator produced no image")
             continue
+        # Make it visually obvious that this is NOT the real artwork.
+        if filename.startswith(("hud-", "bg-")):
+            image = watermark(image)
+        elif filename.endswith(".png") and image.width >= 16 and image.height >= 16:
+            image = mark_sprite(image)
         write_png(image, PATHS.public_assets / filename, placeholder=True)
         report.ok("emitted", filename, actual=f"{image.width}x{image.height}")
     for filename in sorted(set(images) - set(expected)):

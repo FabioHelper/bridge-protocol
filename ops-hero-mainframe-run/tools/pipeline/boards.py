@@ -12,7 +12,7 @@ from typing import Any, Callable
 import numpy as np
 from PIL import Image
 
-from .normalize import AlignMode, normalize_frame
+from .normalize import AlignMode, normalize_frame, snap_rect_to_integer_ratio
 from .regions import Region
 from .report import Report
 
@@ -35,6 +35,37 @@ class BoardContext:
 
 def crop(board: Image.Image, region: Region) -> Image.Image:
     return board.crop((region.x, region.y, region.x + region.w, region.y + region.h))
+
+
+def crop_for_target(ctx: "BoardContext", region: Region, target_w: int, target_h: int) -> Image.Image:
+    """Crop a region, first snapping the rect so the downscale ratio is an exact integer.
+
+    Measured in tools/demo_pixelgrid.py: an exact integer ratio recovers 100% of the source pixels,
+    while a ratio off by ~0.35 drops to 90-95%. Snapping only moves the crop window -- it never
+    invents or redraws a pixel.
+    """
+    rect, factor = snap_rect_to_integer_ratio(
+        region.rect, target_w, target_h, ctx.board.width, ctx.board.height
+    )
+    if factor is None:
+        ctx.report.warn(
+            "crop_snap", f"{ctx.name}:{region.id}",
+            f"no exact integer downscale to {target_w}x{target_h} within tolerance "
+            f"(region is {region.w}x{region.h}); expect minor detail loss. Adjust the crop override "
+            f"so the region is a whole multiple of the target.",
+        )
+    elif rect != region.rect:
+        ctx.report.ok("crop_snap", f"{ctx.name}:{region.id}",
+                      expected=f"{target_w * factor}x{target_h * factor}", actual=f"exact 1:{factor}")
+    return ctx.board.crop((rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]))
+
+
+def crops_for(ctx: "BoardContext", filename: str, regions: list[Region]) -> list[Image.Image]:
+    """Crop every region for an output, snapped to that output's native frame size."""
+    spec = ctx.contract_by_file[filename]
+    frame_w = int(spec.get("frame_width", spec.get("width", 16)))
+    frame_h = int(spec.get("frame_height", spec.get("height", 16)))
+    return [crop_for_target(ctx, region, frame_w, frame_h) for region in regions]
 
 
 def regions_by_id(regions: list[Region]) -> dict[str, Region]:

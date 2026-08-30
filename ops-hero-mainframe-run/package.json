@@ -25,7 +25,8 @@
     "gen:keys": "python3 tools/gen_asset_keys.py",
     "assets:schema": "python3 tools/validate_crop_config.py",
     "assets:selftest": "python3 tools/selftest_pipeline.py",
-    "build:artifact": "vite build --config vite.artifact.config.ts && node tools/build_artifact.mjs"
+    "build:artifact": "vite build --config vite.artifact.config.ts && node tools/build_artifact.mjs",
+    "assets:demo-fidelity": "python3 tools/demo_pixelgrid.py"
   },
   "dependencies": {
     "phaser": "4.2.1"

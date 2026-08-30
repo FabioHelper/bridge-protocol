@@ -20,7 +20,7 @@ from PIL import Image
 
 from pipeline import PATHS, load_contract, load_crops, load_sources
 from pipeline.boards import (
-    BoardContext, auto_assign, crop, emit_sheet, normalize_all, select_protagonist,
+    BoardContext, auto_assign, crop, crops_for, emit_sheet, normalize_all, select_protagonist,
 )
 from pipeline.chroma import parse_hex_color, remove_edge_connected_chroma
 from pipeline.normalize import nearest_resize, trim_to_content
@@ -118,7 +118,7 @@ class Pipeline:
         selection = select_protagonist(ctx)
         if selection is None:
             return
-        images = [crop(board, r) for r in selection]
+        images = crops_for(ctx, 'hero.png', selection)
         # Frames 0-7 share one foot baseline; frames 8-9 use the airborne rule.
         grounded = normalize_all(ctx, images[:8], 32, 48, "foot-baseline", "hero.png")
         airborne = normalize_all(ctx, images[8:], 32, 48, "airborne", "hero.png")
@@ -156,7 +156,7 @@ class Pipeline:
             if region not in chosen:
                 self.report.skipped("region_unused", f"ICONS_SOURCE:{region.id}",
                                     f"redundant icon variant (bbox {region.rect})")
-        emit_sheet(ctx, "operations-tiles.png", [crop(board, r) for r in chosen], "tile")
+        emit_sheet(ctx, "operations-tiles.png", crops_for(ctx, "operations-tiles.png", chosen), "tile")
 
     def do_enemies(self) -> None:
         prepared = self.prepare("ENEMIES_ITEMS_SOURCE")
@@ -173,7 +173,7 @@ class Pipeline:
             align = "center" if filename in {
                 "alert-drone.png", "command-token.png", "invincibility-pickup.png"
             } else "foot-baseline"
-            emit_sheet(ctx, filename, [crop(board, r) for r in group], align)
+            emit_sheet(ctx, filename, crops_for(ctx, filename, group), align)
 
     def do_effects(self) -> None:
         prepared = self.prepare("EFFECTS_SOURCE")
@@ -185,14 +185,14 @@ class Pipeline:
 
         if groups.get("invincibility-aura.png"):
             emit_sheet(ctx, "invincibility-aura.png",
-                       [crop(board, r) for r in groups["invincibility-aura.png"]], "center")
+                       crops_for(ctx, "invincibility-aura.png", groups["invincibility-aura.png"]), "center")
         if groups.get("impact-burst.png"):
             emit_sheet(ctx, "impact-burst.png",
-                       [crop(board, r) for r in groups["impact-burst.png"]], "center")
+                       crops_for(ctx, "impact-burst.png", groups["impact-burst.png"]), "center")
         for index, region in enumerate(groups.get("stars", [])):
-            emit_sheet(ctx, f"star-{index}.png", [crop(board, region)], "center")
+            emit_sheet(ctx, f"star-{index}.png", crops_for(ctx, f"star-{index}.png", [region]), "center")
         for index, region in enumerate(groups.get("sparkles", [])):
-            emit_sheet(ctx, f"sparkle-{index}.png", [crop(board, region)], "center")
+            emit_sheet(ctx, f"sparkle-{index}.png", crops_for(ctx, f"sparkle-{index}.png", [region]), "center")
 
     def do_hud_blocks(self) -> None:
         prepared = self.prepare("HUD_BLOCKS_SOURCE")
@@ -214,7 +214,7 @@ class Pipeline:
                              "no manual grouping; used the first 9 small square regions in reading order. "
                              "Freeze into config/crops.json -> HUD_BLOCKS_SOURCE.groups['gameplay-tiles.png']")
         if len(tiles) == 9:
-            emit_sheet(ctx, "gameplay-tiles.png", [crop(board, r) for r in tiles], "tile")
+            emit_sheet(ctx, "gameplay-tiles.png", crops_for(ctx, "gameplay-tiles.png", tiles), "tile")
         else:
             self.report.error("tile_selection", "gameplay-tiles.png",
                               "need exactly 9 gameplay block regions",

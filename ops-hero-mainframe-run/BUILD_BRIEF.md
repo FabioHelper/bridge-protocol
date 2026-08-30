@@ -170,10 +170,32 @@ npm run build:artifact  # build/ops-hero.html, self-contained, opens and plays
 
 Plus: a human plays start to finish in 60–90 s with all four jobs completable.
 
+## 11b. Is this workflow sound? (measured, not assumed)
+
+Challenged and tested — reproduce with `npm run assets:demo-fidelity`:
+
+- Plain nearest-neighbour recovers **86–95%** of pixels even from blurred, noisy AI-style renders,
+  and the most fragile detail (a 3x4 px ID badge) survives every time.
+- On clean integer-scaled art, an **exact-ratio crop is 100% lossless**; off by ~11 px drops to 90%.
+- A fractional-period resampling stage was built, measured **4–10 pp worse**, and deleted.
+
+**Conclusion: the resampling filter was never the risk — crop precision is.** The pipeline now snaps
+every crop rect to an exact integer multiple of the target frame
+(`normalize.snap_rect_to_integer_ratio`) and WARNs when it cannot.
+
+**Phaser is not the constraint.** Any engine needs the same board-to-spritesheet step, and that step
+is a solved Python problem here. Phaser supplies everything this game needs natively: spritesheet
+loading with frame dimensions, tilemaps from plain arrays, Arcade physics, particle emitters,
+`TileSprite` parallax, and `pixelArt`/`roundPixels`. The artifact path is browser-verified.
+
+**One real Phaser risk:** version 4 is new, so most examples online are Phaser 3. Do not copy Phaser 3
+idioms blindly — the API surface used here was checked against the 4.2.1 type definitions.
+
 ## 12. Assets — current reality
 
 `public/assets/` holds **placeholders** at correct dimensions, so you can build and play the whole
-game today. When real artwork lands, `npm run assets:process` overwrites the same paths at the same
+game today. They are deliberately stamped with magenta hatching and a `PLACEHOLDER` label so no
+screenshot can be mistaken for finished artwork. When real artwork lands, `npm run assets:process` overwrites the same paths at the same
 dimensions and **no source code changes**.
 
 Check which track is live: `npm run assets:validate` prints `Asset track: PLACEHOLDER|PRODUCTION`.

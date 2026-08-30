@@ -108,3 +108,49 @@ def normalize_frame(
         x, y = 0, 0
     canvas.paste(scaled, (x, max(0, y)))
     return NormalizeResult(harden_alpha(canvas), new_w, content.width, upscaled, warnings)
+
+
+def snap_rect_to_integer_ratio(
+    rect: tuple[int, int, int, int],
+    target_w: int,
+    target_h: int,
+    board_w: int,
+    board_h: int,
+    max_shift: int = 6,
+) -> tuple[tuple[int, int, int, int], int | None]:
+    """Grow or shrink a crop rect so its size is an EXACT integer multiple of the target frame.
+
+    Why this exists (measured in tools/demo_pixelgrid.py):
+      exact integer ratio -> 100.0% of pixels recovered
+      ratio off by ~0.2   ->  93-98%
+      ratio off by ~0.35  ->  90-95%
+
+    Downscaling by an exact integer means every output pixel samples one whole source block, so
+    nothing drifts across a block boundary. Snapping is a pure translate-and-resize of the crop
+    window -- no pixels are invented, nothing is redrawn.
+
+    Returns (snapped_rect, factor) where factor is the integer downscale, or the original rect and
+    None when no factor within `max_shift` fits.
+    """
+    x, y, w, h = rect
+    if w <= 0 or h <= 0:
+        return rect, None
+
+    best: tuple[int, tuple[int, int, int, int]] | None = None
+    best_cost = max_shift + 1
+    for factor in range(1, 33):
+        want_w, want_h = target_w * factor, target_h * factor
+        cost = max(abs(want_w - w), abs(want_h - h))
+        if cost > max_shift or cost >= best_cost:
+            continue
+        # Expand or contract symmetrically so the sprite stays centred in its crop.
+        nx = x - (want_w - w) // 2
+        ny = y - (want_h - h) // 2
+        if nx < 0 or ny < 0 or nx + want_w > board_w or ny + want_h > board_h:
+            continue
+        best, best_cost = (factor, (nx, ny, want_w, want_h)), cost
+
+    if best is None:
+        return rect, None
+    factor, snapped = best
+    return snapped, factor

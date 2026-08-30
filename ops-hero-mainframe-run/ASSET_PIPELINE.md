@@ -94,6 +94,56 @@ No production PNG may contain an opaque pixel within tolerance of the key, with 
 detected count ≠ expected → `ERROR region_count_mismatch` listing every bbox so a human can author
 overrides.
 
+## 5b. Feasibility verdict: does board-to-spritesheet actually work?
+
+This was challenged directly, so it was **measured** rather than argued.
+Reproduce with `npm run assets:demo-fidelity` (`tools/demo_pixelgrid.py`): it builds a known 32x48
+sprite containing the most fragile details (1 px eyes, a 3x4 px ID badge, 3 px arms), renders it the
+way an image model does, recovers it, and scores the result against ground truth.
+
+### Result 1 — the feared catastrophe did not happen
+
+The hypothesis was that non-integer downscaling of AI-rendered pixel art would produce mush.
+
+| Source render | Plain nearest-neighbour | ID badge |
+| --- | --- | --- |
+| 2.00x, blurred + noisy | 86.3% pixels correct | survived |
+| 3.72x, blurred + noisy | 93.3% pixels correct | survived |
+| 5.15x, blurred + noisy | 95.1% pixels correct | survived |
+
+**The workflow is viable.** Plain nearest-neighbour is already acceptable even on deliberately
+degraded input.
+
+### Result 2 — the obvious fix made things worse, so it was deleted
+
+A "detect the fractional pixel period and resample by modal colour" stage scored **4 to 10
+percentage points worse** than plain nearest-neighbour. It was removed rather than shipped.
+`tools/pipeline/pixelgrid.py` keeps only the integer-grid detector, demoted to a diagnostic.
+
+### Result 3 — crop precision is the real variable
+
+On clean integer-scaled art, which is what a sharp pixel-art board is:
+
+| Crop accuracy | Pixels recovered |
+| --- | --- |
+| Exact integer ratio | **100.0%** |
+| Off by ~3 px (ratio 3.09) | 98.4% |
+| Off by ~7 px (ratio 3.22) | 93.1% |
+| Off by ~11 px (ratio 3.34) | 90.3% |
+
+**So the risk was never the resampling filter. It is where the crop rectangle lands.**
+
+### The fix that shipped
+
+`normalize.snap_rect_to_integer_ratio` grows or shrinks each detected crop rect symmetrically so its
+size is an exact integer multiple of the target frame, then downscales by that integer. Every output
+pixel samples one whole source block. It is a pure translate-and-resize of the crop window: no pixel
+is invented and nothing is redrawn.
+
+It is wired into every frame-producing path (hero, all four enemy sheets, both item sheets, aura,
+burst, stars, sparkles, both tilesets). When no integer factor fits within tolerance the pipeline
+emits a `crop_snap` WARN naming the region, rather than silently accepting the loss.
+
 ## 6. Normalization and alignment — `tools/pipeline/normalize.py`
 
 1. Trim to the tight alpha bbox.
