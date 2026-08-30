@@ -1,0 +1,1677 @@
+{
+  "counts": {
+    "checks": 208,
+    "errors": 0,
+    "skipped": 1,
+    "warnings": 0
+  },
+  "generated_by": "tools/validate_assets.py",
+  "ok": true,
+  "results": [
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "320x48",
+      "check": "dimensions",
+      "expected": "320x48",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "10",
+      "check": "frame_count",
+      "expected": "10",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "dimensions",
+      "expected": "128x32",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "dimensions",
+      "expected": "128x32",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "dimensions",
+      "expected": "128x32",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "dimensions",
+      "expected": "128x32",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "64x16",
+      "check": "dimensions",
+      "expected": "64x16",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "64x16",
+      "check": "dimensions",
+      "expected": "64x16",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "448x64",
+      "check": "dimensions",
+      "expected": "448x64",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "7",
+      "check": "frame_count",
+      "expected": "7",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "7 frames clear",
+      "check": "aura_center_empty",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "dimensions",
+      "expected": "128x32",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "4",
+      "check": "frame_count",
+      "expected": "4",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "dimensions",
+      "expected": "12x12",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "192x16",
+      "check": "dimensions",
+      "expected": "192x16",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "12",
+      "check": "frame_count",
+      "expected": "12",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "144x16",
+      "check": "dimensions",
+      "expected": "144x16",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "9",
+      "check": "frame_count",
+      "expected": "9",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "0%",
+      "check": "tile_seam",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png:stone_left|stone_center"
+    },
+    {
+      "actual": "0%",
+      "check": "tile_seam",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png:stone_center|stone_right"
+    },
+    {
+      "actual": "0%",
+      "check": "tile_seam",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png:stone_center|stone_center"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "480x30",
+      "check": "dimensions",
+      "expected": "480x30",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "196x56",
+      "check": "dimensions",
+      "expected": "<=200x64",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "124x56",
+      "check": "dimensions",
+      "expected": "<=160x72",
+      "level": "OK",
+      "message": "",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "480x56",
+      "check": "dimensions",
+      "expected": "480x56",
+      "level": "OK",
+      "message": "",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "28x56",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "34x44",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "30x48",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "26x22",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "28x8",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "46x20",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "20x26",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "12x20",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "36x20",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "24x30",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "24x16",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "40x34",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "26x26",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "480x96",
+      "check": "dimensions",
+      "expected": "480x<=184",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "480x96",
+      "check": "dimensions",
+      "expected": "480x<=184",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "480x112",
+      "check": "dimensions",
+      "expected": "480x<=184",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "48x58",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "34x46",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "40x50",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "14x32",
+      "check": "dimensions",
+      "expected": "<=96x96",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "",
+      "check": "alpha_hard_edges",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "",
+      "check": "chroma_residue",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "no digest baseline yet (0 source boards present)",
+      "target": "assets-source"
+    }
+  ],
+  "track": "placeholder"
+}

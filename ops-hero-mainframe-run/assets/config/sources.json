@@ -1,0 +1,58 @@
+{
+  "$comment": "Maps the nine logical source names from the Gemini handoff to files in assets-source/. Reference boards are never cropped into game art.",
+  "chroma_color": "#7CFFB2",
+  "sources": {
+    "GAMEPLAY_REFERENCE": {
+      "file": "01_gameplay_reference.png",
+      "reference_only": true,
+      "role": "Master reference for palette, lighting and composition. Also the sampling source for HUD dark-fill colours."
+    },
+    "VISTA_REFERENCE": {
+      "file": "02_vista_reference.png",
+      "reference_only": true,
+      "role": "Vista Session icon-selection reference used to cross-check operational icon designs."
+    },
+    "PROTAGONIST_SOURCE": {
+      "file": "03_protagonist_source.png",
+      "reference_only": false,
+      "expected_regions": 12,
+      "role": "12 protagonist poses in two rows. 10 are selected for hero.png; 2 redundant standing poses are dropped."
+    },
+    "ICONS_SOURCE": {
+      "file": "04_icons_source.png",
+      "reference_only": false,
+      "expected_regions": null,
+      "role": "Metallic icon family + landscape icons + redundant variants. 12 are selected for operations-tiles.png."
+    },
+    "ENEMIES_ITEMS_SOURCE": {
+      "file": "05_enemies_items_source.png",
+      "reference_only": false,
+      "expected_regions": null,
+      "role": "Job Fail robots, Alert ground robots, Alert flying drones, Spool Runaway robots, command tokens, invincibility pickups."
+    },
+    "EFFECTS_SOURCE": {
+      "file": "06_effects_source.png",
+      "reference_only": false,
+      "expected_regions": null,
+      "role": "7 golden aura rings, 5 colored stars, 8 sparkle particles, 4 impact-burst frames."
+    },
+    "HUD_BLOCKS_SOURCE": {
+      "file": "07_hud_blocks_source.png",
+      "reference_only": false,
+      "expected_regions": null,
+      "role": "Gameplay blocks, top HUD, Viewdata monitor, minimap, bottom HUD frames."
+    },
+    "ENVIRONMENT_SOURCE": {
+      "file": "08_environment_source.png",
+      "reference_only": false,
+      "expected_regions": 13,
+      "role": "Isolated server racks, tape drives, cabinets, terminal workstation components, warning beacons, ventilation modules."
+    },
+    "BACKGROUNDS_SOURCE": {
+      "file": "09_backgrounds_source.png",
+      "reference_only": false,
+      "expected_regions": 3,
+      "role": "Three horizontal strips: sky, mountains and forest, datacenter silhouettes."
+    }
+  }
+}

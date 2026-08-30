@@ -1,0 +1,85 @@
+{
+  "$comment": "EDITABLE crop overrides. Overrides always win over auto-detection. After a pipeline run, copy values from build/reports/resolved-crops.json into this file to freeze them. See docs/SPEC-01-ASSET-PIPELINE.md section 1.5.",
+  "defaults": {
+    "min_area": 64,
+    "merge_gap": 4
+  },
+  "PROTAGONIST_SOURCE": {
+    "min_area": 400,
+    "merge_gap": 6,
+    "expected_regions": 12,
+    "overrides": {},
+    "selection": [],
+    "$selection_note": "Leave empty to use the leg-split heuristic from SPEC-01 s1.8. Once reviewed, paste the exact 10 region ids here in final frame order (idleA, idleB, run x4, opposite-foot, airborne-recovery, jump, fall)."
+  },
+  "ICONS_SOURCE": {
+    "min_area": 100,
+    "merge_gap": 3,
+    "overrides": {},
+    "selection": [],
+    "skip": [],
+    "$skip_note": "Record here the region ids of the redundant landscape variants and the extra magenta mechanical object so the report lists them as SKIPPED rather than missing."
+  },
+  "ENEMIES_ITEMS_SOURCE": {
+    "min_area": 150,
+    "merge_gap": 5,
+    "overrides": {},
+    "groups": {
+      "job-fail-bot.png": [],
+      "alert-bot.png": [],
+      "alert-drone.png": [],
+      "spool-runaway.png": [],
+      "command-token.png": [],
+      "invincibility-pickup.png": []
+    },
+    "screen_interior": {},
+    "$screen_interior_note": "Per-enemy rects of the baked screen text (e.g. JOB FAIL), stored so a later update can replace them with pixel symbols without redoing crops. MVP keeps the baked text."
+  },
+  "EFFECTS_SOURCE": {
+    "min_area": 24,
+    "merge_gap": 2,
+    "overrides": {},
+    "groups": {
+      "invincibility-aura.png": [],
+      "impact-burst.png": [],
+      "stars": [],
+      "sparkles": []
+    },
+    "chroma_policy": "edge-and-enclosed",
+    "$chroma_policy_note": "REQUIRED. The seven aura rings are hollow: the mint inside each ring touches no board edge, so the default edge-connected policy leaves it opaque and the 'aura centre must be empty' validation fails. Proven by tools/selftest_pipeline.py. Safe here because no effects artwork uses the chroma key."
+  },
+  "HUD_BLOCKS_SOURCE": {
+    "min_area": 120,
+    "merge_gap": 4,
+    "overrides": {},
+    "groups": {
+      "gameplay-tiles.png": []
+    },
+    "panels": {
+      "hud-top.png": null,
+      "hud-viewdata.png": null,
+      "hud-minimap.png": null,
+      "hud-bottom.png": null
+    },
+    "clean_regions": [],
+    "$clean_regions_note": "Each entry: { id, panel, rect: [x,y,w,h], sample_at: [x,y] }. rect is in SOURCE board pixels. sample_at picks the dark fill colour from inside the same panel - the fill is sampled, never invented."
+  },
+  "ENVIRONMENT_SOURCE": {
+    "min_area": 150,
+    "merge_gap": 4,
+    "overrides": {},
+    "selection": []
+  },
+  "BACKGROUNDS_SOURCE": {
+    "min_area": 2000,
+    "merge_gap": 0,
+    "overrides": {},
+    "strips": {
+      "bg-far-sky.png": null,
+      "bg-mid-mountains.png": null,
+      "bg-near-datacenter.png": null
+    },
+    "seam_mode": "repeat",
+    "$seam_mode_note": "repeat = tile the strip as-is. mirror = mirror alternate tiles, which guarantees a seamless join at the cost of symmetry."
+  }
+}

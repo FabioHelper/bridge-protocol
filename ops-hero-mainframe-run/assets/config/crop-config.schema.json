@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opshero.local/schemas/crop-config.schema.json",
+  "title": "OPS HERO crop configuration",
+  "description": "Editable crop coordinates, asset selections, alignment anchors, native dimensions and source-board references. Values here ALWAYS win over automatic region detection.",
+  "type": "object",
+  "required": ["version", "coordinate_space", "boards"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "validated": {
+      "type": "boolean",
+      "description": "MUST be false until a human has compared the generated contact sheets against the source boards. Tools print a warning while this is false.",
+      "default": false
+    },
+    "coordinate_space": {
+      "enum": ["pixels", "normalized"],
+      "description": "pixels = rects are absolute source-board pixels. normalized = rects are fractions of board width/height (0..1), resolved to pixels once the real board dimensions are known. Draft configs written before the files exist MUST use 'normalized' or omit rects entirely."
+    },
+    "defaults": { "$ref": "#/$defs/detection" },
+    "boards": {
+      "type": "object",
+      "description": "Keyed by logical source name (PROTAGONIST_SOURCE, ICONS_SOURCE, ...).",
+      "additionalProperties": { "$ref": "#/$defs/board" }
+    }
+  },
+  "$defs": {
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_area": {
+          "type": "integer", "minimum": 1,
+          "description": "Connected components smaller than this (in source pixels) are discarded as noise."
+        },
+        "merge_gap": {
+          "type": "integer", "minimum": 0,
+          "description": "Bounding boxes within this many pixels are merged, reattaching detached parts such as a raised hand, an antenna or a rotor tip."
+        },
+        "chroma_policy": {
+          "enum": ["edge-connected", "edge-and-enclosed"],
+          "default": "edge-connected",
+          "description": "edge-connected: remove ONLY chroma regions touching a board boundary; interior mint is artwork and is preserved. edge-and-enclosed: also remove chroma fully enclosed by artwork. Required for hollow shapes such as the aura rings, whose interior must end up transparent. Opting in is audited: the pipeline reports how many interior pixels it removed."
+        }
+      }
+    },
+    "rect": {
+      "type": "array",
+      "description": "[x, y, w, h] in the file's declared coordinate_space.",
+      "items": { "type": "number", "minimum": 0 },
+      "minItems": 4, "maxItems": 4
+    },
+    "alignment": {
+      "enum": ["foot-baseline", "airborne", "center", "tile", "none"],
+      "description": "foot-baseline: horizontally centred, alpha-bbox bottom pinned to the canvas bottom row, one shared baseline per family. airborne: same, lifted by a fixed constant applied identically to every airborne frame. center: alpha-bbox centre pinned to canvas centre. tile: scaled to exactly fill the tile cell. none: pasted at origin."
+    },
+    "regionSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["region"],
+      "properties": {
+        "region": {
+          "type": "string",
+          "description": "Region id in reading order from the detector, e.g. 'r0'. Reading order is rows top-to-bottom, then left-to-right within a row."
+        },
+        "role": { "type": "string", "description": "Human label, e.g. 'idle A', 'raised-knee jump'." },
+        "flip_h": {
+          "type": "boolean", "default": false,
+          "description": "Mirror horizontally. A deterministic transform, permitted so a source pose that faces the wrong way matches the family's canonical facing. It is NOT redrawing."
+        },
+        "confidence": {
+          "enum": ["visually_validated", "draft_unvalidated", "ambiguous"],
+          "default": "draft_unvalidated",
+          "description": "Honesty flag. Only a human who compared the contact sheet to the board may set 'visually_validated'."
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "cleanRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "panel", "rect"],
+      "properties": {
+        "id": { "type": "string" },
+        "panel": { "type": "string", "description": "Output panel filename this region belongs to." },
+        "rect": { "$ref": "#/$defs/rect" },
+        "sample_at": {
+          "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2,
+          "description": "Point inside the same panel whose 6x6 median colour becomes the cover fill. The fill is SAMPLED from the artwork, never invented."
+        },
+        "reason": { "type": "string", "description": "Why this region is dynamic, e.g. 'score value is rendered by Phaser'." }
+      }
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_file": { "type": "string" },
+        "status": { "enum": ["on_disk", "seen_not_on_disk", "pending"] },
+        "reference_only": { "type": "boolean" },
+        "detection": { "$ref": "#/$defs/detection" },
+        "expected_regions": {
+          "type": ["integer", "null"], "minimum": 1,
+          "description": "Region count the detector must find. A mismatch is a hard ERROR that requires overrides, never a silent guess."
+        },
+        "overrides": {
+          "type": "object",
+          "description": "region id -> rect. Replaces the detected bounding box outright.",
+          "additionalProperties": { "$ref": "#/$defs/rect" }
+        },
+        "outputs": {
+          "type": "object",
+          "description": "Output filename -> its frame list and normalization rules.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["native_frame", "alignment", "frames"],
+            "properties": {
+              "native_frame": {
+                "type": "array", "items": { "type": "integer", "minimum": 1 },
+                "minItems": 2, "maxItems": 2,
+                "description": "[width, height] of ONE frame in native game pixels."
+              },
+              "alignment": { "$ref": "#/$defs/alignment" },
+              "frames": {
+                "type": "array", "items": { "$ref": "#/$defs/regionSelection" },
+                "description": "Ordered: index in this array becomes the frame index in the output spritesheet."
+              },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "skip": {
+          "type": "array", "items": { "type": "string" },
+          "description": "Region ids that are documented redundant variants. Reported as SKIPPED with their bbox, never silently dropped."
+        },
+        "clean_regions": {
+          "type": "array", "items": { "$ref": "#/$defs/cleanRegion" },
+          "description": "HUD dynamic areas to cover before the frame becomes a template."
+        },
+        "screen_interior": {
+          "type": "object",
+          "description": "Region id -> rect of a baked robot/monitor screen. Stored so a later pass can replace baked text with pixel symbols without redoing crops. The MVP keeps the baked text.",
+          "additionalProperties": { "$ref": "#/$defs/rect" }
+        },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

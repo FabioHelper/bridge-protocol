@@ -1,0 +1,184 @@
+{
+  "$comment": "Machine-readable intake manifest. status values: on_disk | seen_not_on_disk | pending. IMPORTANT: 'seen_not_on_disk' means the board was inspected VISUALLY in conversation but the PNG file is NOT present in assets/source/, so the pipeline cannot process it yet. All observations recorded here are visual estimates, NOT measured from file bytes.",
+  "version": 3,
+  "intake_batch": 2,
+  "chroma_color": "#7CFFB2",
+  "identification_note": "The five boards received in batch 1 were identified by INSPECTING THEIR CONTENT, not by the filenames stated in the request. Four of the five differ from the stated mapping. See ASSET_INTAKE.md section 1 for the full reconciliation.",
+  "sources": {
+    "GAMEPLAY_REFERENCE": {
+      "file": "01_gameplay_reference.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 1,
+      "arrived_as_attachment": 4,
+      "stated_as_attachment": 1,
+      "identification": "confirmed_matches_stated_mapping",
+      "reference_only": true,
+      "approx_dimensions": [
+        1024,
+        700
+      ],
+      "dimensions_measured": false,
+      "expected_contents": "FULL-FIDELITY composition: parallax sky/mountains/forest/datacenter, grey stone platforms, hero mid-jump WITH golden aura and orbiting stars, command tokens, metallic chevron icon blocks used as platforms, landscape icon blocks, all four enemy families in situ, in-world z/OS and BATCH QUEUE panels, MAP and VIEWDATA overlays, full-width top and bottom HUD.",
+      "processing_status": "reference_only_never_cropped",
+      "note": "Batch 2 supplied a richer version than batch 1. This is the authoritative reference."
+    },
+    "VISTA_REFERENCE": {
+      "file": "02_vista_reference.png",
+      "status": "pending",
+      "received_in_batch": null,
+      "stated_as_attachment": 2,
+      "identification": "NOT_RECEIVED - stated as supplied but no matching image arrived",
+      "reference_only": true,
+      "approx_dimensions": null,
+      "dimensions_measured": false,
+      "expected_contents": "Vista Session icon chooser: metallic coloured icon family and four landscape icon concepts.",
+      "processing_status": "blocked_awaiting_file"
+    },
+    "PROTAGONIST_SOURCE": {
+      "file": "03_protagonist_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 1,
+      "arrived_as_attachment": 5,
+      "stated_as_attachment": 3,
+      "identification": "confirmed_matches_stated_mapping",
+      "reference_only": false,
+      "approx_dimensions": [
+        1024,
+        613
+      ],
+      "dimensions_measured": false,
+      "expected_regions": 12,
+      "observed_region_estimate": "12 to 13 - top row 6 confirmed, bottom row visually 6 or 7. Region detection on the real file is authoritative.",
+      "expected_contents": "Compact protagonist poses in two rows: idle, run cycle, opposite-foot phases, raised-knee jump, airborne leap, compact fall.",
+      "processing_status": "draft_crops_only_not_visually_validated"
+    },
+    "ICONS_SOURCE": {
+      "file": "04_icons_source.png",
+      "status": "pending",
+      "received_in_batch": null,
+      "stated_as_attachment": 4,
+      "identification": "NOT_RECEIVED - stated as supplied but no matching image arrived",
+      "reference_only": false,
+      "approx_dimensions": null,
+      "dimensions_measured": false,
+      "expected_contents": "Metallic icon family (silver, red, yellow, green, cyan, blue, magenta, black), four landscape icons, redundant variants, one unrelated magenta mechanical object.",
+      "processing_status": "blocked_awaiting_file"
+    },
+    "ENEMIES_ITEMS_SOURCE": {
+      "file": "05_enemies_items_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 2,
+      "stated_as_attachment": 5,
+      "identification": "confirmed - four enemy families plus both pickups",
+      "reference_only": false,
+      "approx_dimensions": [
+        1024,
+        745
+      ],
+      "dimensions_measured": false,
+      "expected_contents": "Job Fail robots, Alert ground robots, Alert flying drones, Spool Runaway robots, command tokens, invincibility pickups.",
+      "processing_status": "draft_crops_only_not_visually_validated",
+      "expected_regions": null,
+      "observed_region_estimate": "Job Fail: 6 poses (3 red-screen, 3 green-screen incl. one tipped over). Alert ground: 4. Alert drone: 4. Spool Runaway: 4. Command token: 4 (3 coin views + 1 edge-on bar). Invincibility pickup: 4. Total 26."
+    },
+    "EFFECTS_SOURCE": {
+      "file": "06_effects_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 2,
+      "stated_as_attachment": null,
+      "identification": "confirmed - aura rings, coloured stars, sparkle particles, impact bursts",
+      "reference_only": false,
+      "approx_dimensions": [
+        1024,
+        559
+      ],
+      "dimensions_measured": false,
+      "expected_contents": "Seven golden aura rings, five coloured stars, eight sparkle particles, four impact-burst frames.",
+      "processing_status": "draft_crops_only_not_visually_validated",
+      "expected_regions": null,
+      "observed_region_estimate": "Row 1: 7 OR 8 golden rings ramping small->large->small (count must be confirmed by detection). Row 2 left: 5 stars (yellow, cyan, magenta, lime, white). Row 2 right: 8 sparkles alternating x-cross and 4-point shapes in orange, gold, blue, cyan, magenta, magenta, white, white. Row 3: 4 impact bursts growing left to right. Total 24 or 25."
+    },
+    "HUD_BLOCKS_SOURCE": {
+      "file": "07_hud_blocks_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 1,
+      "arrived_as_attachment": 3,
+      "stated_as_attachment": null,
+      "identification": "RECEIVED_EARLY - was listed as pending but arrived in batch 1",
+      "reference_only": false,
+      "approx_dimensions": [
+        972,
+        611
+      ],
+      "dimensions_measured": false,
+      "expected_regions": 13,
+      "observed_region_estimate": "9 gameplay blocks (2 rows: 4 then 5) + 4 HUD frames (full-width top bar, VIEWDATA panel, MAP panel, full-width bottom bar).",
+      "expected_contents": "Gameplay tiles and the four HUD frame templates.",
+      "processing_status": "draft_crops_only_not_visually_validated"
+    },
+    "ENVIRONMENT_SOURCE": {
+      "file": "08_environment_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 1,
+      "arrived_as_attachment": 2,
+      "stated_as_attachment": null,
+      "identification": "RECEIVED_EARLY - was listed as pending but arrived in batch 1",
+      "reference_only": false,
+      "expected_regions": 13,
+      "observed_region_estimate": "17 props in three rows (6 + 6 + 5) - FOUR MORE than the 13 contracted names. See ASSET_INTAKE.md section 5.",
+      "approx_dimensions": [
+        1024,
+        559
+      ],
+      "dimensions_measured": false,
+      "expected_contents": "Server racks, tape drives, cabinets, CRT terminal, keyboard, desk, chair, warning beacons, wall and freestanding monitors, cable module, machinery module, ventilation grille.",
+      "processing_status": "draft_crops_only_not_visually_validated"
+    },
+    "BACKGROUNDS_SOURCE": {
+      "file": "09_backgrounds_source.png",
+      "status": "seen_not_on_disk",
+      "received_in_batch": 1,
+      "arrived_as_attachment": 1,
+      "stated_as_attachment": null,
+      "identification": "RECEIVED_EARLY - was listed as pending but arrived in batch 1",
+      "reference_only": false,
+      "expected_regions": 3,
+      "observed_region_estimate": "3 horizontal strips, clearly separated by mint bands. Matches expectation.",
+      "approx_dimensions": [
+        976,
+        610
+      ],
+      "dimensions_measured": false,
+      "expected_contents": "Sky with clouds; mountains and forest with a snow-capped peak; datacenter machine silhouettes.",
+      "processing_status": "draft_crops_only_not_visually_validated"
+    }
+  },
+  "batch_1_summary": {
+    "received": [
+      "GAMEPLAY_REFERENCE",
+      "PROTAGONIST_SOURCE",
+      "HUD_BLOCKS_SOURCE",
+      "ENVIRONMENT_SOURCE",
+      "BACKGROUNDS_SOURCE"
+    ],
+    "still_pending_after_batch_1": [
+      "VISTA_REFERENCE",
+      "ICONS_SOURCE",
+      "ENEMIES_ITEMS_SOURCE",
+      "EFFECTS_SOURCE"
+    ]
+  },
+  "batch_2_summary": {
+    "received": [
+      "EFFECTS_SOURCE",
+      "ENEMIES_ITEMS_SOURCE",
+      "GAMEPLAY_REFERENCE (full-fidelity replacement)"
+    ],
+    "still_pending": [
+      "VISTA_REFERENCE",
+      "ICONS_SOURCE"
+    ],
+    "note": "ICONS_SOURCE is the only board still blocking production extraction. VISTA_REFERENCE is reference-only and blocks nothing. The full-fidelity gameplay reference shows the metallic chevron blocks and all four landscape icons in play, so the icon family's design is already known even though the croppable board has not arrived.",
+    "blocking_issue": "Still true: NONE of the boards exists as a file in assets/source/. They arrived as conversation attachments. Extraction cannot start until the PNGs are on disk."
+  }
+}

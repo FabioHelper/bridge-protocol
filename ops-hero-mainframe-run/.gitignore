@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.vite/
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+test-results/
+playwright-report/
+
+# Generated artifact build outputs (regenerate with: npm run build:artifact)
+build/artifact-bundle/
+build/ops-hero.html

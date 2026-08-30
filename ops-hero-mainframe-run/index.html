@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="OPS HERO: Mainframe Run - an original 16-bit datacenter platformer." />
+    <title>OPS HERO: Mainframe Run</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #06080f;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+        color: #8fe6c0;
+      }
+      #game-root {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Nearest-neighbour upscaling on every browser: the single most important CSS rule in this file. */
+      #game-root canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        display: block;
+      }
+      #boot-fallback {
+        position: absolute;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-root"><span id="boot-fallback">LOADING MAINFRAME...</span></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

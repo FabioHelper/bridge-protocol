@@ -1,0 +1,698 @@
+{
+  "version": 2,
+  "validated": false,
+  "coordinate_space": "normalized",
+  "defaults": {
+    "min_area": 64,
+    "merge_gap": 4,
+    "chroma_policy": "edge-connected"
+  },
+  "boards": {
+    "PROTAGONIST_SOURCE": {
+      "source_file": "03_protagonist_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 400,
+        "merge_gap": 6,
+        "chroma_policy": "edge-connected"
+      },
+      "expected_regions": 12,
+      "overrides": {},
+      "outputs": {
+        "hero.png": {
+          "native_frame": [
+            32,
+            48
+          ],
+          "alignment": "foot-baseline",
+          "note": "Frames 0-7 use foot-baseline. Frames 8-9 are overridden to 'airborne' by the processor. Region ids assume 12 detected regions in reading order: r0-r5 top row, r6-r11 bottom row. IF DETECTION FINDS 13, EVERY ID BELOW SHIFTS AND THIS BLOCK MUST BE REWRITTEN.",
+          "frames": [
+            {
+              "region": "r0",
+              "role": "idle A",
+              "confidence": "draft_unvalidated",
+              "note": "Top row 1: standing, feet together, arms down."
+            },
+            {
+              "region": "r1",
+              "role": "idle B",
+              "confidence": "draft_unvalidated",
+              "note": "Top row 2: near-duplicate of r0 with a small arm/hand difference. Acceptable as a 2-frame idle breathe; if too similar, swap for a bottom-row standing pose."
+            },
+            {
+              "region": "r2",
+              "role": "run contact",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r3",
+              "role": "run compression",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r4",
+              "role": "run passing",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r5",
+              "role": "run extension",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r9",
+              "role": "opposite-foot contact",
+              "confidence": "ambiguous",
+              "note": "Bottom row: the striding pose with fists raised. Ambiguous - bottom-row poses 0-3 read as standing/walking variants and any of them could serve."
+            },
+            {
+              "region": "r11",
+              "role": "airborne recovery",
+              "confidence": "ambiguous",
+              "note": "Bottom row: the leaping pose with the trailing leg extended."
+            },
+            {
+              "region": "r10",
+              "role": "raised-knee jump",
+              "confidence": "draft_unvalidated",
+              "note": "Bottom row: the clearest airborne pose - raised knee plus raised arm."
+            },
+            {
+              "region": "r8",
+              "role": "compact fall",
+              "confidence": "ambiguous",
+              "note": "Handoff says the compact fall sits at the far right of the bottom row. Visual inspection is not conclusive about which of the right-hand poses is the fall vs the leap. VERIFY ON THE CONTACT SHEET."
+            }
+          ]
+        }
+      },
+      "skip": [],
+      "notes": [
+        "UNVALIDATED DRAFT. No rect in this block has been checked against real pixel coordinates.",
+        "Visual count of the bottom row is 6 OR 7. If the detector reports 13 regions, expected_regions and every region id must be corrected before processing.",
+        "Character faces RIGHT in the run poses, matching the gameplay reference. Any pose detected facing left must get flip_h: true so facing is consistent across the sheet.",
+        "Preserve: hair silhouette, beard, white ID badge on lanyard, hands/fists, brown shoes. The badge is the highest-risk detail - roughly 2x3 px after normalization.",
+        "Source figures are approximately 100-110 px tall; normalizing to 48 px is a non-integer ~1:2.2 downscale. Nearest-neighbour will drop rows unevenly and can eat the badge and facial features. See ASSET_PIPELINE.md section 6.3."
+      ]
+    },
+    "HUD_BLOCKS_SOURCE": {
+      "source_file": "07_hud_blocks_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 120,
+        "merge_gap": 4,
+        "chroma_policy": "edge-connected"
+      },
+      "expected_regions": 13,
+      "overrides": {},
+      "outputs": {
+        "gameplay-tiles.png": {
+          "native_frame": [
+            16,
+            16
+          ],
+          "alignment": "tile",
+          "note": "9 blocks observed in two rows: 4 on the top row, 5 on the second row. Reading order gives r0-r3 then r4-r8.",
+          "frames": [
+            {
+              "region": "r0",
+              "role": "terminal_command",
+              "confidence": "visually_validated",
+              "note": "Bright gold block with a '>_' prompt glyph. Unmistakable."
+            },
+            {
+              "region": "r1",
+              "role": "stone_left",
+              "confidence": "ambiguous",
+              "note": "The board supplies FOUR tan stone variants, not an explicit left/center/right/under set. This mapping is a guess by board order."
+            },
+            {
+              "region": "r2",
+              "role": "stone_center",
+              "confidence": "ambiguous",
+              "note": "Must be the variant that tiles seamlessly with itself. Pick by running the tile_seam validation check across all four candidates."
+            },
+            {
+              "region": "r3",
+              "role": "stone_right",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r4",
+              "role": "stone_under",
+              "confidence": "ambiguous",
+              "note": "The darker, more heavily cracked stone variant on the second row reads best as an underside."
+            },
+            {
+              "region": "r5",
+              "role": "dark_inactive",
+              "confidence": "visually_validated",
+              "note": "Flat dark grey panel with a plain border."
+            },
+            {
+              "region": "r6",
+              "role": "warning",
+              "confidence": "visually_validated",
+              "note": "Yellow/black hazard stripes framing a red warning triangle."
+            },
+            {
+              "region": "r7",
+              "role": "breakable",
+              "confidence": "visually_validated",
+              "note": "Grey rubble stone, already in the cracked state the handoff asks for."
+            },
+            {
+              "region": "r8",
+              "role": "exit_terminal",
+              "confidence": "visually_validated",
+              "note": "Green-screen terminal showing an arrow-into-door glyph."
+            }
+          ]
+        },
+        "hud-top.png": {
+          "native_frame": [
+            480,
+            30
+          ],
+          "alignment": "none",
+          "note": "Full-width strip. Baked decorative headings observed: OPS HERO, SCORE, JOBS, ALERTS, COINS, PF KEYS, SYS STATUS. PF1-PF12 button labels are also baked and should STAY baked; only the active-key highlight is drawn dynamically.",
+          "frames": [
+            {
+              "region": "r9",
+              "role": "top bar frame",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "hud-viewdata.png": {
+          "native_frame": [
+            196,
+            56
+          ],
+          "alignment": "none",
+          "note": "VIEWDATA 3270 casing with an empty dark screen. The screen is already blank in the source - no cleaning needed, only dynamic text on top.",
+          "frames": [
+            {
+              "region": "r10",
+              "role": "viewdata panel",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "hud-minimap.png": {
+          "native_frame": [
+            124,
+            56
+          ],
+          "alignment": "none",
+          "note": "MAP panel with a dotted grid and no markers. Already clean.",
+          "frames": [
+            {
+              "region": "r11",
+              "role": "minimap panel",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "hud-bottom.png": {
+          "native_frame": [
+            480,
+            56
+          ],
+          "alignment": "none",
+          "note": "Full-width strip, NOT a 160px right-hand panel as the first draft of the spec assumed. Contains CURRENT MISSION, OBJECTIVE, ITEM, AUTOMATION and POWER sections side by side.",
+          "frames": [
+            {
+              "region": "r12",
+              "role": "bottom bar frame",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        }
+      },
+      "clean_regions": [],
+      "notes": [
+        "UNVALIDATED DRAFT. clean_regions is deliberately EMPTY: rects cannot be authored before the file exists. See ASSET_INTAKE.md section 4 for the list of regions that will need cleaning.",
+        "Good news from inspection: the POWER meter is already drawn EMPTY in the source, and the VIEWDATA and MAP screens are already blank. Far less cleaning is needed than the original handoff assumed.",
+        "Cleaning IS still required for: the baked 'ALL SYSTEMS GO' status string, the baked SYS STATUS activity graph, the baked gold star in the ITEM slot, and the five baked robot glyphs in AUTOMATION."
+      ]
+    },
+    "ENVIRONMENT_SOURCE": {
+      "source_file": "08_environment_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 150,
+        "merge_gap": 4,
+        "chroma_policy": "edge-connected"
+      },
+      "expected_regions": 17,
+      "overrides": {},
+      "outputs": {},
+      "skip": [],
+      "notes": [
+        "UNVALIDATED DRAFT.",
+        "SPEC CHANGE: 17 props observed (rows of 6, 6 and 5), but the asset contract names only 13. Proposed reading-order mapping: r0 rack, r1 rack-wide, r2 tape-drive, r3 tape-drive-dials, r4 cabinet-small, r5 cabinet-double, r6 terminal-monitor, r7 keyboard, r8 desk, r9 chair, r10 warning-beacon, r11 warning-beacon-tall, r12 wall-monitor, r13 freestanding-monitor, r14 cable-module, r15 machinery-module, r16 vent-grille.",
+        "Recommendation: extend the contract to all 17 rather than discard four good props. They are decorative and validated by maximum size only, so the cost is zero. Awaiting approval.",
+        "Props are large in the source (roughly 60-160 px). Downscaling to a 16 px tile world means a rack lands around 28x56 native, i.e. under 2 tiles wide by 3.5 tall. Verify against GAMEPLAY_REFERENCE scale before freezing.",
+        "The CRT terminal, wall monitor and freestanding monitor all carry baked green screen text. Store those rects in screen_interior so a later pass can swap them for pixel symbols."
+      ],
+      "screen_interior": {}
+    },
+    "BACKGROUNDS_SOURCE": {
+      "source_file": "09_backgrounds_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 2000,
+        "merge_gap": 0,
+        "chroma_policy": "edge-connected"
+      },
+      "expected_regions": 3,
+      "overrides": {},
+      "outputs": {},
+      "notes": [
+        "UNVALIDATED DRAFT. Three strips confirmed visually, cleanly separated by mint bands, stacked top to bottom in the parallax order the spec expects.",
+        "MAJOR SPEC CORRECTION: the mid strip contains NO mint artwork. Its forest is dark desaturated green, nowhere near #7CFFB2. The earlier 'preserve the mint foothills' exception is unnecessary, and bg-mid-mountains.png must be REMOVED from asset-contract.json -> chroma_allowed so a genuine chroma leak cannot hide behind it.",
+        "Strip 1 sky: vivid blue vertical gradient, darker at top, with scattered white pixel clouds. This gradient's top colour is the value to use for the camera clear colour.",
+        "Strip 2: layered blue-grey mountain ranges, one prominent snow-capped peak right of centre, dark evergreen forest along the bottom edge.",
+        "Strip 3: near-black datacenter machine silhouettes - racks, overhead pipe runs, three circular fan units, consoles and monitors, with small red and orange LED dots.",
+        "SCALE PROBLEM: strips are roughly 945 px wide by 170-190 px tall. Mapping width 945 -> 480 is a ~1:2 downscale giving layers roughly 480x86 to 480x96, which is SHORTER than the 184 px play viewport. Do not upscale to fill. Anchor instead, and fill the remainder with the sampled sky colour. See ASSET_PIPELINE.md section 6.5."
+      ]
+    },
+    "VISTA_REFERENCE": {
+      "source_file": "02_vista_reference.png",
+      "status": "pending",
+      "reference_only": true,
+      "notes": [
+        "Awaiting file. No crop data may be authored."
+      ]
+    },
+    "ICONS_SOURCE": {
+      "source_file": "04_icons_source.png",
+      "status": "pending",
+      "reference_only": false,
+      "expected_regions": null,
+      "outputs": {},
+      "notes": [
+        "Awaiting file. Final order is fixed by contract: silver, red, yellow, green, cyan, blue, magenta, black, palm, evergreen, green_hills, snowy_mountain -> operations-tiles.png at 192x16.",
+        "GAMEPLAY_REFERENCE shows nine icon blocks in play (silver, red, yellow, green, cyan on one row; magenta, blue, blue, black on another), each a bevelled metallic square with a downward chevron. That confirms the metallic family's in-world use as platform blocks."
+      ]
+    },
+    "ENEMIES_ITEMS_SOURCE": {
+      "source_file": "05_enemies_items_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 150,
+        "merge_gap": 5,
+        "chroma_policy": "edge-connected"
+      },
+      "expected_regions": 26,
+      "overrides": {},
+      "outputs": {
+        "job-fail-bot.png": {
+          "native_frame": [
+            32,
+            32
+          ],
+          "alignment": "foot-baseline",
+          "note": "SIX poses available, four selected. Three carry a RED 'JOB FAIL' screen and three a GREEN one; the last green pose is tipped over and is the deactivated frame. Selecting the green trio keeps the walk cycle visually consistent.",
+          "frames": [
+            {
+              "region": "r3",
+              "role": "neutral (green screen)",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r4",
+              "role": "movement A (green screen)",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r0",
+              "role": "movement B",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r5",
+              "role": "deactivated (tipped over)",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "alert-bot.png": {
+          "native_frame": [
+            32,
+            32
+          ],
+          "alignment": "foot-baseline",
+          "note": "Exactly four poses, no redundancy. The fourth raises both arms with a flashing beacon - a natural alerted pose.",
+          "frames": [
+            {
+              "region": "r6",
+              "role": "neutral",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r7",
+              "role": "movement A",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r8",
+              "role": "movement B",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r9",
+              "role": "arms raised / beacon flash",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "alert-drone.png": {
+          "native_frame": [
+            32,
+            32
+          ],
+          "alignment": "center",
+          "note": "Exactly four poses. Rotor width VARIES between frames, which is precisely why common-centre alignment is mandatory - bbox alignment would make the drone wobble.",
+          "frames": [
+            {
+              "region": "r10",
+              "role": "hover 0",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r11",
+              "role": "hover 1",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r12",
+              "role": "hover 2",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r13",
+              "role": "hover 3",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "spool-runaway.png": {
+          "native_frame": [
+            32,
+            32
+          ],
+          "alignment": "foot-baseline",
+          "note": "Four poses. ONE SOURCE SCREEN READS 'SPDOOL RUNAWAY' - a typo baked into the art. The MVP keeps baked screen text, so prefer the correctly-spelled poses plus the tape-symbol-screen pose, or clean that screen interior.",
+          "frames": [
+            {
+              "region": "r14",
+              "role": "neutral",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r15",
+              "role": "movement A",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r16",
+              "role": "movement B",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r17",
+              "role": "tape-symbol screen",
+              "confidence": "ambiguous"
+            }
+          ]
+        },
+        "command-token.png": {
+          "native_frame": [
+            16,
+            16
+          ],
+          "alignment": "center",
+          "note": "REORDERING REQUIRED. The board gives three round '>_' coin views plus one thin vertical bar - the edge-on view. Reading order will not produce a smooth spin. Correct order: front, angled, EDGE (the bar), angled.",
+          "frames": [
+            {
+              "region": "r18",
+              "role": "front",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r19",
+              "role": "angled",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r20",
+              "role": "edge (thin bar)",
+              "confidence": "ambiguous"
+            },
+            {
+              "region": "r21",
+              "role": "angled returning",
+              "confidence": "ambiguous"
+            }
+          ]
+        },
+        "invincibility-pickup.png": {
+          "native_frame": [
+            16,
+            16
+          ],
+          "alignment": "center",
+          "note": "Gold chevron badge with a dashed halo. All four required pulse accents confirmed present.",
+          "frames": [
+            {
+              "region": "r22",
+              "role": "pulse cyan",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r23",
+              "role": "pulse magenta",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r24",
+              "role": "pulse lime",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r25",
+              "role": "pulse white",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        }
+      },
+      "skip": [],
+      "screen_interior": {},
+      "notes": [
+        "UNVALIDATED DRAFT. The board is laid out in blocks, not a uniform grid, so plain reading order may not produce the region ids assumed above. Confirm with assets:inspect before processing.",
+        "Job Fail red-screen poses are recorded as SKIPPED, not discarded: they are ready-made artwork for an 'alerted' visual state in a later pass.",
+        "Robots carry baked screen text ('JOB FAIL', 'ALERT', 'SPOOL RUNAWAY'). MVP keeps it. Record each screen rect in screen_interior so a later pass can swap in pixel symbols without redoing crops.",
+        "Enemies are roughly 2/3 the protagonist's height in the source, matching the 32x32 vs 32x48 contract."
+      ]
+    },
+    "EFFECTS_SOURCE": {
+      "source_file": "06_effects_source.png",
+      "status": "seen_not_on_disk",
+      "reference_only": false,
+      "detection": {
+        "min_area": 24,
+        "merge_gap": 2,
+        "chroma_policy": "edge-and-enclosed"
+      },
+      "expected_regions": null,
+      "overrides": {},
+      "outputs": {
+        "invincibility-aura.png": {
+          "native_frame": [
+            64,
+            64
+          ],
+          "alignment": "center",
+          "note": "Row 1. Rings ramp small -> large -> small, so a full pulse is already baked in and playback is a STRAIGHT LOOP, not ping-pong. Region ids assume 7 rings; if detection reports 8, add r7 here and bump AURA_FRAME_COUNT. chroma_policy MUST stay edge-and-enclosed or the mint inside each ring survives and the centre-empty gate fails.",
+          "frames": [
+            {
+              "region": "r0",
+              "role": "aura 0",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r1",
+              "role": "aura 1",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r2",
+              "role": "aura 2",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r3",
+              "role": "aura 3",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r4",
+              "role": "aura 4",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r5",
+              "role": "aura 5",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r6",
+              "role": "aura 6",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "stars": {
+          "native_frame": [
+            12,
+            12
+          ],
+          "alignment": "center",
+          "note": "Row 2 left. Five chunky outlined stars. Canvas raised 8->12 in contract v3 to keep the outline.",
+          "frames": [
+            {
+              "region": "r7",
+              "role": "star yellow",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r8",
+              "role": "star cyan",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r9",
+              "role": "star magenta",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r10",
+              "role": "star lime",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r11",
+              "role": "star white",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "sparkles": {
+          "native_frame": [
+            12,
+            12
+          ],
+          "alignment": "center",
+          "note": "Row 2 right. Eight particles alternating x-cross and 4-point spark shapes.",
+          "frames": [
+            {
+              "region": "r12",
+              "role": "x orange",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r13",
+              "role": "spark gold",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r14",
+              "role": "x blue",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r15",
+              "role": "spark cyan",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r16",
+              "role": "x magenta",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r17",
+              "role": "spark magenta",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r18",
+              "role": "x white",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r19",
+              "role": "spark white",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        },
+        "impact-burst.png": {
+          "native_frame": [
+            32,
+            32
+          ],
+          "alignment": "center",
+          "note": "Row 3. Four bursts growing left to right - already in playback order, no reordering needed.",
+          "frames": [
+            {
+              "region": "r20",
+              "role": "burst 0",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r21",
+              "role": "burst 1",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r22",
+              "role": "burst 2",
+              "confidence": "draft_unvalidated"
+            },
+            {
+              "region": "r23",
+              "role": "burst 3",
+              "confidence": "draft_unvalidated"
+            }
+          ]
+        }
+      },
+      "notes": [
+        "UNVALIDATED DRAFT. Region ids assume 7 rings and pure reading order; confirm with assets:inspect.",
+        "AURA FRAME COUNT IS THE ONE OPEN QUESTION on this board: it reads as 7 or 8 rings.",
+        "Aura centres are mint in the source. Only chroma_policy 'edge-and-enclosed' clears them; the default edge-connected policy leaves opaque mint and validation fails. Proven by assets:selftest.",
+        "Stars and sparkles sit close together on the board. Watch merge_gap: too large and adjacent particles merge into one region."
+      ]
+    },
+    "GAMEPLAY_REFERENCE": {
+      "source_file": "01_gameplay_reference.png",
+      "status": "seen_not_on_disk",
+      "reference_only": true,
+      "notes": [
+        "Batch 2 supplied a full-fidelity version. Never cropped; used for palette sampling and design checks.",
+        "CONFIRMS: golden aura renders BEHIND the hero with coloured stars orbiting in front - exactly the composition InvincibilitySystem must reproduce.",
+        "CONFIRMS: metallic chevron icon blocks AND all four landscape icon blocks are used as in-world platforms, so the icon family's design is known even before ICONS_SOURCE arrives.",
+        "AMBIGUITY RAISED: ground platforms here read as GREY stone brick, while HUD_BLOCKS_SOURCE supplies TAN/BROWN stone variants plus one grey rubble block. Resolve which variant is stone_center on the contact sheet before freezing gameplay-tiles.png."
+      ]
+    }
+  }
+}

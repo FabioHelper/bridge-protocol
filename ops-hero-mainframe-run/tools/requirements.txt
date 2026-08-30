@@ -1,0 +1,5 @@
+# Deterministic asset pipeline dependencies.
+# Install with:  python3 -m pip install -r tools/requirements.txt
+Pillow>=10.0
+numpy>=1.26
+opencv-python-headless>=4.9

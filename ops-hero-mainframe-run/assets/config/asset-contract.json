@@ -1,0 +1,514 @@
+{
+  "$comment": "SINGLE SOURCE OF TRUTH for asset dimensions. v3 applies corrections from intake batch 2 (effects board, enemies/items board, full-fidelity gameplay reference). Read by tools/*.py and by tools/gen_asset_keys.py. Mirrored in ASSET_PIPELINE.md.",
+  "version": 3,
+  "chroma_color": "#7CFFB2",
+  "chroma_tolerance": 18,
+  "logical_resolution": [
+    480,
+    270
+  ],
+  "native_tile_size": 16,
+  "chroma_allowed": [],
+  "aura_center_rect": [
+    22,
+    22,
+    20,
+    20
+  ],
+  "outputs": [
+    {
+      "file": "hero.png",
+      "kind": "spritesheet",
+      "source": "PROTAGONIST_SOURCE",
+      "frame_width": 32,
+      "frame_height": 48,
+      "frame_count": 10,
+      "width": 320,
+      "height": 48,
+      "alignment": "foot-baseline",
+      "notes": "Frames 0-7 foot-baseline; frames 8-9 airborne (lift 3px). Order fixed by SPEC-01 s1.8."
+    },
+    {
+      "file": "job-fail-bot.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frame_count": 4,
+      "width": 128,
+      "height": 32,
+      "alignment": "foot-baseline",
+      "notes": "Board supplies SIX poses in two rows: three with a RED 'JOB FAIL' screen and three with a GREEN one, the last of which is tipped over (deactivated). MVP selects 4: green neutral, green walk A, green walk B, tipped-over deactivated. The red-screen trio is recorded as SKIPPED, not discarded -- it is the natural artwork for an 'alerted' visual state in a later pass."
+    },
+    {
+      "file": "alert-bot.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frame_count": 4,
+      "width": 128,
+      "height": 32,
+      "alignment": "foot-baseline",
+      "notes": "all four source poses"
+    },
+    {
+      "file": "spool-runaway.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frame_count": 4,
+      "width": 128,
+      "height": 32,
+      "alignment": "foot-baseline",
+      "notes": "Four poses. WARNING: one baked screen reads 'SPDOOL RUNAWAY' (typo in the source art). The MVP keeps baked screen text, so that frame would ship the typo. Prefer the three correctly-spelled poses plus the tape-symbol screen pose; otherwise clean that screen interior."
+    },
+    {
+      "file": "alert-drone.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frame_count": 4,
+      "width": 128,
+      "height": 32,
+      "alignment": "center",
+      "notes": "Four poses with a spinning top rotor and twin thruster flames. Rotor width VARIES per frame, which is exactly why common-centre alignment is mandatory: bbox-based alignment would make the drone wobble in flight."
+    },
+    {
+      "file": "command-token.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 16,
+      "frame_height": 16,
+      "frame_count": 4,
+      "width": 64,
+      "height": 16,
+      "alignment": "center",
+      "notes": "Board supplies three round '>_' coin views plus one thin vertical bar (the edge-on view). Rotation order must be front, angled, EDGE (the bar), angled -- reading order alone will not produce a smooth spin, so the reorder hook in crops.json is required here."
+    },
+    {
+      "file": "invincibility-pickup.png",
+      "kind": "spritesheet",
+      "source": "ENEMIES_ITEMS_SOURCE",
+      "frame_width": 16,
+      "frame_height": 16,
+      "frame_count": 4,
+      "width": 64,
+      "height": 16,
+      "alignment": "center",
+      "notes": "Gold chevron badge with a dashed halo in cyan, magenta, lime and white -- the four pulse accents the handoff requires, confirmed present. Note the badge reuses the operational icon chevron, tying the pickup visually to the icon blocks."
+    },
+    {
+      "file": "invincibility-aura.png",
+      "kind": "spritesheet",
+      "source": "EFFECTS_SOURCE",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frame_count": 7,
+      "width": 448,
+      "height": 64,
+      "alignment": "center",
+      "notes": "PLAYBACK CHANGED IN v3. The source rings already ramp small -> large -> small, i.e. a complete symmetric pulse is baked into the frames. Ping-pong playback would therefore replay the shrink and stutter. Straight loop is correct. OPEN QUESTION: the board visually reads as 7 OR 8 rings. Contract holds 7; if assets:inspect reports 8, change exactly two values -- frame_count here and INVINCIBILITY.AURA_FRAME_COUNT in src/config/Tuning.ts. Animations.ts derives its sequence from that constant, and tests/unit/contract.test.ts enforces the two agree."
+    },
+    {
+      "file": "impact-burst.png",
+      "kind": "spritesheet",
+      "source": "EFFECTS_SOURCE",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frame_count": 4,
+      "width": 128,
+      "height": 32,
+      "alignment": "center",
+      "notes": "Plays at contact point when an invincible player touches an enemy."
+    },
+    {
+      "file": "star-0.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Independent orbiting star (yellow). Orbit motion computed in Phaser, never baked. v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "star-1.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Independent orbiting star (cyan). Orbit motion computed in Phaser, never baked. v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "star-2.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Independent orbiting star (magenta). Orbit motion computed in Phaser, never baked. v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "star-3.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Independent orbiting star (lime). Orbit motion computed in Phaser, never baked. v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "star-4.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Independent orbiting star (white). Orbit motion computed in Phaser, never baked. v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-0.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (gold, small). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-1.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (gold, medium). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-2.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (cyan, small). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-3.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (cyan, medium). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-4.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (magenta, small). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-5.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (magenta, medium). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-6.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (white, small). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "sparkle-7.png",
+      "kind": "image",
+      "source": "EFFECTS_SOURCE",
+      "width": 12,
+      "height": 12,
+      "alignment": "center",
+      "notes": "Runtime particle texture (white, medium). v3: canvas raised 8->12 to preserve the outline."
+    },
+    {
+      "file": "operations-tiles.png",
+      "kind": "spritesheet",
+      "source": "ICONS_SOURCE",
+      "frame_width": 16,
+      "frame_height": 16,
+      "frame_count": 12,
+      "width": 192,
+      "height": 16,
+      "alignment": "tile",
+      "notes": "Order: silver, red, yellow, green, cyan, blue, magenta, black, palm, evergreen, green_hills, snowy_mountain."
+    },
+    {
+      "file": "gameplay-tiles.png",
+      "kind": "spritesheet",
+      "source": "HUD_BLOCKS_SOURCE",
+      "frame_width": 16,
+      "frame_height": 16,
+      "frame_count": 9,
+      "width": 144,
+      "height": 16,
+      "alignment": "tile",
+      "notes": "Order: terminal_command, stone_left, stone_center, stone_right, stone_under, dark_inactive, warning, breakable, exit_terminal."
+    },
+    {
+      "file": "hud-top.png",
+      "kind": "image",
+      "source": "HUD_BLOCKS_SOURCE",
+      "width": 480,
+      "height": 30,
+      "alignment": "none",
+      "notes": "Full-width top strip. PF1-PF12 button labels stay baked; only the active highlight is dynamic. 'ALL SYSTEMS GO' and the activity graph must be cleaned."
+    },
+    {
+      "file": "hud-viewdata.png",
+      "kind": "image",
+      "source": "HUD_BLOCKS_SOURCE",
+      "alignment": "none",
+      "notes": "VIEWDATA 3270 casing. Screen interior is already blank in the source. PROVISIONAL: exact size is set by the crop once the board is on disk.",
+      "size_mode": "max",
+      "max_width": 200,
+      "max_height": 64
+    },
+    {
+      "file": "hud-minimap.png",
+      "kind": "image",
+      "source": "HUD_BLOCKS_SOURCE",
+      "alignment": "none",
+      "notes": "MAP panel with a dotted grid. Already free of markers. PROVISIONAL: exact size is set by the crop once the board is on disk.",
+      "size_mode": "max",
+      "max_width": 160,
+      "max_height": 72
+    },
+    {
+      "file": "hud-bottom.png",
+      "kind": "image",
+      "source": "HUD_BLOCKS_SOURCE",
+      "width": 480,
+      "height": 56,
+      "alignment": "none",
+      "notes": "Full-width bottom strip: CURRENT MISSION, OBJECTIVE, ITEM, AUTOMATION, POWER side by side."
+    },
+    {
+      "file": "env-rack.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-tape-drive.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-cabinet.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-terminal-monitor.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-keyboard.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-desk.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-chair.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-warning-beacon.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-wall-monitor.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-freestanding-monitor.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-cable-module.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-machinery-module.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "env-vent-grille.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Decorative background prop. No collision body unless the level blueprint opts in."
+    },
+    {
+      "file": "bg-far-sky.png",
+      "kind": "image",
+      "source": "BACKGROUNDS_SOURCE",
+      "width": 480,
+      "alignment": "none",
+      "notes": "Vivid blue vertical gradient with white pixel clouds. Downscaled by the ratio mapping strip width to 480; height follows and is NEVER upscaled to fill. Gap is filled by the sampled sky clear colour.",
+      "scroll_factor": 0.1,
+      "size_mode": "exact_width_max_height",
+      "max_height": 184,
+      "anchor": "top"
+    },
+    {
+      "file": "bg-mid-mountains.png",
+      "kind": "image",
+      "source": "BACKGROUNDS_SOURCE",
+      "width": 480,
+      "alignment": "none",
+      "notes": "Layered blue-grey ranges, one snow-capped peak, dark evergreen forest. Downscaled by the ratio mapping strip width to 480; height follows and is NEVER upscaled to fill. Gap is filled by the sampled sky clear colour.",
+      "scroll_factor": 0.35,
+      "size_mode": "exact_width_max_height",
+      "max_height": 184,
+      "anchor": "bottom"
+    },
+    {
+      "file": "bg-near-datacenter.png",
+      "kind": "image",
+      "source": "BACKGROUNDS_SOURCE",
+      "width": 480,
+      "alignment": "none",
+      "notes": "Near-black machine silhouettes, pipe runs, three fan units, LED dots. Downscaled by the ratio mapping strip width to 480; height follows and is NEVER upscaled to fill. Gap is filled by the sampled sky clear colour.",
+      "scroll_factor": 0.65,
+      "size_mode": "exact_width_max_height",
+      "max_height": 184,
+      "anchor": "bottom"
+    },
+    {
+      "file": "env-rack-wide.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Wide double rack, the widest prop on the board. Added in contract v2: the board supplies 17 props, not 13."
+    },
+    {
+      "file": "env-tape-drive-dials.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Tape unit with two round dials/reels. Added in contract v2: the board supplies 17 props, not 13."
+    },
+    {
+      "file": "env-cabinet-double.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Double-door cabinet. Added in contract v2: the board supplies 17 props, not 13."
+    },
+    {
+      "file": "env-warning-beacon-tall.png",
+      "kind": "image",
+      "source": "ENVIRONMENT_SOURCE",
+      "size_mode": "max",
+      "max_width": 96,
+      "max_height": 96,
+      "alignment": "center",
+      "notes": "Red beacon on a tall stand. Added in contract v2: the board supplies 17 props, not 13."
+    }
+  ],
+  "chroma_allowed_note": "Empty by design. Batch-1 inspection confirmed the mountains/forest strip uses dark desaturated greens, nowhere near #7CFFB2, so no board legitimately keeps chroma-coloured artwork. Re-open this only with visual evidence."
+}

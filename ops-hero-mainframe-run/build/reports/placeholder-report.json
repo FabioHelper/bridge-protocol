@@ -1,0 +1,396 @@
+{
+  "counts": {
+    "checks": 48,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 0
+  },
+  "generated_by": "tools/make_placeholders.py",
+  "ok": true,
+  "results": [
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "480x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "480x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "480x112",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "64x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "40x50",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "30x48",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "24x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "20x26",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "46x20",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "24x30",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "28x8",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "40x34",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "48x58",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "28x56",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "34x46",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "34x44",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "26x22",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "26x26",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "36x20",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "14x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "12x20",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "144x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "320x48",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "480x56",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "124x56",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "480x30",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "196x56",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "448x64",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "64x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "192x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    }
+  ]
+}

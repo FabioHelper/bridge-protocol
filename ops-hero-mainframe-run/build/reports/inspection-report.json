@@ -1,0 +1,84 @@
+{
+  "counts": {
+    "checks": 9,
+    "errors": 9,
+    "skipped": 0,
+    "warnings": 0
+  },
+  "generated_by": "tools/inspect_sources.py",
+  "ok": false,
+  "results": [
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 01_gameplay_reference.png in assets-source/",
+      "target": "GAMEPLAY_REFERENCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 02_vista_reference.png in assets-source/",
+      "target": "VISTA_REFERENCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 03_protagonist_source.png in assets-source/",
+      "target": "PROTAGONIST_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 04_icons_source.png in assets-source/",
+      "target": "ICONS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 05_enemies_items_source.png in assets-source/",
+      "target": "ENEMIES_ITEMS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 06_effects_source.png in assets-source/",
+      "target": "EFFECTS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 07_hud_blocks_source.png in assets-source/",
+      "target": "HUD_BLOCKS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 08_environment_source.png in assets-source/",
+      "target": "ENVIRONMENT_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "missing 09_backgrounds_source.png in assets-source/",
+      "target": "BACKGROUNDS_SOURCE"
+    }
+  ]
+}
