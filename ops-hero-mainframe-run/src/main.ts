@@ -1,11 +1,17 @@
 import Phaser from 'phaser';
 
 import { createGameConfig } from './config/GameConfig';
-import { ScaffoldScene } from './scenes/ScaffoldScene';
+import { BootScene } from './scenes/BootScene';
+import { PreloadScene } from './scenes/PreloadScene';
+import { MainMenuScene } from './scenes/MainMenuScene';
+import { LevelScene } from './scenes/LevelScene';
+import { HudScene } from './scenes/HudScene';
+import { GameOverScene } from './scenes/GameOverScene';
 
-// Scene list is deliberately minimal: the real Boot/Preload/MainMenu/Level/Hud/GameOver scenes
-// are specified in SPEC.md section 5.2 but not implemented yet.
-const game = new Phaser.Game(createGameConfig([ScaffoldScene]));
+// Flow: Boot -> Preload -> MainMenu -> (Level || Hud) -> GameOver -> MainMenu. See SPEC.md 5.2.
+const game = new Phaser.Game(
+  createGameConfig([BootScene, PreloadScene, MainMenuScene, LevelScene, HudScene, GameOverScene]),
+);
 
 document.getElementById('boot-fallback')?.remove();
 
