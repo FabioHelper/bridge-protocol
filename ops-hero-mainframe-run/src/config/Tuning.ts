@@ -182,6 +182,9 @@ export const HUD = {
   PF_KEY_COUNT: 12,
   SCORE_DIGITS: 7,
   COUNTER_DIGITS: 3,
+  FONT_SIZE_PX: 8,
+  HEADING_FONT_SIZE_PX: 8,
+  POWER_METER_SEGMENTS: 10,
 } as const;
 
 export const STORAGE = {
