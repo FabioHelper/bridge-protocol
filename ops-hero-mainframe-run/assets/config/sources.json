@@ -1,19 +1,19 @@
 {
-  "$comment": "Maps the nine logical source names from the Gemini handoff to files in assets-source/. Reference boards are never cropped into game art.",
+  "$comment": "Maps the nine logical source names from the Gemini handoff to files in assets-source/. Reference boards are never cropped into game art. Filenames updated to the boards actually uploaded (several are .webp).",
   "chroma_color": "#7CFFB2",
   "sources": {
     "GAMEPLAY_REFERENCE": {
-      "file": "01_gameplay_reference.png",
+      "file": "01_gameplay_reference.webp",
       "reference_only": true,
       "role": "Master reference for palette, lighting and composition. Also the sampling source for HUD dark-fill colours."
     },
     "VISTA_REFERENCE": {
-      "file": "02_vista_reference.png",
+      "file": "01b_gameplay_reference_mockup.png",
       "reference_only": true,
-      "role": "Vista Session icon-selection reference used to cross-check operational icon designs."
+      "role": "PLACEHOLDER SLOT: the real Vista icon chooser never arrived. Currently points at the sparse gameplay mockup, which is reference-only and harmless."
     },
     "PROTAGONIST_SOURCE": {
-      "file": "03_protagonist_source.png",
+      "file": "03_protagonist_source.webp",
       "reference_only": false,
       "expected_regions": 12,
       "role": "12 protagonist poses in two rows. 10 are selected for hero.png; 2 redundant standing poses are dropped."
@@ -22,10 +22,10 @@
       "file": "04_icons_source.png",
       "reference_only": false,
       "expected_regions": null,
-      "role": "Metallic icon family + landscape icons + redundant variants. 12 are selected for operations-tiles.png."
+      "role": "NOT SUPPLIED. Blocks operations-tiles.png only. Everything else processes without it."
     },
     "ENEMIES_ITEMS_SOURCE": {
-      "file": "05_enemies_items_source.png",
+      "file": "05_enemies_items_source.webp",
       "reference_only": false,
       "expected_regions": null,
       "role": "Job Fail robots, Alert ground robots, Alert flying drones, Spool Runaway robots, command tokens, invincibility pickups."
@@ -37,7 +37,7 @@
       "role": "7 golden aura rings, 5 colored stars, 8 sparkle particles, 4 impact-burst frames."
     },
     "HUD_BLOCKS_SOURCE": {
-      "file": "07_hud_blocks_source.png",
+      "file": "07_hud_blocks_source.webp",
       "reference_only": false,
       "expected_regions": null,
       "role": "Gameplay blocks, top HUD, Viewdata monitor, minimap, bottom HUD frames."
@@ -49,7 +49,7 @@
       "role": "Isolated server racks, tape drives, cabinets, terminal workstation components, warning beacons, ventilation modules."
     },
     "BACKGROUNDS_SOURCE": {
-      "file": "09_backgrounds_source.png",
+      "file": "09_backgrounds_source.webp",
       "reference_only": false,
       "expected_regions": 3,
       "role": "Three horizontal strips: sky, mountains and forest, datacenter silhouettes."

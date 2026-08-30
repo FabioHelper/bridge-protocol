@@ -1,12 +1,12 @@
 {
   "counts": {
-    "checks": 208,
-    "errors": 0,
-    "skipped": 1,
+    "checks": 215,
+    "errors": 1,
+    "skipped": 0,
     "warnings": 0
   },
   "generated_by": "tools/validate_assets.py",
-  "ok": true,
+  "ok": false,
   "results": [
     {
       "actual": "",
@@ -937,7 +937,7 @@
       "target": "hud-viewdata.png"
     },
     {
-      "actual": "196x56",
+      "actual": "16x16",
       "check": "dimensions",
       "expected": "<=200x64",
       "level": "OK",
@@ -1033,7 +1033,7 @@
       "target": "env-rack.png"
     },
     {
-      "actual": "28x56",
+      "actual": "59x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1065,7 +1065,7 @@
       "target": "env-tape-drive.png"
     },
     {
-      "actual": "34x44",
+      "actual": "96x75",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1097,7 +1097,7 @@
       "target": "env-cabinet.png"
     },
     {
-      "actual": "30x48",
+      "actual": "67x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1129,7 +1129,7 @@
       "target": "env-terminal-monitor.png"
     },
     {
-      "actual": "26x22",
+      "actual": "70x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1161,7 +1161,7 @@
       "target": "env-keyboard.png"
     },
     {
-      "actual": "28x8",
+      "actual": "82x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1193,7 +1193,7 @@
       "target": "env-desk.png"
     },
     {
-      "actual": "46x20",
+      "actual": "88x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1225,7 +1225,7 @@
       "target": "env-chair.png"
     },
     {
-      "actual": "20x26",
+      "actual": "96x83",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1257,7 +1257,7 @@
       "target": "env-warning-beacon.png"
     },
     {
-      "actual": "12x20",
+      "actual": "96x30",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1289,7 +1289,7 @@
       "target": "env-wall-monitor.png"
     },
     {
-      "actual": "36x20",
+      "actual": "96x49",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1321,7 +1321,7 @@
       "target": "env-freestanding-monitor.png"
     },
     {
-      "actual": "24x30",
+      "actual": "64x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1353,7 +1353,7 @@
       "target": "env-cable-module.png"
     },
     {
-      "actual": "24x16",
+      "actual": "54x62",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1385,7 +1385,7 @@
       "target": "env-machinery-module.png"
     },
     {
-      "actual": "40x34",
+      "actual": "44x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1417,7 +1417,7 @@
       "target": "env-vent-grille.png"
     },
     {
-      "actual": "26x26",
+      "actual": "96x69",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1449,7 +1449,7 @@
       "target": "bg-far-sky.png"
     },
     {
-      "actual": "480x96",
+      "actual": "480x91",
       "check": "dimensions",
       "expected": "480x<=184",
       "level": "OK",
@@ -1481,7 +1481,7 @@
       "target": "bg-mid-mountains.png"
     },
     {
-      "actual": "480x96",
+      "actual": "480x92",
       "check": "dimensions",
       "expected": "480x<=184",
       "level": "OK",
@@ -1513,7 +1513,7 @@
       "target": "bg-near-datacenter.png"
     },
     {
-      "actual": "480x112",
+      "actual": "480x92",
       "check": "dimensions",
       "expected": "480x<=184",
       "level": "OK",
@@ -1529,11 +1529,11 @@
       "target": "bg-near-datacenter.png"
     },
     {
-      "actual": "",
+      "actual": "239",
       "check": "chroma_residue",
-      "expected": "",
-      "level": "OK",
-      "message": "",
+      "expected": "0",
+      "level": "ERROR",
+      "message": "239 opaque pixels within tolerance of the chroma key",
       "target": "bg-near-datacenter.png"
     },
     {
@@ -1545,7 +1545,7 @@
       "target": "env-rack-wide.png"
     },
     {
-      "actual": "48x58",
+      "actual": "88x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1577,7 +1577,7 @@
       "target": "env-tape-drive-dials.png"
     },
     {
-      "actual": "34x46",
+      "actual": "96x27",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1609,7 +1609,7 @@
       "target": "env-cabinet-double.png"
     },
     {
-      "actual": "40x50",
+      "actual": "96x56",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1641,7 +1641,7 @@
       "target": "env-warning-beacon-tall.png"
     },
     {
-      "actual": "14x32",
+      "actual": "96x96",
       "check": "dimensions",
       "expected": "<=96x96",
       "level": "OK",
@@ -1668,10 +1668,66 @@
       "actual": "",
       "check": "source_unmodified",
       "expected": "",
-      "level": "SKIPPED",
-      "message": "no digest baseline yet (0 source boards present)",
-      "target": "assets-source"
+      "level": "OK",
+      "message": "",
+      "target": "01_gameplay_reference.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "01b_gameplay_reference_mockup.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "03_protagonist_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "05_enemies_items_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "06_effects_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "07_hud_blocks_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "08_environment_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "09_backgrounds_source.webp"
     }
   ],
-  "track": "placeholder"
+  "track": "mixed"
 }

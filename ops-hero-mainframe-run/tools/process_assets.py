@@ -22,7 +22,9 @@ from pipeline import PATHS, load_contract, load_crops, load_sources
 from pipeline.boards import (
     BoardContext, auto_assign, crop, crops_for, emit_sheet, normalize_all, select_protagonist,
 )
-from pipeline.chroma import parse_hex_color, remove_edge_connected_chroma
+from pipeline.chroma import (
+    defringe, estimate_chroma_key, parse_hex_color, remove_edge_connected_chroma,
+)
 from pipeline.normalize import nearest_resize, trim_to_content
 from pipeline.paths import write_json
 from pipeline.regions import apply_overrides, detect_regions, find_ambiguous_overlaps
@@ -68,21 +70,44 @@ class Pipeline:
         self.report.ok("emitted", filename, actual=f"{packed.width}x{packed.height}")
 
     def context(self, name: str, board: Image.Image, regions: list) -> BoardContext:
+        key, fringe_tol, fringe_passes = getattr(self, "_chroma", (self.key, self.tolerance + 30, 2))
         return BoardContext(
             name=name, board=board, regions=regions, config=self.crops.get(name, {}),
             contract_by_file=self.by_file, report=self.report, emit=self.emit,
+            chroma_key=key, defringe_tolerance=fringe_tol, defringe_passes=fringe_passes,
         )
 
     def prepare(self, name: str) -> tuple[Image.Image, list] | None:
         """Load, chroma-key and region-detect one board; write its diagnostic overlay."""
         meta = self.sources[name]
         path = PATHS.sources_dir / str(meta["file"])
+        if not path.exists():
+            self.report.error("file_present", name, f"{meta['file']} not supplied; outputs skipped")
+            return None
         with Image.open(path) as opened:
             raw = opened.convert("RGBA")
         cfg = self.crops.get(name, {})
         policy = str(cfg.get("chroma_policy", "edge-connected"))
-        chroma = remove_edge_connected_chroma(raw, self.key, self.tolerance, policy)
+        # Per-board chroma settings beat the nominal key. Necessary because a board re-encoded as
+        # lossy WebP no longer has a flat #7CFFB2 field (measured drift up to 44 on the
+        # protagonist board, versus a nominal tolerance of 18).
+        if cfg.get("chroma_key") or cfg.get("chroma_tolerance"):
+            key = tuple(cfg["chroma_key"]) if cfg.get("chroma_key") else self.key
+            tol = int(cfg.get("chroma_tolerance", self.tolerance))
+            self.report.ok("chroma_calibration", name, expected=str(key), actual=f"tol={tol}")
+        else:
+            key, tol = estimate_chroma_key(raw, self.key)
+            if (key, tol) != (self.key, self.tolerance):
+                self.report.warn("chroma_calibration", name,
+                                 "auto-calibrated from the board's own border; freeze into "
+                                 "crops.json as chroma_key/chroma_tolerance once reviewed",
+                                 expected=str(key), actual=f"tol={tol}")
+        chroma = remove_edge_connected_chroma(raw, key, tol, policy)
         keyed = chroma.image
+        # Defringing happens PER CROPPED REGION (see boards.crop_for_target), never here:
+        # altering board alpha before detection changes the region count.
+        self._chroma = (key, int(cfg.get("defringe_tolerance", tol + 30)),
+                        int(cfg.get("defringe_passes", 2)))
         if policy == "edge-and-enclosed":
             self.report.warn("chroma_policy", name,
                              "board opted into 'edge-and-enclosed': chroma enclosed by artwork was also "
@@ -336,6 +361,9 @@ class Pipeline:
             else:
                 self.report.error("bg_strips", filename, "no strip available")
                 continue
+            # Background strips bypass crop_for_target, so they need the same halo removal.
+            key, fringe_tol, fringe_passes = getattr(self, "_chroma", (self.key, self.tolerance + 30, 2))
+            strip, _peeled = defringe(strip, key, fringe_tol, fringe_passes)
             layer = self._fit_strip(strip, target_w, max_h, seam_mode)
             write_png(layer, PATHS.public_assets / filename)
             self.written.append(filename)
@@ -377,17 +405,24 @@ class Pipeline:
             if not (PATHS.sources_dir / str(meta["file"])).exists()
         ]
         if missing:
-            print("MISSING SOURCE BOARDS in assets/source/:")
+            # Absent boards must not block the boards that ARE present: report and continue.
+            for name in missing:
+                self.report.error("file_present", name, "board not supplied; its outputs are skipped")
+            print("NOTE: not supplied, their outputs will be skipped:")
             for name in missing:
                 print(f"  - {name}")
-            print("\nDrop the nine approved PNGs into assets/source/ and re-run.")
-            print("To keep developing meanwhile:  npm run assets:placeholders")
-            return 1
+            print()
 
-        digests = {
-            str(meta["file"]): sha256_file(PATHS.sources_dir / str(meta["file"]))
-            for meta in self.sources.values()
-        }
+        def _digests() -> dict[str, str]:
+            """Digest only the boards that exist; absent ones are reported, not fatal."""
+            out: dict[str, str] = {}
+            for meta in self.sources.values():
+                path = PATHS.sources_dir / str(meta["file"])
+                if path.exists():
+                    out[str(meta["file"])] = sha256_file(path)
+            return out
+
+        digests = _digests()
 
         self.do_protagonist()
         self.do_icons()
@@ -397,12 +432,9 @@ class Pipeline:
         self.do_environment()
         self.do_backgrounds()
 
-        after = {
-            str(meta["file"]): sha256_file(PATHS.sources_dir / str(meta["file"]))
-            for meta in self.sources.values()
-        }
+        after = _digests()
         for name, digest in digests.items():
-            if after[name] != digest:
+            if after.get(name) != digest:
                 self.report.error("source_unmodified", name, "source board was modified during processing!")
             else:
                 self.report.ok("source_unmodified", name)

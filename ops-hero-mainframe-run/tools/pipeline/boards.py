@@ -12,6 +12,7 @@ from typing import Any, Callable
 import numpy as np
 from PIL import Image
 
+from .chroma import defringe
 from .normalize import AlignMode, normalize_frame, snap_rect_to_integer_ratio
 from .regions import Region
 from .report import Report
@@ -31,6 +32,9 @@ class BoardContext:
     report: Report
     emit: Callable[[str, Image.Image, list[Image.Image]], None]
     """emit(filename, packed_image, frames) -- writes the PNG and its contact sheet."""
+    chroma_key: tuple[int, int, int] = (124, 255, 178)
+    defringe_tolerance: int = 48
+    defringe_passes: int = 2
 
 
 def crop(board: Image.Image, region: Region) -> Image.Image:
@@ -57,7 +61,12 @@ def crop_for_target(ctx: "BoardContext", region: Region, target_w: int, target_h
     elif rect != region.rect:
         ctx.report.ok("crop_snap", f"{ctx.name}:{region.id}",
                       expected=f"{target_w * factor}x{target_h * factor}", actual=f"exact 1:{factor}")
-    return ctx.board.crop((rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]))
+    cropped = ctx.board.crop((rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]))
+    # Peel the anti-aliased mint halo now that the region is isolated. Boundary pixels only, so
+    # green ARTWORK inside the sprite (a robot's screen) is never touched. Done here rather than
+    # on the whole board because changing board alpha before detection shifts the region count.
+    cleaned, _peeled = defringe(cropped, ctx.chroma_key, ctx.defringe_tolerance, ctx.defringe_passes)
+    return cleaned
 
 
 def crops_for(ctx: "BoardContext", filename: str, regions: list[Region]) -> list[Image.Image]:

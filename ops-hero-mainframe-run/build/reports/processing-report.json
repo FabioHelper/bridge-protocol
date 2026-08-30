@@ -1,0 +1,1228 @@
+{
+  "counts": {
+    "checks": 152,
+    "errors": 7,
+    "skipped": 6,
+    "warnings": 62
+  },
+  "generated_by": "tools/process_assets.py",
+  "ok": false,
+  "results": [
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "board not supplied; its outputs are skipped",
+      "target": "04_icons_source.png"
+    },
+    {
+      "actual": "tol=50",
+      "check": "chroma_calibration",
+      "expected": "(132, 248, 165)",
+      "level": "OK",
+      "message": "",
+      "target": "PROTAGONIST_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "protagonist_selection",
+      "expected": "",
+      "level": "WARN",
+      "message": "selection derived from the leg-split heuristic. Review build/asset-diagnostics/hero.png-contact.png and freeze the ids into config/crops.json -> PROTAGONIST_SOURCE.selection",
+      "target": "PROTAGONIST_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant standing pose (bbox (137, 81, 109, 232))",
+      "target": "PROTAGONIST_SOURCE:r1"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant standing pose (bbox (560, 90, 148, 223))",
+      "target": "PROTAGONIST_SOURCE:r4"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant standing pose (bbox (14, 81, 104, 232))",
+      "target": "PROTAGONIST_SOURCE:r0"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant standing pose (bbox (402, 102, 147, 211))",
+      "target": "PROTAGONIST_SOURCE:r3"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 136x229); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r2"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 164x220); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r5"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 104x232); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r0"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 109x232); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r1"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 147x211); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r3"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 148x223); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r4"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 115x251); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r6"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 123x248); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r7"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 127x248); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r8"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x48 within tolerance (region is 145x254); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "PROTAGONIST_SOURCE:r11"
+    },
+    {
+      "actual": "320x48",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hero.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "04_icons_source.png not supplied; outputs skipped",
+      "target": "ICONS_SOURCE"
+    },
+    {
+      "actual": "tol=25",
+      "check": "chroma_calibration",
+      "expected": "(130, 251, 171)",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "skipped as a documented redundant variant (bbox (26, 170, 102, 121))",
+      "target": "ENEMIES_ITEMS_SOURCE:r7"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "skipped as a documented redundant variant (bbox (159, 170, 102, 121))",
+      "target": "ENEMIES_ITEMS_SOURCE:r8"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 114x122); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r0"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 114x122); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r1"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 101x122); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r2"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 118x97); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r9"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "job-fail-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 119x119); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r3"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 119x119); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r4"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 119x119); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r10"
+    },
+    {
+      "actual": "exact 1:4",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE:r11"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-bot.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 116x107); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r5"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 115x109); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r6"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 116x107); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r12"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 115x107); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r13"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "alert-drone.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 153x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r14"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 152x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r15"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 154x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r20"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 151x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r21"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "spool-runaway.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 105x106); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r16"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 100x107); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r17"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 31x108); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r22"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 101x107); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "ENEMIES_ITEMS_SOURCE:r23"
+    },
+    {
+      "actual": "64x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "command-token.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE:r18"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE:r19"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE:r24"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ENEMIES_ITEMS_SOURCE:r25"
+    },
+    {
+      "actual": "64x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-pickup.png"
+    },
+    {
+      "actual": "tol=28",
+      "check": "chroma_calibration",
+      "expected": "(117, 245, 170)",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "chroma_policy",
+      "expected": "",
+      "level": "WARN",
+      "message": "board opted into 'edge-and-enclosed': chroma enclosed by artwork was also removed (79.27% of the board). Required for hollow shapes such as the aura rings; never enable it where mint is artwork.",
+      "target": "EFFECTS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 64x64 within tolerance (region is 97x101); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r0"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 64x64 within tolerance (region is 117x121); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r1"
+    },
+    {
+      "actual": "exact 1:2",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r2"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 64x64 within tolerance (region is 163x164); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r3"
+    },
+    {
+      "actual": "exact 1:2",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r4"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 64x64 within tolerance (region is 107x108); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r5"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 64x64 within tolerance (region is 98x101); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r6"
+    },
+    {
+      "actual": "448x64",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "invincibility-aura.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 117x118); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r20"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 144x147); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r21"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 178x177); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r22"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 32x32 within tolerance (region is 203x203); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r23"
+    },
+    {
+      "actual": "128x32",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "impact-burst.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r7"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-0.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r8"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-1.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r9"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-2.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r10"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-3.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r11"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "star-4.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 12x12 within tolerance (region is 29x31); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r12"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-0.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 12x12 within tolerance (region is 53x58); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r13"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-1.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 12x12 within tolerance (region is 31x29); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r14"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-2.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 12x12 within tolerance (region is 52x56); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r15"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-3.png"
+    },
+    {
+      "actual": "exact 1:3",
+      "check": "crop_snap",
+      "expected": "36x36",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r16"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-4.png"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "60x60",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r17"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-5.png"
+    },
+    {
+      "actual": "exact 1:2",
+      "check": "crop_snap",
+      "expected": "24x24",
+      "level": "OK",
+      "message": "",
+      "target": "EFFECTS_SOURCE:r18"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-6.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 12x12 within tolerance (region is 52x57); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "EFFECTS_SOURCE:r19"
+    },
+    {
+      "actual": "12x12",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "sparkle-7.png"
+    },
+    {
+      "actual": "tol=30",
+      "check": "chroma_calibration",
+      "expected": "(129, 251, 174)",
+      "level": "OK",
+      "message": "",
+      "target": "HUD_BLOCKS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "tile_selection",
+      "expected": "",
+      "level": "WARN",
+      "message": "no manual grouping; used the first 9 small square regions in reading order. Freeze into config/crops.json -> HUD_BLOCKS_SOURCE.groups['gameplay-tiles.png']",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 123x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r0"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 124x119); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r1"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 123x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r2"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 124x120); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r3"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 123x121); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r4"
+    },
+    {
+      "actual": "exact 1:8",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "HUD_BLOCKS_SOURCE:r5"
+    },
+    {
+      "actual": "exact 1:8",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "HUD_BLOCKS_SOURCE:r6"
+    },
+    {
+      "actual": "",
+      "check": "crop_snap",
+      "expected": "",
+      "level": "WARN",
+      "message": "no exact integer downscale to 16x16 within tolerance (region is 124x121); expect minor detail loss. Adjust the crop override so the region is a whole multiple of the target.",
+      "target": "HUD_BLOCKS_SOURCE:r7"
+    },
+    {
+      "actual": "exact 1:8",
+      "check": "crop_snap",
+      "expected": "128x128",
+      "level": "OK",
+      "message": "",
+      "target": "HUD_BLOCKS_SOURCE:r8"
+    },
+    {
+      "actual": "144x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "gameplay-tiles.png"
+    },
+    {
+      "actual": "",
+      "check": "hud_clean",
+      "expected": "",
+      "level": "WARN",
+      "message": "no clean_regions configured: baked dynamic values (score, lives, mission text, meter fill) will still be visible. Fill in config/crops.json -> HUD_BLOCKS_SOURCE.clean_regions",
+      "target": "HUD_BLOCKS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "hud_panel",
+      "expected": "",
+      "level": "WARN",
+      "message": "auto-picked region r9 (0, 305, 972, 207) by area; set an explicit rect in config/crops.json -> HUD_BLOCKS_SOURCE.panels['hud-top.png']",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "480x30",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-top.png"
+    },
+    {
+      "actual": "",
+      "check": "hud_panel",
+      "expected": "",
+      "level": "WARN",
+      "message": "auto-picked region r10 (0, 516, 972, 95) by area; set an explicit rect in config/crops.json -> HUD_BLOCKS_SOURCE.panels['hud-viewdata.png']",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "16x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "hud-viewdata.png"
+    },
+    {
+      "actual": "",
+      "check": "hud_panel",
+      "expected": "",
+      "level": "ERROR",
+      "message": "no rect configured and no large region available",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "",
+      "check": "hud_panel",
+      "expected": "",
+      "level": "ERROR",
+      "message": "no rect configured and no large region available",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "tol=23",
+      "check": "chroma_calibration",
+      "expected": "(124, 250, 176)",
+      "level": "OK",
+      "message": "",
+      "target": "ENVIRONMENT_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "env_selection",
+      "expected": "",
+      "level": "WARN",
+      "message": "no manual selection; took the first 17 regions in reading order to match the contract order. Freeze into config/crops.json -> ENVIRONMENT_SOURCE.selection",
+      "target": "ENVIRONMENT_SOURCE"
+    },
+    {
+      "actual": "59x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack.png"
+    },
+    {
+      "actual": "96x75",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive.png"
+    },
+    {
+      "actual": "67x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet.png"
+    },
+    {
+      "actual": "70x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-terminal-monitor.png"
+    },
+    {
+      "actual": "82x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-keyboard.png"
+    },
+    {
+      "actual": "88x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-desk.png"
+    },
+    {
+      "actual": "96x83",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-chair.png"
+    },
+    {
+      "actual": "96x30",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon.png"
+    },
+    {
+      "actual": "96x49",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-wall-monitor.png"
+    },
+    {
+      "actual": "64x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-freestanding-monitor.png"
+    },
+    {
+      "actual": "54x62",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cable-module.png"
+    },
+    {
+      "actual": "44x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-machinery-module.png"
+    },
+    {
+      "actual": "96x69",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-vent-grille.png"
+    },
+    {
+      "actual": "88x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-rack-wide.png"
+    },
+    {
+      "actual": "96x27",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-tape-drive-dials.png"
+    },
+    {
+      "actual": "96x56",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-cabinet-double.png"
+    },
+    {
+      "actual": "96x96",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "env-warning-beacon-tall.png"
+    },
+    {
+      "actual": "tol=21",
+      "check": "chroma_calibration",
+      "expected": "(124, 252, 177)",
+      "level": "OK",
+      "message": "",
+      "target": "BACKGROUNDS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "bg_strips",
+      "expected": "",
+      "level": "WARN",
+      "message": "auto-picked strip r0 by vertical order; set an explicit rect in config/crops.json -> BACKGROUNDS_SOURCE.strips['bg-far-sky.png']",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "480x91",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "",
+      "check": "bg_height",
+      "expected": "",
+      "level": "WARN",
+      "message": "layer is 91px tall, shorter than the 184px play viewport. Anchor is 'top'; the gap is filled by the sampled sky clear colour. This is correct: pixel art is never upscaled to fill.",
+      "target": "bg-far-sky.png"
+    },
+    {
+      "actual": "",
+      "check": "bg_strips",
+      "expected": "",
+      "level": "WARN",
+      "message": "auto-picked strip r1 by vertical order; set an explicit rect in config/crops.json -> BACKGROUNDS_SOURCE.strips['bg-mid-mountains.png']",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "480x92",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "",
+      "check": "bg_height",
+      "expected": "",
+      "level": "WARN",
+      "message": "layer is 92px tall, shorter than the 184px play viewport. Anchor is 'bottom'; the gap is filled by the sampled sky clear colour. This is correct: pixel art is never upscaled to fill.",
+      "target": "bg-mid-mountains.png"
+    },
+    {
+      "actual": "",
+      "check": "bg_strips",
+      "expected": "",
+      "level": "WARN",
+      "message": "auto-picked strip r2 by vertical order; set an explicit rect in config/crops.json -> BACKGROUNDS_SOURCE.strips['bg-near-datacenter.png']",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "480x92",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "",
+      "check": "bg_height",
+      "expected": "",
+      "level": "WARN",
+      "message": "layer is 92px tall, shorter than the 184px play viewport. Anchor is 'bottom'; the gap is filled by the sampled sky clear colour. This is correct: pixel art is never upscaled to fill.",
+      "target": "bg-near-datacenter.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "01_gameplay_reference.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "01b_gameplay_reference_mockup.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "03_protagonist_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "05_enemies_items_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "06_effects_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "07_hud_blocks_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "08_environment_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "09_backgrounds_source.webp"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "contracted output was not produced",
+      "target": "hud-bottom.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "contracted output was not produced",
+      "target": "hud-minimap.png"
+    },
+    {
+      "actual": "",
+      "check": "file_present",
+      "expected": "",
+      "level": "ERROR",
+      "message": "contracted output was not produced",
+      "target": "operations-tiles.png"
+    }
+  ]
+}

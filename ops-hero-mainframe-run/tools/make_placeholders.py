@@ -454,6 +454,9 @@ def build() -> dict[str, Image.Image]:
 
 
 def main() -> int:
+    # --only-missing backfills just the assets the real pipeline could not produce, leaving
+    # genuine extracted artwork untouched.
+    only_missing = "--only-missing" in sys.argv
     contract = load_contract()
     PATHS.ensure_output_dirs()
     report = Report("tools/make_placeholders.py")
@@ -464,6 +467,9 @@ def main() -> int:
         image = images.get(filename)
         if image is None:
             report.error("file_present", filename, "placeholder generator produced no image")
+            continue
+        if only_missing and (PATHS.public_assets / filename).exists():
+            report.skipped("emitted", filename, "real asset present; left untouched")
             continue
         # Make it visually obvious that this is NOT the real artwork.
         if filename.startswith(("hud-", "bg-")):

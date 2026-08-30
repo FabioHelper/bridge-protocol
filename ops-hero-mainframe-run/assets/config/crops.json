@@ -1,16 +1,23 @@
 {
   "$comment": "EDITABLE crop overrides. Overrides always win over auto-detection. After a pipeline run, copy values from build/reports/resolved-crops.json into this file to freeze them. See docs/SPEC-01-ASSET-PIPELINE.md section 1.5.",
   "defaults": {
-    "min_area": 64,
-    "merge_gap": 4
+    "min_area": 300,
+    "merge_gap": 0
   },
   "PROTAGONIST_SOURCE": {
-    "min_area": 400,
-    "merge_gap": 6,
+    "min_area": 300,
+    "merge_gap": 0,
     "expected_regions": 12,
     "overrides": {},
     "selection": [],
-    "$selection_note": "Leave empty to use the leg-split heuristic from SPEC-01 s1.8. Once reviewed, paste the exact 10 region ids here in final frame order (idleA, idleB, run x4, opposite-foot, airborne-recovery, jump, fall)."
+    "$selection_note": "Leave empty to use the leg-split heuristic from SPEC-01 s1.8. Once reviewed, paste the exact 10 region ids here in final frame order (idleA, idleB, run x4, opposite-foot, airborne-recovery, jump, fall).",
+    "chroma_key": [
+      132,
+      248,
+      165
+    ],
+    "chroma_tolerance": 50,
+    "$chroma_note": "Lossy WebP drifted the mint field; measured border deviation reached 44. tol=50 with merge_gap=0 is the only setting that separates all 12 poses."
   },
   "ICONS_SOURCE": {
     "min_area": 100,
@@ -21,36 +28,106 @@
     "$skip_note": "Record here the region ids of the redundant landscape variants and the extra magenta mechanical object so the report lists them as SKIPPED rather than missing."
   },
   "ENEMIES_ITEMS_SOURCE": {
-    "min_area": 150,
-    "merge_gap": 5,
+    "min_area": 300,
+    "merge_gap": 0,
     "overrides": {},
     "groups": {
-      "job-fail-bot.png": [],
-      "alert-bot.png": [],
-      "alert-drone.png": [],
-      "spool-runaway.png": [],
-      "command-token.png": [],
-      "invincibility-pickup.png": []
+      "job-fail-bot.png": [
+        "r0",
+        "r1",
+        "r2",
+        "r9"
+      ],
+      "alert-bot.png": [
+        "r3",
+        "r4",
+        "r10",
+        "r11"
+      ],
+      "alert-drone.png": [
+        "r5",
+        "r6",
+        "r12",
+        "r13"
+      ],
+      "spool-runaway.png": [
+        "r14",
+        "r15",
+        "r20",
+        "r21"
+      ],
+      "command-token.png": [
+        "r16",
+        "r17",
+        "r22",
+        "r23"
+      ],
+      "invincibility-pickup.png": [
+        "r18",
+        "r19",
+        "r24",
+        "r25"
+      ]
     },
     "screen_interior": {},
-    "$screen_interior_note": "Per-enemy rects of the baked screen text (e.g. JOB FAIL), stored so a later update can replace them with pixel symbols without redoing crops. MVP keeps the baked text."
+    "$screen_interior_note": "Per-enemy rects of the baked screen text (e.g. JOB FAIL), stored so a later update can replace them with pixel symbols without redoing crops. MVP keeps the baked text.",
+    "chroma_key": [
+      130,
+      251,
+      171
+    ],
+    "chroma_tolerance": 25
   },
   "EFFECTS_SOURCE": {
-    "min_area": 24,
-    "merge_gap": 2,
+    "min_area": 300,
+    "merge_gap": 0,
     "overrides": {},
     "groups": {
-      "invincibility-aura.png": [],
-      "impact-burst.png": [],
-      "stars": [],
-      "sparkles": []
+      "invincibility-aura.png": [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6"
+      ],
+      "stars": [
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11"
+      ],
+      "sparkles": [
+        "r12",
+        "r13",
+        "r14",
+        "r15",
+        "r16",
+        "r17",
+        "r18",
+        "r19"
+      ],
+      "impact-burst.png": [
+        "r20",
+        "r21",
+        "r22",
+        "r23"
+      ]
     },
     "chroma_policy": "edge-and-enclosed",
-    "$chroma_policy_note": "REQUIRED. The seven aura rings are hollow: the mint inside each ring touches no board edge, so the default edge-connected policy leaves it opaque and the 'aura centre must be empty' validation fails. Proven by tools/selftest_pipeline.py. Safe here because no effects artwork uses the chroma key."
+    "$chroma_policy_note": "REQUIRED. The seven aura rings are hollow: the mint inside each ring touches no board edge, so the default edge-connected policy leaves it opaque and the 'aura centre must be empty' validation fails. Proven by tools/selftest_pipeline.py. Safe here because no effects artwork uses the chroma key.",
+    "chroma_key": [
+      117,
+      245,
+      170
+    ],
+    "chroma_tolerance": 28
   },
   "HUD_BLOCKS_SOURCE": {
-    "min_area": 120,
-    "merge_gap": 4,
+    "min_area": 300,
+    "merge_gap": 0,
     "overrides": {},
     "groups": {
       "gameplay-tiles.png": []
@@ -62,13 +139,26 @@
       "hud-bottom.png": null
     },
     "clean_regions": [],
-    "$clean_regions_note": "Each entry: { id, panel, rect: [x,y,w,h], sample_at: [x,y] }. rect is in SOURCE board pixels. sample_at picks the dark fill colour from inside the same panel - the fill is sampled, never invented."
+    "$clean_regions_note": "Each entry: { id, panel, rect: [x,y,w,h], sample_at: [x,y] }. rect is in SOURCE board pixels. sample_at picks the dark fill colour from inside the same panel - the fill is sampled, never invented.",
+    "chroma_key": [
+      129,
+      251,
+      174
+    ],
+    "chroma_tolerance": 30,
+    "$note": "Detects 11 regions: 9 gameplay tiles plus 2 full-width HUD bands. The four HUD panels are connected through their own backdrop and cannot be split by connectivity, so they need explicit rects in `panels`."
   },
   "ENVIRONMENT_SOURCE": {
-    "min_area": 150,
-    "merge_gap": 4,
+    "min_area": 300,
+    "merge_gap": 0,
     "overrides": {},
-    "selection": []
+    "selection": [],
+    "chroma_key": [
+      124,
+      250,
+      176
+    ],
+    "chroma_tolerance": 23
   },
   "BACKGROUNDS_SOURCE": {
     "min_area": 2000,
@@ -80,6 +170,12 @@
       "bg-near-datacenter.png": null
     },
     "seam_mode": "repeat",
-    "$seam_mode_note": "repeat = tile the strip as-is. mirror = mirror alternate tiles, which guarantees a seamless join at the cost of symmetry."
+    "$seam_mode_note": "repeat = tile the strip as-is. mirror = mirror alternate tiles, which guarantees a seamless join at the cost of symmetry.",
+    "chroma_key": [
+      124,
+      252,
+      177
+    ],
+    "chroma_tolerance": 21
   }
 }
