@@ -21,8 +21,8 @@
     "ICONS_SOURCE": {
       "file": "04_icons_source.png",
       "reference_only": false,
-      "expected_regions": null,
-      "role": "NOT SUPPLIED. Blocks operations-tiles.png only. Everything else processes without it."
+      "expected_regions": 16,
+      "role": "Metallic icon family (8) + landscape icons + redundant variants + one unrelated magenta mechanical object. 16 regions expected; 12 selected."
     },
     "ENEMIES_ITEMS_SOURCE": {
       "file": "05_enemies_items_source.webp",
