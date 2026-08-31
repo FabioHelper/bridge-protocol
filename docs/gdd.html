@@ -1,0 +1,593 @@
+<title>Breach Protocol Design Bible</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --paper:#f3f6fb; --card:#ffffff; --sunk:#e8edf6; --line:#d3dceb;
+  --ink:#161d2b; --ink-2:#48566e; --ink-3:#77869e;
+  --amber:#9a6400; --amber-bg:#fdf3e0; --cyan:#0d6a87; --breach:#ad271f;
+  --jade:#0d6b48; --violet:#6a44b8;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --sign:'IBM Plex Sans Condensed',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --w:74ch;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#090d15; --card:#111825; --sunk:#0c1220; --line:#222d40;
+  --ink:#e4ebf7; --ink-2:#9aa9c0; --ink-3:#6b7b94;
+  --amber:#ffb000; --amber-bg:#231a06; --cyan:#57cbe8; --breach:#ff5f56;
+  --jade:#45d69a; --violet:#b18cff;
+}}
+:root[data-theme="dark"]{
+  --paper:#090d15; --card:#111825; --sunk:#0c1220; --line:#222d40;
+  --ink:#e4ebf7; --ink-2:#9aa9c0; --ink-3:#6b7b94;
+  --amber:#ffb000; --amber-bg:#231a06; --cyan:#57cbe8; --breach:#ff5f56;
+  --jade:#45d69a; --violet:#b18cff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 24px 120px}
+h1,h2,h3{font-family:var(--sign);font-weight:700;text-wrap:balance;line-height:1.12;margin:0}
+a{color:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* masthead */
+header{border-bottom:1px solid var(--line);margin-bottom:52px;
+  background:var(--card);padding:56px 24px 34px}
+.mast{max-width:var(--w);margin:0 auto}
+.slug{font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:18px;display:flex;flex-wrap:wrap;gap:8px 18px}
+h1{font-size:clamp(34px,6.4vw,56px);letter-spacing:.01em;text-transform:uppercase}
+h1 em{display:block;font-style:normal;color:var(--amber);font-size:.44em;letter-spacing:.2em;margin-top:12px}
+.dek{font-size:18px;color:var(--ink-2);margin-top:22px;max-width:62ch;line-height:1.55}
+
+/* structure */
+section{margin-top:60px;scroll-margin-top:20px}
+h2{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);
+  padding-bottom:9px;border-bottom:2px solid var(--amber);margin-bottom:26px}
+h3{font-size:21px;margin:34px 0 10px;letter-spacing:.01em}
+h3:first-of-type{margin-top:0}
+p{margin:0 0 16px}
+p+h3{margin-top:36px}
+strong{font-weight:600}
+em.term{font-style:normal;font-family:var(--mono);font-size:.9em;color:var(--amber);
+  background:var(--amber-bg);padding:1px 5px;border-radius:2px}
+
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin-bottom:7px}
+li::marker{color:var(--ink-3)}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:26px 0}
+.pillar{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--amber);padding:18px}
+.pillar h4{font-family:var(--sign);font-weight:700;font-size:15px;letter-spacing:.06em;
+  text-transform:uppercase;margin:0 0 7px}
+.pillar p{font-size:14px;color:var(--ink-2);margin:0;line-height:1.55}
+
+/* data */
+.scroll{overflow-x:auto;margin:22px 0;border:1px solid var(--line);background:var(--card)}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:13px;min-width:520px}
+th{text-align:left;font-weight:600;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-3);padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap;
+  background:var(--sunk)}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+td b{font-weight:600}
+.k-amber{color:var(--amber)} .k-cyan{color:var(--cyan)} .k-jade{color:var(--jade)}
+.k-breach{color:var(--breach)} .k-violet{color:var(--violet)}
+
+/* callouts */
+.note{border-left:3px solid var(--amber);background:var(--card);padding:16px 18px;margin:22px 0}
+.note .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);margin-bottom:7px}
+.note p:last-child{margin-bottom:0}
+.note.cut{border-left-color:var(--breach)}
+.note.cut .lbl{color:var(--breach)}
+
+/* transcript */
+.tx{background:var(--sunk);border:1px solid var(--line);font-family:var(--mono);font-size:13px;
+  margin:22px 0;overflow-x:auto}
+.tx .row{display:grid;grid-template-columns:88px 1fr;gap:14px;padding:8px 16px;
+  border-bottom:1px solid var(--line);min-width:440px}
+.tx .row:last-child{border-bottom:0}
+.tx .sp{font-weight:600;letter-spacing:.05em}
+.tx .an{color:var(--ink-2)}
+.tx .an b{color:var(--ink);font-weight:600}
+
+/* loop diagram */
+.loop{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin:24px 0;
+  border:1px solid var(--line);background:var(--card)}
+.loop div{padding:16px;border-right:1px solid var(--line);position:relative}
+.loop div:last-child{border-right:0}
+.loop .st{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--amber);
+  text-transform:uppercase;margin-bottom:6px;display:block}
+.loop .bd{font-size:14px;color:var(--ink-2);line-height:1.5}
+
+/* toc */
+nav.toc{background:var(--card);border:1px solid var(--line);padding:18px 20px;margin-bottom:8px}
+nav.toc .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:12px}
+nav.toc ol{columns:2;column-gap:32px;margin:0;padding-left:18px;font-size:14px}
+nav.toc li{margin-bottom:5px;break-inside:avoid}
+nav.toc a{color:var(--ink-2);text-decoration:none}
+nav.toc a:hover{color:var(--amber);text-decoration:underline}
+@media (max-width:620px){nav.toc ol{columns:1}}
+footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+</style>
+
+<header>
+  <div class="mast">
+    <div class="slug"><span>Design Bible</span><span>Revision 3.0</span><span>Third Shift · Node 7</span></div>
+    <h1>Mainframe<br>Breach Protocol<em>Corporate Horror · Social Deduction</em></h1>
+    <p class="dek">A 4–8 player social deduction game set across one night shift in a Global
+      Network Operations Centre. Nobody dies. People just stop having credentials — and the
+      building keeps a record of everyone who was ever standing anywhere.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc" aria-label="Contents">
+  <div class="lbl">Contents</div>
+  <ol>
+    <li><a href="#pillars">Design pillars</a></li>
+    <li><a href="#fiction">The fiction</a></li>
+    <li><a href="#loop">Core loop</a></li>
+    <li><a href="#acts">The four acts</a></li>
+    <li><a href="#economy">SLA economy</a></li>
+    <li><a href="#information">Information economy</a></li>
+    <li><a href="#roles">Roles &amp; powers</a></li>
+    <li><a href="#rogue">The Rogue Admin</a></li>
+    <li><a href="#tasks">Task design</a></li>
+    <li><a href="#bridge">The bridge</a></li>
+    <li><a href="#finale">The finale</a></li>
+    <li><a href="#death">Being locked out</a></li>
+    <li><a href="#ai">AI operators</a></li>
+    <li><a href="#art">Art &amp; audio direction</a></li>
+    <li><a href="#ux">UX &amp; accessibility</a></li>
+    <li><a href="#tuning">Tuning reference</a></li>
+    <li><a href="#cut">Cut &amp; deferred</a></li>
+  </ol>
+</nav>
+
+<section id="pillars">
+<h2>Design pillars</h2>
+<p>Four rules that settle arguments. If a feature does not serve one of them, it does not
+ship.</p>
+
+<div class="pillars">
+  <div class="pillar"><h4>The building remembers</h4>
+    <p>Every accusation must be checkable against a record. Suspicion in this game is
+    evidentiary, not vibes.</p></div>
+  <div class="pillar"><h4>Horror is procedural</h4>
+    <p>No monsters. The dread comes from process — a badge that stops working, a ticket
+    queue that will not close, a ceiling that keeps dropping.</p></div>
+  <div class="pillar"><h4>The night gets worse</h4>
+    <p>Every system escalates on one clock. Nothing about hour four should feel like hour
+    one.</p></div>
+  <div class="pillar"><h4>Doubt must survive</h4>
+    <p>Information is always partial. Any mechanic that makes the rogue obvious is a bug,
+    however satisfying it feels.</p></div>
+</div>
+</section>
+
+<section id="fiction">
+<h2>The fiction</h2>
+<p>It is 03:00 in a Global NOC. Six operators are on the floor covering the third shift.
+One of them has privileged access they are not supposed to have, and has spent the last
+hour quietly issuing logic bombs against production.</p>
+
+<p>The thematic pivot that makes this game its own thing: <strong>the antagonist is
+non-lethal.</strong> The Rogue Admin does not kill anyone. They <em class="term">revoke
+credentials</em>. A deprovisioned operator is still standing there — badge dead, terminal
+locked, watching. The org chart quietly shrinks. That is more unsettling than a body,
+and it is the entire reason the game's vocabulary works: nobody is murdered, tickets are
+closed, incidents are resolved, the shift ends.</p>
+
+<p>Everything is named from inside the job. You do not "do a task" — you close an
+incident. You do not "call a meeting" — you convene an <strong>Emergency Bridge</strong>.
+You do not "win" — <strong>operations normalize</strong>.</p>
+</section>
+
+<section id="loop">
+<h2>Core loop</h2>
+<div class="loop">
+  <div><span class="st">Clear</span><span class="bd">Work your queue. Each commit restores SLA and writes a badge record.</span></div>
+  <div><span class="st">Contain</span><span class="bd">Faults appear. Drop your queue and run to the counter-console, or bleed out.</span></div>
+  <div><span class="st">Notice</span><span class="bd">Someone goes dark. Who was on that side of the floor?</span></div>
+  <div><span class="st">Convene</span><span class="bd">Read the access log against what people claim. Vote or skip.</span></div>
+  <div><span class="st">Converge</span><span class="bd">Queues clear. Hold the bridge console together while the rogue drains it.</span></div>
+</div>
+<p>Loop length is roughly 8–14 minutes. The loop is designed so that the <em>work</em>
+(clearing) and the <em>social</em> (convening) feed each other: clearing generates the
+badge records that the bridge argues over, and the bridge decides who is still around to
+clear.</p>
+</section>
+
+<section id="acts">
+<h2>The four acts</h2>
+<p>One shift clock drives drain, the SLA ceiling, the colour grade, scanline density and
+the audio bed. There is no separate "difficulty" system — the clock <em>is</em> the
+difficulty system, and the player reads it on the wall.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Act</th><th>Reads</th><th class="n">Starts</th><th class="n">Drain/s</th><th class="n">SLA ceiling</th><th>Grade</th></tr></thead>
+<tbody>
+<tr><td class="k-cyan"><b>NOMINAL</b></td><td>03:00</td><td class="n">0s</td><td class="n">0.14</td><td class="n">100%</td><td>Clean cyan, full key light</td></tr>
+<tr><td class="k-cyan"><b>DEGRADED</b></td><td>03:43</td><td class="n">150s</td><td class="n">0.30</td><td class="n">90%</td><td>Slight desaturation, thicker scanlines</td></tr>
+<tr><td class="k-amber"><b>CRITICAL</b></td><td>04:35</td><td class="n">330s</td><td class="n">0.52</td><td class="n">74%</td><td>Hue shifts warm, fog closes 22 units</td></tr>
+<tr><td class="k-breach"><b>CONTAINMENT</b></td><td>05:33</td><td class="n">520s</td><td class="n">0.78</td><td class="n">58%</td><td>Key light dims and sours, act label pulses</td></tr>
+</tbody></table></div>
+
+<div class="note">
+<div class="lbl">The load-bearing idea</div>
+<p>The <strong>ceiling</strong>, not the drain, is what makes the meter mean something.
+Repairs restore SLA, but never above the current act's cap. What the night costs you, it
+keeps. By CONTAINMENT a perfect team is playing with 58 points of headroom, so a single
+un-contained abend is suddenly a 74-second death sentence rather than an inconvenience.</p>
+</div>
+</section>
+
+<section id="economy">
+<h2>SLA economy</h2>
+<p>Version 2 shipped with an inert meter. The audit is worth recording because it is the
+kind of failure that hides behind working code: every system functioned, and the game had
+no tension.</p>
+
+<div class="note cut">
+<div class="lbl">What was wrong</div>
+<p>Idle drain of 0.10/s against 20 tasks averaging 17 SLA restore each meant
+<strong>340 points of restore chasing a 100-point bar</strong>. The meter sat pinned at
+100% for the entire shift. The central tension device was decorative.</p>
+</div>
+
+<p>The fix was structural rather than numeric — a falling ceiling converts surplus restore
+from "wasted overflow" into "the thing that keeps you alive later". Restore values were
+left generous on purpose: the crew should feel productive. The pressure comes from the
+ceiling descending underneath them.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Source</th><th class="n">Value</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Idle drain</td><td class="n">0.14 → 0.78/s</td><td>Act-driven</td></tr>
+<tr><td>Abend fault</td><td class="n">+2.60/s</td><td>Loud. 38s to kill from full. Cleared by one LPAR repair</td></tr>
+<tr><td>Logic bomb</td><td class="n">+0.75/s</td><td class="k-breach">Silent — no banner unless a NOC Analyst is on shift</td></tr>
+<tr><td>Task commit</td><td class="n">+12 to +22</td><td>Capped by the act ceiling</td></tr>
+<tr><td>Hotpatch</td><td class="n">drain = 0</td><td>SysAdmin power, 9 seconds</td></tr>
+</tbody></table></div>
+
+<p>The logic bomb is the most interesting object in this table. It is quiet, cheap and
+slow, and the only crew member who can see its source is the NOC Analyst. A bomb planted
+in NOMINAL and left alone is nearly invisible; the same bomb in CONTAINMENT is lethal. It
+rewards a rogue who plans ahead and punishes a crew who never rostered an analyst.</p>
+</section>
+
+<section id="information">
+<h2>Information economy</h2>
+<p>This is the heart of the design, and the thing version 2 was missing entirely. A social
+deduction game is an information game; without a substrate, voting is a coin flip. Three
+systems supply it.</p>
+
+<h3>Limited vision</h3>
+<p>You always see the <strong>building</strong> — you work here, you know the floor plan.
+You do not always see the <strong>people</strong>. Operators fade out beyond 8.6 tiles or
+behind any opaque geometry, with a 2.2-tile falloff so contacts resolve gradually rather
+than popping. This single rule creates every ambiguity the bridge later argues over.</p>
+
+<h3>The access log</h3>
+<p>The building's badge reader is the deduction engine, and it is thematically free —
+every real NOC has one. Four record types:</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Record</th><th>Written when</th><th>Reveals</th></tr></thead>
+<tbody>
+<tr><td class="k-cyan"><b>BADGE</b></td><td>An operator lingers at a console (6s cooldown)</td><td>Name, console, time</td></tr>
+<tr><td class="k-jade"><b>COMMIT</b></td><td>A task is completed</td><td>Name, console, time</td></tr>
+<tr><td class="k-breach"><b>REVOKE</b></td><td>Credentials are revoked</td><td class="k-breach"><b>Place and time — never the name</b></td></tr>
+<tr><td class="k-amber"><b>FAULT</b></td><td>A non-silent sabotage fires</td><td>Fault type and time</td></tr>
+</tbody></table></div>
+
+<p>The revocation record is the load-bearing one. It is <em class="term">UNSIGNED</em>:
+it tells the floor <em>where</em> and <em>when</em> a badge died, but not <em>who</em>
+did it. Deduction is the act of cross-referencing that place and time against everyone
+else's badge trail. That is a genuine forensic procedure, and it is the game.</p>
+
+<h3>Testimony</h3>
+<p>Bots speak from a witness memory recorded every 1.4 seconds — who they actually had
+line of sight to, where that person was standing, and when. At the bridge each bot emits
+one statement. A sighting only becomes testimony if the subject was within 5.5 tiles of
+the revocation, the witness within 7, and both within 4.5 seconds of it.</p>
+
+<p><strong>At most two operators may come forward.</strong> This is a deliberate ceiling,
+not a performance limit: a floor that unanimously fingers the same person is a cutscene.
+Remaining crew fall back to honest, boring alibis — which is exactly what most people in
+a real incident have.</p>
+
+<p>The rogue lies on a schedule: 70% of the time it names a console it never badged (a
+<strong>falsifiable</strong> lie you can catch by reading the log), 30% of the time it
+tells the literal truth about where it was, which is safer and weaker because being
+somewhere earlier proves nothing about where you went next.</p>
+
+<div class="note">
+<div class="lbl">Worked example — unscripted output from a playtest</div>
+<p>Revocation logged at Rack SYS-01. The actual rogue was DELTA.</p>
+</div>
+
+<div class="tx">
+  <div class="row"><span class="sp k-breach">DELTA</span><span class="an">"I was on Routing Console B. Pull the log if you want." <b>← the rogue, telling the truth</b></span></div>
+  <div class="row"><span class="sp">GAMMA</span><span class="an">"I had eyes on EPSILON by Rack SYS-01 right when it went dark." <b>← honest, and wrong</b></span></div>
+  <div class="row"><span class="sp">EPSILON</span><span class="an">"I was nowhere near Rack SYS-01. I cannot help you." <b>← flatly contradicts GAMMA</b></span></div>
+  <div class="row"><span class="sp">BETA</span><span class="an">"I had eyes on DELTA by Rack SYS-01 right when it went dark." <b>← correct</b></span></div>
+</div>
+
+<p>Two eyewitnesses naming different people, one of them denying it outright, and a rogue
+whose alibi the log will confirm. The player has to reason that a corroborated alibi at
+03:41 says nothing about 03:44. None of this was scripted — it is what the three windows
+produce when a killing happens near a crowd.</p>
+</section>
+
+<section id="roles">
+<h2>Roles &amp; powers</h2>
+<p>Every role carries passive modifiers <em>and</em> one active power on <strong>Q</strong>.
+The passives shape how you play the whole shift; the power is a decision you make three or
+four times a night. Powers are previewed on the selection screen so the choice is informed.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Role</th><th>Passive</th><th>Power (Q)</th><th class="n">CD</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td class="k-amber"><b>SysAdmin</b></td><td>Repairs at any console type, ×1.5 repair weight</td><td>Hotpatch</td><td class="n">62s</td><td>The only role that can contain a fault it wasn't near. Freezing drain for 9s can save a doomed bar</td></tr>
+<tr><td class="k-cyan"><b>NOC Analyst</b></td><td>Sees silent faults and their source</td><td>Ping Sweep</td><td class="n">54s</td><td>The only counter to the logic bomb. Sweep paints every operator through walls for 4s — a hard alibi generator</td></tr>
+<tr><td class="k-jade"><b>Database Admin</b></td><td>Tasks take half as long</td><td>Rollback</td><td class="n">48s</td><td>Clears the whole queue fastest, so pushes the shift toward the finale. Rollback instantly restores corrupted zones</td></tr>
+<tr><td class="k-violet"><b>Problem Manager</b></td><td>No bridge cooldown, double vote weight</td><td>Spot Audit</td><td class="n">44s</td><td>Can convene the moment they see something. Audit pulls the nearest operator's last badge record on demand</td></tr>
+</tbody></table></div>
+
+<div class="note">
+<div class="lbl">Design nuance</div>
+<p>The Rogue Admin <strong>keeps their cover role's power</strong> and should be seen using
+it. A rogue who never hotpatches is a rogue who reads as a rogue. This converts the role
+system from flavour into active camouflage, and gives the rogue something honest and useful
+to do in public.</p>
+</div>
+</section>
+
+<section id="rogue">
+<h2>The Rogue Admin</h2>
+<p>The rogue's toolkit is built around <em>plausible deniability</em> rather than raw
+damage. Every tool is something a legitimate admin might conceivably have caused.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Tool</th><th class="n">CD</th><th>Effect</th><th>Counter</th></tr></thead>
+<tbody>
+<tr><td><b>Trigger Abend</b></td><td class="n">26s</td><td>+2.6 SLA/s, loud alarm, screen shake</td><td>One LPAR repair</td></tr>
+<tr><td><b>Plant Logic Bomb</b></td><td class="n">42s</td><td>+0.75 SLA/s, <b>no alarm</b></td><td>Two alert acknowledgements</td></tr>
+<tr><td><b>Corrupt Zones</b></td><td class="n">34s</td><td>Locks 3 consoles for 38s</td><td>Wait, or a DBA rollback</td></tr>
+<tr><td><b>Seal Bulkheads</b></td><td class="n">30s</td><td>Both doors impassable for 14s</td><td>Wait. Splits the floor in two</td></tr>
+<tr><td><b>Spoof False Alert</b></td><td class="n">38s</td><td>Full alarm, <b>zero damage</b></td><td>Nothing — it wastes the crew's time</td></tr>
+<tr><td class="k-violet"><b>Purge Access Logs</b></td><td class="n">55s</td><td>Truncates the last 9 records</td><td class="k-violet">Nothing — but the purge itself is logged</td></tr>
+</tbody></table></div>
+
+<p><strong>Spoof</strong> and <strong>Purge</strong> are the two that make the rogue a
+character rather than a damage source. Spoof is pure misdirection — a real-looking alarm
+that costs nothing, sending the crew running to a repair that was never needed and
+manufacturing an excuse for you to be anywhere. Purge is the direct counter to the audit
+trail, and it is deliberately a double-edged tool: it destroys the evidence against you,
+but the truncation is itself written into the log, so the crew learns that <em>somebody</em>
+had something to hide.</p>
+
+<h3>Revocation</h3>
+<p>Requires proximity of 1.7 tiles, clear line of sight, a 22-second cooldown, and the
+target must be genuinely isolated — bots verify that no third party has eyes on the victim
+before committing. There is a 14-second opening grace so no shift ends in the first ten
+seconds. The revocation writes its unsigned record; anyone with line of sight forms real,
+mechanical suspicion that feeds their vote.</p>
+</section>
+
+<section id="tasks">
+<h2>Task design</h2>
+<p>Tasks are <strong>competence fantasies</strong>, 8–18 seconds, built from real
+mainframe operations vocabulary. The hard constraint: <strong>every puzzle generates its
+own answer per attempt, from a rule printed in the modal.</strong> You solve them by
+reading, never by memorising. Version 1's triage form always wanted <em>P1 /
+Mainframe-Ops</em> — both the first option of each dropdown — which is a puzzle exactly
+once.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Task</th><th class="n">Base</th><th>Verb</th><th>Randomises</th></tr></thead>
+<tbody>
+<tr><td>Acknowledge Alert</td><td class="n">11s</td><td>Find three matching lines in a live scrolling console</td><td>Target abend code, feed contents, hit count</td></tr>
+<tr><td>File Incident Ticket</td><td class="n">16s</td><td>Read a triage matrix, set priority and assignment group</td><td>Subsystem, impact tier, option order</td></tr>
+<tr><td>Cancel Abending Job</td><td class="n">13s</td><td>Pick the looping job out of a spool display</td><td>Job names, which one is faulted, abend code</td></tr>
+<tr><td>IPL Recovery Sequence</td><td class="n">18s</td><td>Execute four steps in runbook order</td><td>Which four steps, their order, button layout</td></tr>
+<tr><td>Verify Routing Table</td><td class="n">16s</td><td>Restore three CIDR blocks to their gateways</td><td>Blocks, gateways, VLAN tags, row order</td></tr>
+<tr><td>Restore From Tape</td><td class="n">15s</td><td class="k-amber"><b>Two-stage, cross-map</b></td><td>Corruption time, catalogue, seek window and speed</td></tr>
+</tbody></table></div>
+
+<p><strong>Restore From Tape</strong> is the designed outlier. Stage one is in the NOC:
+read a corruption timestamp and pick the newest backup taken <em>before</em> it. Stage two
+is in the data centre: stop a moving head inside a restore window. It is the only task that
+forces you to cross the bulkhead, which is precisely why it exists — it manufactures the
+long unaccompanied walk that makes alibis meaningful and gives the rogue its best
+opportunity. It is sorted <strong>last</strong> in every queue, so the shift's most exposed
+errand lands in its most dangerous act.</p>
+</section>
+
+<section id="bridge">
+<h2>The bridge</h2>
+<p>Three phases on one authoritative timer. The single-overlay, single-timer construction
+is deliberate: the prototype's meeting flow had a class of bug where the discussion and
+voting clocks disagreed.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Phase</th><th class="n">Length</th><th>Shown</th></tr></thead>
+<tbody>
+<tr><td><b>DISCUSSION</b></td><td class="n">15s</td><td>Floor statements beside the full access log. Read them against each other</td></tr>
+<tr><td><b>VOTING</b></td><td class="n">30s</td><td>Weighted tally, live. Log stays on screen</td></tr>
+<tr><td><b>REVEAL</b></td><td class="n">4.5s</td><td>Who was deprovisioned, and whether the floor was right</td></tr>
+</tbody></table></div>
+
+<p>Convening requires standing at the bridge table <em>or</em> being within 4.2 tiles of a
+locked-out operator with line of sight — you must actually find the body. All living
+operators are pulled to the table on convene, which resets positional stalemates and gives
+the next act a clean start. A Problem Manager ignores the 40-second cooldown entirely.</p>
+
+<p>Ties and skip-majorities deprovision nobody, and the reveal says so plainly. Getting it
+wrong needs to feel like a decision the floor made, not a dice roll.</p>
+</section>
+
+<section id="finale">
+<h2>The finale</h2>
+<p>Once every queue on the floor is clear, the Master IPL unlocks. Version 2 made this a
+hold-to-win button in a modal, which is an anticlimax: the game's whole shape is people
+moving around a floor, and the climax removed the floor.</p>
+
+<p>The finale is now <strong>contested space</strong>. A charge bar visible to every
+operator fills while crew stand within 2.4 tiles of the bridge console, at 15 points per
+operator per second. The rogue standing in the same space drains it at 26 per second.</p>
+
+<ul>
+<li>One crew member alone <strong>cannot</strong> out-charge a present rogue. The crew must arrive together.</li>
+<li>The rogue must physically commit to the console, in the open, in front of everyone — or remove people first.</li>
+<li>Crew see the bar fall but <strong>cannot see who is draining it</strong> unless they can see the person. The last thirty seconds are a scramble to work out who is standing in the room with you.</li>
+</ul>
+
+<p>This turns the endgame into the game's own thesis played at full volume: a crowd, a
+shared resource, and one person in the room who should not be there.</p>
+</section>
+
+<section id="death">
+<h2>Being locked out</h2>
+<p>An eliminated player who has nothing to do is a player who leaves. Deprovisioned
+operators keep the camera, keep movement, and gain <strong>forensic access</strong>:</p>
+<ul>
+<li>They see <strong>every</strong> operator on the floor, ignoring the vision rule.</li>
+<li>They read the <strong>un-redacted</strong> access log — revocations show the actual name, rendered in violet.</li>
+<li>They can say nothing, vote for nobody, and change nothing.</li>
+</ul>
+<p>That is the horror beat and the retention mechanic at once. You know exactly who it is.
+You watch the floor deliberate. You watch them get it wrong. The banner reads
+<em class="term">READ-ONLY ACCESS</em>.</p>
+</section>
+
+<section id="ai">
+<h2>AI operators</h2>
+<p>Five bots fill the floor so a solo or three-player session is still a real game. A
+seven-state machine, transitions validated against a declared table at boot.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>State</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td><b>PATROL</b></td><td>Fallback wander when no objective is reachable</td></tr>
+<tr><td><b>PATH</b></td><td>BFS route to the next queue item, re-routing when bulkheads change</td></tr>
+<tr><td><b>WORK</b></td><td>4–7.5s at a console, then a validated commit through the same reducer players use</td></tr>
+<tr><td><b>FAKE_WORK</b></td><td class="k-breach">Rogue only. Mimes a work loop at a console it was never assigned</td></tr>
+<tr><td><b>HUNT</b></td><td class="k-breach">Pursues an isolated target, re-pathing every 0.55s so it routes around geometry</td></tr>
+<tr><td><b>FLEE</b></td><td>Leaves the scene toward a point at least 7 tiles away</td></tr>
+<tr><td><b>ALIBI</b></td><td class="k-breach">Rogue re-enters a populated area and looks busy</td></tr>
+</tbody></table></div>
+
+<p>Bots act only through the same validated reducer as human players — a bot cannot commit
+a task it was not assigned or revoke someone it is not standing next to. They are honest
+participants, not privileged scripts. Crew bots weight their vote by mechanical suspicion
+earned from witnessed revocations and corroborated testimony; rogue bots vote for a crew
+member.</p>
+</section>
+
+<section id="art">
+<h2>Art &amp; audio direction</h2>
+<h3>Palette</h3>
+<p>Amber phosphor on navy — the IBM 3278 terminal, not the green CRT everything else
+reaches for. Colour is strictly semantic: <span class="k-cyan">cyan means nominal</span>,
+<span class="k-amber">amber means attention</span>, <span class="k-jade">jade means
+committed</span>, <span class="k-breach">red means breach</span>,
+<span class="k-violet">violet means forensic</span>. No decorative colour anywhere.</p>
+
+<h3>Type</h3>
+<p>IBM Plex Sans Condensed for facility signage, IBM Plex Mono for every terminal readout.
+Literally the mainframe vendor's typeface. The corporate face set against the terminal face
+<em>is</em> the game's thematic tension, rendered in type.</p>
+
+<h3>Camera and space</h3>
+<p>Locked 2:1 isometric orthographic, following with a 0.085 lerp. The bright NOC floor
+against the near-black data centre is a deliberate contrast: the server hall should read as
+the dangerous room, and it does so purely through material value.</p>
+
+<h3>Audio</h3>
+<p>A held FM drone under everything, attacked at −60 dB and ramped up so there is no pop at
+boot. The graph is wired once and <strong>never re-patched</strong>; a permanently connected
+parallel bitcrush-and-distortion path sits at zero gain and crossfades up during a fault.
+Cue throttling is per <em>voice</em> rather than per cue, which is what actually prevents
+two different cues from being scheduled on the same synth at an identical timestamp.</p>
+</section>
+
+<section id="ux">
+<h2>UX &amp; accessibility</h2>
+<ul>
+<li><strong>Role reveal.</strong> A held cinematic card opens every shift: your assignment,
+your allegiance, your objectives, your power. The rogue's card explains the badge system
+and tells them their cover role's power is camouflage they should use in public.</li>
+<li><strong>One interact key.</strong> SPACE resolves to exactly one action, chosen by a
+priority ladder, and the prompt always names it explicitly — <em class="term">CONTAIN ·
+TRIGGER ABEND</em>, not "Interact".</li>
+<li><strong>Faults name their own cure.</strong> The alert banner states which console type
+contains it and how many repairs remain.</li>
+<li><strong>Input hygiene.</strong> Held keys live in a set, so releasing S never cancels a
+held W. Keys are lowercased against Caps Lock. Every phase transition blurs the focused
+element so movement can never be trapped in a text field. INPUT, SELECT, TEXTAREA and
+contenteditable all suppress movement.</li>
+<li><strong>Touch.</strong> A d-pad appears on coarse pointers; the centre button doubles as
+interact and as the hold control for charge-based tasks.</li>
+<li><strong>Reduced motion.</strong> <em class="term">prefers-reduced-motion</em> disables
+the CRT flicker and screen shake and collapses transitions.</li>
+<li><strong>Focus.</strong> Every control has a visible amber focus ring; controls are real
+buttons with <em class="term">aria-pressed</em> state.</li>
+</ul>
+</section>
+
+<section id="tuning">
+<h2>Tuning reference</h2>
+<div class="scroll"><table>
+<thead><tr><th>Parameter</th><th class="n">Value</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td>Player speed</td><td class="n">5.0 t/s</td><td>Crossing the floor takes ~5s — long enough to be caught out</td></tr>
+<tr><td>Bot speed</td><td class="n">4.5 t/s</td><td>Close enough that a hunting rogue is a real threat; slow enough to outrun</td></tr>
+<tr><td>Vision range</td><td class="n">8.6 tiles</td><td>Roughly one room. You can be alone in a populated building</td></tr>
+<tr><td>Revoke range</td><td class="n">1.7 tiles</td><td>Requires genuine contact</td></tr>
+<tr><td>Report range</td><td class="n">4.2 tiles</td><td>You must find the body, but need not stand on it</td></tr>
+<tr><td>Tasks per crew</td><td class="n">4</td><td>20 total at six players — about 8 minutes of honest work</td></tr>
+<tr><td>Opening grace</td><td class="n">14s</td><td>No shift ends before anyone has moved</td></tr>
+<tr><td>Bridge cooldown</td><td class="n">40s</td><td>Prevents meeting-spam stalling the shift</td></tr>
+<tr><td>Badge cooldown</td><td class="n">6s</td><td>Keeps the log readable rather than a wall of noise</td></tr>
+<tr><td>Log capacity</td><td class="n">64 records</td><td>Long enough to cover two acts; short enough to scan under a 15s timer</td></tr>
+<tr><td>Testimony windows</td><td class="n">4.5s / 5.5t / 7t</td><td>Time, subject distance, witness distance. Tightened from 9s/6.5t after playtesting produced pile-ons</td></tr>
+<tr><td>Max eyewitnesses</td><td class="n">2</td><td>Hard ceiling. Doubt must survive</td></tr>
+<tr><td>IPL charge</td><td class="n">100</td><td>15/s per crew, −26/s per rogue. One operator cannot beat one rogue</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="cut">
+<h2>Cut &amp; deferred</h2>
+<p>Recorded so the reasoning is not relitigated.</p>
+<ul>
+<li><strong>Voice or text chat.</strong> Out of scope for a zero-install page. The access
+log and generated testimony are the deliberate substitute, and are arguably better for solo
+play — they give an offline shift a real argument to referee.</li>
+<li><strong>Multiple rogues.</strong> The manifest supports the ratio; the testimony system
+assumes a single actor for its lie generation. Turning it on needs the lie model reworked
+so two rogues do not accidentally corroborate each other.</li>
+<li><strong>Persistent meta-progression.</strong> Deliberately shallow — shifts survived,
+rogue record, fastest IPL, in browser storage. Unlockables would pull the game toward
+grind and away from a self-contained night.</li>
+<li><strong>Post-processing bloom.</strong> Would need the Three.js addon bundle, which the
+single-file no-build constraint forbids. Emissive materials, fog and a CSS scanline layer
+carry the look at 42 draw calls instead.</li>
+<li><strong>Body positions persisting.</strong> Locked-out operators currently stay where
+they fell, which is correct, but they are not yet obstacles or cover. Deferred.</li>
+</ul>
+</section>
+
+<footer>
+Mainframe: Breach Protocol · Design Bible rev 3.0 · Three.js r152 · YUKA 0.7.8 · Tone.js 14.7.77 · PeerJS 1.5.2 · single file, no build step
+</footer>
+</div>

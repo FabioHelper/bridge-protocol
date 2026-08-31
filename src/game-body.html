@@ -259,6 +259,86 @@ body.cine #bar-t,body.cine #bar-b{height:64px}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--amber);color:var(--void);font-weight:600}
 
+/* ── shift clock: the act structure, made visible ─────────────────── */
+#d-clock{top:16px;left:50%;transform:translateX(-50%) translateY(112px);text-align:center;min-width:150px}
+#clock-time{font-family:var(--sign);font-weight:700;font-size:23px;line-height:1;color:var(--ink-hi);
+  font-variant-numeric:tabular-nums;letter-spacing:.06em}
+#clock-act{font-size:10px;letter-spacing:.24em;margin-top:3px;color:var(--ink-dim);text-transform:uppercase}
+body[data-act="1"] #clock-act{color:var(--cyan)}
+body[data-act="2"] #clock-act{color:var(--amber)}
+body[data-act="3"] #clock-act{color:var(--breach);animation:thump 1.4s infinite}
+#sla-cap{position:absolute;top:0;bottom:0;width:2px;background:var(--breach);opacity:.75}
+
+/* the night sours the whole frame, one act at a time */
+body[data-act="1"] #game-root{filter:saturate(.92) contrast(1.03)}
+body[data-act="2"] #game-root{filter:saturate(.8) contrast(1.07) hue-rotate(-6deg)}
+body[data-act="3"] #game-root{filter:saturate(.66) contrast(1.12) hue-rotate(-12deg) brightness(.95)}
+body[data-act="2"] #crt{background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.22) 2px 3px)}
+body[data-act="3"] #crt{background:repeating-linear-gradient(to bottom,transparent 0 1px,rgba(0,0,0,.3) 1px 3px)}
+
+/* ── role power ───────────────────────────────────────────────────── */
+#power-btn{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
+  margin-top:9px;padding:8px 10px;background:rgba(255,176,0,.08);border:1px solid var(--rule-hi);
+  color:var(--amber);font-family:var(--mono);font-size:12px;letter-spacing:.06em;cursor:pointer;
+  transition:background .14s,transform .1s}
+#power-btn:hover:not(:disabled){background:var(--amber);color:var(--void)}
+#power-btn:disabled{opacity:.4;cursor:not-allowed}
+#power-btn .pk{font-family:var(--sign);font-weight:700;border:1px solid currentColor;padding:0 6px;font-size:11px}
+#audit-out{font-size:11px;color:var(--cyan);margin-top:6px;line-height:1.5;display:none}
+#audit-out.on{display:block}
+
+/* ── master IPL: contested floor, watched by everyone ─────────────── */
+#d-ipl{top:16px;left:50%;transform:translateX(-50%) translateY(176px);min-width:330px;text-align:center;display:none}
+#d-ipl.on{display:block}
+#ipl-track{height:12px;background:var(--steel-3);margin-top:6px;position:relative;overflow:hidden;
+  border:1px solid var(--rule)}
+#ipl-bar{height:100%;width:0;background:linear-gradient(90deg,var(--jade),#9dffd0);transition:width .12s linear}
+#ipl-note{font-size:11px;letter-spacing:.1em;margin-top:5px;color:var(--ink-dim)}
+#d-ipl.contested #ipl-bar{background:linear-gradient(90deg,var(--breach),#ff9a9a)}
+#d-ipl.contested #ipl-note{color:var(--breach)}
+
+/* ── ghost ────────────────────────────────────────────────────────── */
+#d-ghost{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;display:none;
+  border-color:rgba(167,123,255,.5);background:rgba(9,14,26,.5);pointer-events:none}
+#d-ghost.on{display:block}
+#d-ghost .gt{font-family:var(--sign);font-weight:700;font-size:20px;letter-spacing:.14em;color:var(--violet)}
+#d-ghost .gs{font-size:11px;color:var(--ink-dim);margin-top:4px;letter-spacing:.06em}
+
+/* ── bridge: testimony and the audit trail ────────────────────────── */
+#bridge .panel{max-width:820px}
+.bridge-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);align-items:start}
+@media (max-width:760px){.bridge-grid{grid-template-columns:1fr}}
+.talk{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,176,0,.08);text-align:left}
+.talk .sp{font-family:var(--sign);font-weight:700;font-size:12px;letter-spacing:.08em;flex:0 0 74px}
+.talk .ln{font-size:12px;color:var(--ink);line-height:1.5}
+.logtab{max-height:250px;overflow-y:auto;background:#04070e;border:1px solid rgba(255,176,0,.18)}
+.logrow{display:grid;grid-template-columns:44px 58px 1fr;gap:8px;padding:4px 9px;font-size:11px;
+  border-bottom:1px solid rgba(255,176,0,.05);align-items:baseline}
+.logrow .lt{color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.logrow .lk{font-size:9px;letter-spacing:.12em;color:var(--ink-dim)}
+.logrow.k-COMMIT .lk{color:var(--jade)} .logrow.k-BADGE .lk{color:var(--cyan)}
+.logrow.k-REVOKE{background:rgba(255,59,59,.1)} .logrow.k-REVOKE .lk{color:var(--breach)}
+.logrow.k-FAULT .lk{color:var(--amber)} .logrow.k-FAULT .lv{color:var(--amber)}
+.logrow .lv{color:var(--ink)}
+.logrow .lv b{color:var(--ink-hi);font-weight:500}
+
+/* ── role reveal ──────────────────────────────────────────────────── */
+#reveal{position:fixed;inset:0;z-index:800;display:none;place-items:center;background:#000;
+  text-align:center;padding:var(--s4)}
+#reveal.on{display:grid}
+#reveal .rv-lbl{font-size:11px;letter-spacing:.5em;color:var(--ink-dim);margin-bottom:var(--s3);
+  animation:rvin .5s both}
+#reveal .rv-name{font-family:var(--sign);font-weight:700;font-size:clamp(40px,9vw,86px);
+  letter-spacing:.07em;line-height:1;animation:rvin .6s .18s both}
+#reveal .rv-side{font-size:14px;letter-spacing:.24em;margin-top:var(--s3);animation:rvin .6s .38s both}
+#reveal .rv-obj{margin:var(--s4) auto 0;max-width:430px;font-size:13px;line-height:1.8;
+  color:var(--ink);text-align:left;border-left:2px solid var(--amber-dim);padding-left:var(--s3);
+  animation:rvin .6s .58s both}
+#reveal .rv-obj b{color:var(--amber);font-weight:500}
+#reveal .rv-go{margin-top:var(--s4);font-size:11px;letter-spacing:.3em;color:var(--ink-dim);
+  animation:rvin .6s .9s both}
+@keyframes rvin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
 /* ── toast ───────────────────────────────────────────────────────── */
 #toast{position:fixed;top:88px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:9000;
   background:rgba(9,14,26,.96);border:1px solid var(--rule-hi);padding:10px 20px;
@@ -305,6 +385,7 @@ body.cine #bar-t,body.cine #bar-b{height:64px}
       <button class="btn" id="b-connect">Connect</button>
     </div>
     <div id="boot-log"></div>
+    <div id="menu-record" class="lbl" style="margin-top:10px;text-align:center;opacity:.75"></div>
   </div>
 </section>
 
@@ -364,10 +445,25 @@ body.cine #bar-t,body.cine #bar-b{height:64px}
       <div id="glob-track"><div id="glob-bar"></div></div>
     </div>
   </div>
+  <div class="dock" id="d-clock">
+    <div id="clock-time" class="num">03:00</div>
+    <div id="clock-act">Nominal</div>
+  </div>
+  <div class="dock" id="d-ipl">
+    <div class="lbl">Master IPL · Converge on the Bridge</div>
+    <div id="ipl-track"><div id="ipl-bar"></div></div>
+    <div id="ipl-note">No operator on the console</div>
+  </div>
+  <div class="dock" id="d-ghost">
+    <div class="gt">READ-ONLY ACCESS</div>
+    <div class="gs">Your badge is dead. You see everything and can say nothing.</div>
+  </div>
   <div class="dock" id="d-role">
     <div class="lbl">Credentials</div>
     <div id="role-name">SYSADMIN</div>
     <div id="role-perk"></div>
+    <button id="power-btn"><span><span class="pk">Q</span> <span id="power-label">Hotpatch</span></span><span id="power-cd">READY</span></button>
+    <div id="audit-out"></div>
   </div>
   <div class="dock" id="d-alert">
     <div id="alert-title">ABEND CASCADE</div>
@@ -402,7 +498,28 @@ body.cine #bar-t,body.cine #bar-b{height:64px}
       <div id="bridge-sub">Initiated by ---</div>
       <div id="bridge-clock" class="num">15</div>
     </div>
-    <div id="bridge-body"></div>
+    <div class="bridge-grid">
+      <div>
+        <div class="lbl" style="margin-bottom:6px">Floor Statements</div>
+        <div id="bridge-talk"></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:6px">Access Log · Node 7</div>
+        <div id="bridge-log" class="logtab"></div>
+      </div>
+    </div>
+    <div id="bridge-body" style="margin-top:var(--s3)"></div>
+  </div>
+</div>
+
+<!-- ════ ROLE REVEAL ════ -->
+<div id="reveal">
+  <div>
+    <div class="rv-lbl">Shift Assignment</div>
+    <div class="rv-name" id="rv-name">SYSADMIN</div>
+    <div class="rv-side" id="rv-side">NOC OPERATIONS</div>
+    <div class="rv-obj" id="rv-obj"></div>
+    <div class="rv-go">Press any key to take the floor</div>
   </div>
 </div>
 

@@ -45,6 +45,30 @@ const SI = {
 
   spawn:{ col:14.5, row:8.5, spread:1.6 },
 
+  /* The shift is the act structure. Drain climbs and — more importantly — the
+     SLA CEILING falls, so late-shift repairs can never restore what was lost.
+     This is what makes the meter mean something instead of pinning at 100. */
+  shift:{
+    startHour:3, minPerSec:0.29,     /* a full shift reads 03:00 -> ~06:00 */
+    acts:[
+      {t:0,   drain:0.14, cap:100, grade:0.00, name:'NOMINAL'},
+      {t:150, drain:0.30, cap:90,  grade:0.34, name:'DEGRADED'},
+      {t:330, drain:0.52, cap:74,  grade:0.68, name:'CRITICAL'},
+      {t:520, drain:0.78, cap:58,  grade:1.00, name:'CONTAINMENT'}
+    ]},
+
+  /* You work in this building, so you always see its geometry. You do not
+     always see the people in it. That asymmetry is the whole game. */
+  vision:{ range:8.6, fade:2.2 },
+
+  /* The audit trail. Badge events are the substrate every accusation is
+     built from — an IT shop's real forensic instrument, used as the
+     deduction engine. */
+  log:{ max:64, badgeCooldown:6 },
+
+  /* The finale is contested floor space, not a hold-to-win button. */
+  ipl:{ need:100, crewRate:15, rogueRate:26, radius:2.4 },
+
   /* anchor = the console tile (solid). stand = resolved by compile(). */
   zones:[
     {id:'TZ-ACK1',  anchor:[2,2],  task:'ACK_ALERT',     label:'Terminal NOC-A1'},
@@ -79,13 +103,21 @@ const SI = {
 
   roles:[
     {id:'SYS',name:'SysAdmin',      color:'#ffb000',blurb:'Repairs any fault, 50% faster.',
-     abilities:[{hook:'fixSpeed',mul:1.5},{hook:'canFixAnyZoneType',value:true}]},
+     abilities:[{hook:'fixSpeed',mul:1.5},{hook:'canFixAnyZoneType',value:true}],
+     power:{id:'HOTPATCH',label:'Hotpatch',cd:62,dur:9,
+            desc:'Freezes all SLA bleed for nine seconds.'}},
     {id:'NOC',name:'NOC Analyst',   color:'#4ec9e8',blurb:'Sees the bleed and its source.',
-     abilities:[{hook:'revealDrainSource',value:true},{hook:'sabotageAlertLead',sec:3}]},
+     abilities:[{hook:'revealDrainSource',value:true},{hook:'sabotageAlertLead',sec:3}],
+     power:{id:'PINGSWEEP',label:'Ping Sweep',cd:54,dur:4,
+            desc:'Paints every operator through walls for four seconds.'}},
     {id:'DBA',name:'Database Admin',color:'#3ddc97',blurb:'Closes tickets in half the time.',
-     abilities:[{hook:'taskDuration',mul:0.5}]},
+     abilities:[{hook:'taskDuration',mul:0.5}],
+     power:{id:'ROLLBACK',label:'Rollback',cd:48,dur:0,
+            desc:'Instantly restores every corrupted zone.'}},
     {id:'MGR',name:'Problem Manager',color:'#a77bff',blurb:'Convenes the bridge on demand. Double vote.',
-     abilities:[{hook:'bridgeCooldown',mul:0},{hook:'voteWeight',add:1}]}
+     abilities:[{hook:'bridgeCooldown',mul:0},{hook:'voteWeight',add:1}],
+     power:{id:'AUDIT',label:'Spot Audit',cd:44,dur:0,
+            desc:'Pulls the last badge record of the nearest operator.'}}
   ],
 
   colors:['#e05a4d','#4a90d9','#3ddc97','#ffb000','#a77bff','#26c6b8','#e8579b','#ff7a45'],
@@ -95,7 +127,8 @@ const SI = {
     {id:'SAB-BOMB', icon:'◈',label:'Plant Logic Bomb', cd:42,effect:'DRAIN',     drain:0.75,counter:'ACK_ALERT',need:2,alarm:'silent'},
     {id:'SAB-LOCK', icon:'⌧',label:'Corrupt Zones',    cd:34,effect:'LOCK_ZONES',dur:38,count:3,counter:null,alarm:'soft'},
     {id:'SAB-DOOR', icon:'⛔',label:'Seal Bulkheads',   cd:30,effect:'LOCK_DOORS',dur:14,counter:null,alarm:'soft'},
-    {id:'SAB-SPOOF',icon:'📡',label:'Spoof False Alert',cd:38,effect:'FAKE',      dur:13,counter:null,alarm:'loud'}
+    {id:'SAB-SPOOF',icon:'📡',label:'Spoof False Alert',cd:38,effect:'FAKE',      dur:13,counter:null,alarm:'loud'},
+    {id:'SAB-PURGE',icon:'🗑',label:'Purge Access Logs', cd:55,effect:'PURGE',     wipe:9, counter:null,alarm:'soft'}
   ],
 
   rules:{
@@ -152,7 +185,7 @@ const SI = {
        from any inbound merge, so a peer can never inherit host identity. */
     localOnly:['myId','isHost','isOffline','peer','conns','hostConn','forceRole'],
     publicPlayer:['name','role','color','x','y','out','doneCount','working','wa','wb'],
-    privatePlayer:['saboteur','tasks','done','sabCd','revokeCd','stage']
+    privatePlayer:['saboteur','tasks','done','sabCd','revokeCd','stage','powerCd','auditResult','alibi']
   },
 
   render:{
@@ -419,7 +452,8 @@ const State = {
   players:{}, tasksDone:0, tasksNeeded:0, masterUnlock:false,
   fx:{}, lockedZones:{}, doorsSealed:false, votes:{}, weights:{},
   bridgeCd:0, grace:0, ending:null, cast:[], ejected:null, ejectWasRogue:false,
-  useBots:true
+  useBots:true,
+  clock:0, act:0, log:[], iplCharge:0, testimony:[], powerFx:{}, seq:0
 };
 
 function blankPlayer(o){
@@ -427,10 +461,78 @@ function blankPlayer(o){
     name:'OPERATOR', role:'SYS', color:SI.colors[0], x:SI.spawn.col, y:SI.spawn.row,
     out:false, saboteur:false, tasks:[], done:[], stage:{}, doneCount:0,
     revokeCd:0, sabCd:{}, working:false, wa:0, wb:0, isBot:false,
-    voteDelay:0, suspect:{}, ready:false
+    voteDelay:0, suspect:{}, ready:false,
+    powerCd:0, lastZone:null, badgeCd:0, seen:[], alibi:[]
   }, o||{});
 }
 const me = () => State.players[State.myId] || null;
+
+/* ── the shift clock: which act are we in ── */
+function currentAct(){
+  const A = SI.shift.acts;
+  let cur = A[0];
+  for (const a of A) if (State.clock >= a.t) cur = a;
+  return cur;
+}
+function shiftTime(){
+  const base = SI.shift.startHour*60 + Math.floor(State.clock * SI.shift.minPerSec);
+  const hh = Math.floor(base/60)%24, mm = base%60;
+  return (hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+}
+
+/* ── the access log: every accusation in this game is built from it ── */
+function logEvent(kind, actorId, zoneId, extra){
+  const z = zoneId ? D.zone.get(zoneId) : null;
+  State.log.push({
+    i: ++State.seq,
+    c: State.clock,
+    t: shiftTime(),
+    k: kind,                                   /* BADGE | COMMIT | REVOKE | FAULT */
+    who: actorId || null,
+    z: zoneId || null,
+    zl: z ? z.label : (extra && extra.where) || '—',
+    hidden: !!(extra && extra.hidden)          /* REVOKE hides its actor from crew */
+  });
+  if (State.log.length > SI.log.max) State.log.splice(0, State.log.length - SI.log.max);
+}
+/* A badge record is written when an operator lingers at a console. It is the
+   only passive trace anyone leaves, so it is the only thing worth lying about. */
+function badgeTouch(id, p, dt){
+  p.badgeCd = Math.max(0, (p.badgeCd||0) - dt);
+  let here = null;
+  for (const z of SI.zones){
+    if (z.id === 'ZX-MASTER') continue;
+    if (Game.near(p, z, 1.15)){ here = z; break; }
+  }
+  if (!here){ p.lastZone = null; return; }
+  if (p.lastZone === here.id) return;
+  p.lastZone = here.id;
+  if (p.badgeCd > 0) return;
+  p.badgeCd = SI.log.badgeCooldown;
+  logEvent('BADGE', id, here.id);
+  p.alibi.push({t:shiftTime(), z:here.id});
+  if (p.alibi.length > 8) p.alibi.shift();
+}
+/* Bots remember who they actually had eyes on. Their testimony is generated
+   from this, not invented — which is what makes it worth listening to. */
+function witnessSweep(dt){
+  for (const id in State.players){
+    const w = State.players[id];
+    if (!w.isBot || w.out) continue;
+    w._ws = (w._ws||0) - dt;
+    if (w._ws > 0) continue;
+    w._ws = 1.4;
+    for (const oid in State.players){
+      if (oid === id) continue;
+      const o = State.players[oid];
+      if (o.out) continue;
+      if (dist(w.x,w.y,o.x,o.y) > SI.vision.range || !los(w.x,w.y,o.x,o.y)) continue;
+      w.seen.push({who:oid, c:State.clock, t:shiftTime(), z:o.lastZone,
+                   x:o.x, y:o.y, wx:w.x, wy:w.y});
+      if (w.seen.length > 22) w.seen.shift();
+    }
+  }
+}
 const roleOf = p => D.role.get(p && p.role) || SI.roles[0];
 function perk(p, hook, fallback){
   const r = roleOf(p); let v = fallback;
@@ -548,6 +650,12 @@ const Net = {
       doorsSealed:State.doorsSealed, votes:State.votes, weights:State.weights,
       bridgeCd:State.bridgeCd, ending:State.ending, cast:State.cast,
       ejected:State.ejected, ejectWasRogue:State.ejectWasRogue,
+      clock:State.clock, act:State.act, iplCharge:State.iplCharge,
+      powerFx:State.powerFx, testimony:State.testimony,
+      /* Ghosts get the un-redacted log; the living get names stripped from
+         revocations, which is exactly the information the bridge argues over. */
+      log:(target && target.out) ? State.log
+          : State.log.map(function(e){ return e.hidden ? {i:e.i,c:e.c,t:e.t,k:e.k,z:e.z,zl:e.zl,who:null,hidden:true} : e; }),
       players:pub, fx:fx, you:priv, youId:forId};
   },
   flush(force){
@@ -595,6 +703,8 @@ function applySnapshot(s){
   State.doorsSealed=s.doorsSealed; State.votes=s.votes||{}; State.weights=s.weights||{};
   State.bridgeCd=s.bridgeCd; State.ending=s.ending; State.cast=s.cast||[];
   State.ejected=s.ejected; State.ejectWasRogue=s.ejectWasRogue; State.fx=s.fx||{};
+  State.clock=s.clock||0; State.act=s.act||0; State.iplCharge=s.iplCharge||0;
+  State.powerFx=s.powerFx||{}; State.testimony=s.testimony||[]; State.log=s.log||[];
 
   const local = me();
   const keep = local ? {x:local.x, y:local.y} : null;
@@ -878,6 +988,34 @@ const Bots = {
 /* ═══ SECTION 5 — HOST GAME LOGIC ══════════════════════════════════════════
    Every mutation lands here. Every client action is validated against
    ownership, proximity, phase and cooldown before it touches State.        */
+/* Shift record. Browser storage can throw outright in some contexts, so every
+   read and write is guarded and the game renders correctly with nothing. */
+const Record = {
+  KEY:'mbp.record.v1',
+  read(){
+    try{
+      const raw = localStorage.getItem(this.KEY);
+      const r = raw ? JSON.parse(raw) : null;
+      return (r && typeof r==='object') ? r : {shifts:0,won:0,asRogue:0,rogueWon:0,best:0};
+    }catch(e){ return {shifts:0,won:0,asRogue:0,rogueWon:0,best:0}; }
+  },
+  log(won, asRogue, clock){
+    try{
+      const r = this.read();
+      r.shifts++; if(won) r.won++;
+      if(asRogue){ r.asRogue++; if(won) r.rogueWon++; }
+      if(won && !asRogue && clock>0 && (!r.best || clock<r.best)) r.best = Math.round(clock);
+      localStorage.setItem(this.KEY, JSON.stringify(r));
+    }catch(e){}
+  },
+  line(){
+    const r = this.read();
+    if (!r.shifts) return 'First shift on the floor.';
+    const mm = r.best ? (Math.floor(r.best/60)+'m '+(r.best%60)+'s') : '—';
+    return r.shifts+' shifts · '+r.won+' survived · '+r.asRogue+' as the rogue ('+r.rogueWon+' clean) · fastest IPL '+mm;
+  }
+};
+
 const Game = {
   zoneCenter(z){ return [z.stand[0]+0.5, z.stand[1]+0.5]; },
   near(p,z,range){
@@ -911,19 +1049,24 @@ const Game = {
     State.masterUnlock=false; State.bridgeCd=0; State.votes={}; State.weights={};
     State.ending=null; State.cast=[]; State.ejected=null;
     State.grace = SI.rules.startGrace;
+    State.clock=0; State.act=0; State.log=[]; State.seq=0;
+    State.iplCharge=0; State.testimony=[]; State.powerFx={};
+    logEvent('FAULT', null, null, {where:'SHIFT HANDOVER · NODE 7'});
 
     for (const id of ids){
       const p = State.players[id];
       p.out=false; p.done=[]; p.stage={}; p.suspect={}; p.working=false;
       p.x = SI.spawn.col + (Math.random()-0.5)*SI.spawn.spread*2;
       p.y = SI.spawn.row + (Math.random()-0.5)*SI.spawn.spread*2;
-      p.revokeCd = 12;
+      p.revokeCd = 12; p.powerCd = 8; p.badgeCd = 0;
+      p.lastZone = null; p.seen = []; p.alibi = []; p.auditResult = null;
       p.sabCd = {};
       for (const s of SI.sabotage) p.sabCd[s.id] = 12;
       p.saboteur = (id === sabId);
       if (p.saboteur) p.tasks = [];
       else {
-        p.tasks = shuffle(D.assignable).slice(0, SI.rules.tasksPerCrew).map(z=>z.id);
+        p.tasks = shuffle(D.assignable).slice(0, SI.rules.tasksPerCrew)
+          .sort((x,y)=>(x.stage?1:0)-(y.stage?1:0)).map(z=>z.id);
         State.tasksNeeded += p.tasks.length;
       }
       p.taskTotal = p.tasks.length;
@@ -941,14 +1084,23 @@ const Game = {
     try{
       if (State.phase==='PLAYING'){
         if (State.grace>0) State.grace = Math.max(0, State.grace-dt);
+        State.clock += dt;
+        const act = currentAct();
+        State.act = SI.shift.acts.indexOf(act);
 
-        let drain = SI.rules.slaIdle;
+        /* Act drain, plus whatever the rogue is running. Hotpatch freezes it. */
+        let drain = act.drain;
         for (const k in State.fx){
           const def = D.sab.get(k); if(!def) continue;
           if (def.effect==='DRAIN') drain += def.drain;
         }
-        State.sla = clamp(State.sla - drain*dt, 0, SI.rules.slaMax);
+        if (State.powerFx.HOTPATCH > 0) drain = 0;
+        /* The ceiling falls as the shift ages: what the night costs, it keeps. */
+        State.sla = clamp(State.sla - drain*dt, 0, act.cap);
         if (State.sla <= 0){ this.finish('SAB_SLA'); return; }
+
+        for (const k in State.powerFx)
+          if (State.powerFx[k] > 0) State.powerFx[k] = Math.max(0, State.powerFx[k]-dt);
 
         /* timed effects */
         for (const k in State.fx){
@@ -967,14 +1119,19 @@ const Game = {
         for (const id in State.players){
           const p = State.players[id];
           if (p.revokeCd>0) p.revokeCd = Math.max(0,p.revokeCd-dt);
+          if (p.powerCd>0)  p.powerCd  = Math.max(0,p.powerCd-dt);
           for (const s in p.sabCd) if (p.sabCd[s]>0) p.sabCd[s] = Math.max(0,p.sabCd[s]-dt);
           /* integrate remote intent — the host owns every position */
           if (!p.isBot && id!==State.myId && !p.out) this.integrate(p, dt);
+          if (!p.out) badgeTouch(id, p, dt);
         }
         Bots.update(dt);
+        witnessSweep(dt);
+        this.iplContest(dt);
         if (!State.masterUnlock && State.tasksNeeded>0 && State.tasksDone>=State.tasksNeeded){
-          State.masterUnlock = true; Net.cue('unlock');
-          toast('ALL QUEUES CLEAR — MASTER IPL UNLOCKED','good');
+          State.masterUnlock = true; State.iplCharge = 0; Net.cue('unlock');
+          logEvent('FAULT', null, null, {where:'ALL QUEUES CLEAR'});
+          toast('ALL QUEUES CLEAR — CONVERGE ON THE BRIDGE','good');
         }
       }
       else if (State.phase==='DISCUSSION'){
@@ -996,6 +1153,28 @@ const Game = {
       }
       Net.tick(dt);
     } catch(e){ console.error('[host]',e); }
+  },
+
+  /* The endgame is floor space, not a button. Crew charge it by standing on
+     it; the rogue drains it faster than one operator can fill it, so the crew
+     must arrive together or remove them first. Everyone watches the same bar. */
+  iplContest(dt){
+    if (!State.masterUnlock) return;
+    const z = D.zone.get('ZX-MASTER'); if(!z) return;
+    const c = this.zoneCenter(z);
+    let crew = 0, rogue = 0;
+    for (const id in State.players){
+      const p = State.players[id];
+      if (p.out) continue;
+      if (dist(p.x,p.y,c[0],c[1]) > SI.ipl.radius) continue;
+      if (p.saboteur) rogue++; else crew++;
+    }
+    if (!crew && !rogue) return;
+    const before = State.iplCharge;
+    const rate = crew*SI.ipl.crewRate - rogue*SI.ipl.rogueRate;
+    State.iplCharge = clamp(State.iplCharge + rate*dt, 0, SI.ipl.need);
+    if (before < SI.ipl.need && State.iplCharge >= SI.ipl.need){ this.finish('CREW_IPL'); return; }
+    if (before < 40 && State.iplCharge >= 40) Net.cue('ok');
   },
 
   integrate(p, dt){
@@ -1039,6 +1218,7 @@ const Game = {
       }
       a.done.push(zid); a.doneCount = a.done.length;
       State.tasksDone++;
+      logEvent('COMMIT', actorId, z.id);
       const t = SI.tasks[def ? def.task : 'ACK_ALERT'];
       State.sla = clamp(State.sla + (t?t.restore:12), 0, SI.rules.slaMax);
       Net.cue('ok'); Net.flush(true);
@@ -1065,6 +1245,11 @@ const Game = {
           State.lockedZones[z.id] = def.dur;
       }
       if (def.effect==='LOCK_DOORS') State.doorsSealed = true;
+      if (def.effect==='PURGE'){
+        State.log.splice(Math.max(0, State.log.length - (def.wipe||9)));
+        logEvent('FAULT', null, null, {where:'AUDIT VOLUME TRUNCATED'});
+      }
+      if (def.alarm !== 'silent') logEvent('FAULT', null, null, {where:def.label.toUpperCase()});
       if (def.alarm==='loud'){ Net.cue('alarm'); Net.fx('shake'); }
       else if (def.alarm==='soft') Net.cue('fail');
       Aud.mood(true);
@@ -1095,6 +1280,13 @@ const Game = {
       if (!los(a.x,a.y,t.x,t.y)) return;
       t.out = true; t.working = false;
       a.revokeCd = SI.rules.revokeCd;
+      let nearest = null, nd = 1e9;
+      for (const z of SI.zones){
+        const c = this.zoneCenter(z), d2 = dist(t.x,t.y,c[0],c[1]);
+        if (d2 < nd){ nd = d2; nearest = z; }
+      }
+      logEvent('REVOKE', actorId, nearest?nearest.id:null,
+        {hidden:true, where:nearest?nearest.label:'open floor'});
       /* anyone with eyes on it forms a real suspicion */
       for (const wid in State.players){
         const w = State.players[wid];
@@ -1108,6 +1300,37 @@ const Game = {
       }
       Net.cue('revoke'); Net.fx('shake'); Net.flush(true);
       this.checkEnd();
+      return;
+    }
+
+    if (action==='POWER'){
+      const r = roleOf(a), pw = r.power;
+      if (!pw || a.powerCd > 0) return;
+      a.powerCd = pw.cd;
+      if (pw.id==='HOTPATCH'){ State.powerFx.HOTPATCH = pw.dur; Net.cue('unlock'); }
+      if (pw.id==='PINGSWEEP'){ a.sweepFx = pw.dur; State.powerFx['SWEEP_'+actorId] = pw.dur; Net.cue('ok'); }
+      if (pw.id==='ROLLBACK'){
+        State.lockedZones = {}; delete State.fx['SAB-LOCK'];
+        Net.cue('unlock');
+      }
+      if (pw.id==='AUDIT'){
+        let best=null, bd=1e9;
+        for (const oid in State.players){
+          if (oid===actorId) continue;
+          const o = State.players[oid]; if(o.out) continue;
+          const d2 = dist(a.x,a.y,o.x,o.y);
+          if (d2 < bd){ bd = d2; best = oid; }
+        }
+        if (best){
+          const o = State.players[best];
+          const last = o.alibi.length ? o.alibi[o.alibi.length-1] : null;
+          a.auditResult = last
+            ? o.name+' last badged '+(D.zone.get(last.z)||{label:'unknown'}).label+' at '+last.t
+            : o.name+' has no badge record this shift';
+          Net.cue('ok');
+        } else a.auditResult = 'No operator in range.';
+      }
+      Net.flush(true);
       return;
     }
 
@@ -1126,6 +1349,7 @@ const Game = {
       State.phase='DISCUSSION'; State.timer=SI.rules.discussion;
       State.votes={}; State.weights={}; State.caller=a.name; State.callerId=actorId;
       State.bridgeCd = SI.rules.bridgeCd;
+      this.buildTestimony();
       for (const id in State.players){
         const p = State.players[id];
         p.voteDelay = 0; p.working=false;
@@ -1138,6 +1362,84 @@ const Game = {
       UI.applyPhase(); Net.flush(true);
       return;
     }
+  },
+
+  /* Every bot says one true thing, or — if it is the rogue — one plausible
+     lie. Crew bots weight what they actually saw near the revocation. */
+  buildTestimony(){
+    State.testimony = [];
+    let rv = null;
+    for (let i=State.log.length-1;i>=0;i--) if (State.log[i].k==='REVOKE'){ rv = State.log[i]; break; }
+    const rvZone = rv && rv.z ? D.zone.get(rv.z) : null;
+    const rvAt = rvZone ? this.zoneCenter(rvZone) : null;
+    const rvClock = rv ? (rv.c || 0) : 0;
+
+    /* Pass one: who could credibly have seen anything. A sighting only counts
+       if the subject AND the witness were near the revocation, within a narrow
+       window either side of it. */
+    const crew = [], claims = [];
+    for (const id in State.players){
+      const p = State.players[id];
+      if (!p.isBot || p.out) continue;
+      if (p.saboteur){ crew.push({id:id, p:p, rogue:true}); continue; }
+      let best = null, bestScore = 1e9;
+      if (rv && rvAt){
+        for (let i=p.seen.length-1;i>=0;i--){
+          const sg = p.seen[i];
+          if (sg.who === id) continue;
+          const dt2 = Math.abs((sg.c||0) - rvClock);
+          if (dt2 > 4.5) continue;
+          const dd = dist(sg.x, sg.y, rvAt[0], rvAt[1]);
+          if (dd > 5.5) continue;
+          const wx = sg.wx===undefined?sg.x:sg.wx, wy = sg.wy===undefined?sg.y:sg.wy;
+          const dw = dist(wx, wy, rvAt[0], rvAt[1]);
+          if (dw > 7) continue;
+          const score = dt2*1.4 + dd + dw*0.5;
+          if (score < bestScore){ bestScore = score; best = sg; }
+        }
+      }
+      crew.push({id:id, p:p, best:best, score:bestScore});
+      if (best) claims.push({id:id, score:bestScore});
+    }
+
+    /* At most two operators come forward. A floor that unanimously fingers the
+       same person is a cutscene, not a deduction — the doubt has to survive. */
+    claims.sort((x,y)=>x.score-y.score);
+    const speaking = {};
+    for (const c of claims.slice(0,2)) speaking[c.id] = 1;
+
+    for (const e of crew){
+      const p = e.p;
+      let line;
+      if (e.rogue){
+        const badged = {};
+        for (const a2 of p.alibi) badged[a2.z] = 1;
+        if (Math.random() < 0.3 && p.alibi.length){
+          const a1 = p.alibi[p.alibi.length-1], z1 = D.zone.get(a1.z);
+          line = 'I was on ' + (z1?z1.label:'the floor') + '. Pull the log if you want.';
+        } else {
+          const clean = D.assignable.filter(z=>!badged[z.id]);
+          const z = clean.length ? pick(clean) : pick(D.assignable);
+          line = 'I never left ' + z.label + '. Check the badge log.';
+        }
+      } else if (speaking[e.id] && e.best && State.players[e.best.who]){
+        line = 'I had eyes on ' + State.players[e.best.who].name + ' by ' + rv.zl +
+               ' right when it went dark.';
+        p.suspect[e.best.who] = (p.suspect[e.best.who]||0) + 6;
+      } else if (rv && rvAt && dist(p.x,p.y,rvAt[0],rvAt[1]) > 11){
+        line = 'I was nowhere near ' + rv.zl + '. I cannot help you.';
+      } else if (p.alibi.length >= 2){
+        const a0 = p.alibi[p.alibi.length-2], a1 = p.alibi[p.alibi.length-1];
+        const z0 = D.zone.get(a0.z), z1 = D.zone.get(a1.z);
+        line = 'I ran ' + (z0?z0.label:'?') + ' at ' + a0.t + ', then ' +
+               (z1?z1.label:'?') + ' at ' + a1.t + '.';
+      } else if (p.alibi.length === 1){
+        const a1 = p.alibi[0], z1 = D.zone.get(a1.z);
+        line = 'I have been on ' + (z1?z1.label:'the floor') + ' since ' + a1.t + '.';
+      } else line = 'I was heads-down. I saw nothing.';
+      State.testimony.push({who:p.name, color:p.color, line:line});
+    }
+    State.testimony = shuffle(State.testimony);
   },
 
   botSabotage(botId){
@@ -1222,6 +1524,11 @@ const Game = {
   finish(key){
     if (State.ending) return;
     State.ending = key;
+    const M0 = me();
+    if (M0){
+      const e = SI.endings[key];
+      Record.log(e && (e.side==='ROGUE') === !!M0.saboteur, !!M0.saboteur, State.clock);
+    }
     State.cast = Object.keys(State.players).map(id=>{
       const p = State.players[id];
       return {name:p.name, color:p.color, role:roleOf(p).name,
@@ -1428,6 +1735,9 @@ const Render = {
       ring.rotation.x=-Math.PI/2; ring.position.y=-0.44; g.add(ring);
     }
     g.matColor = mat;
+    g.fadeMats = [mat, visor.material, dot.material, label.material];
+    for (const fm of g.fadeMats) fm.transparent = true;
+    g.fade = isMe ? 1 : 0;
     this.scene.add(g);
     return g;
   },
@@ -1439,6 +1749,9 @@ const Render = {
       for (const id in this.actors){
         if (!State.players[id]){ this.scene.remove(this.actors[id]); delete this.actors[id]; }
       }
+      const M0 = me();
+      const seeAll = !!(M0 && M0.out) || !!(M0 && State.powerFx['SWEEP_'+State.myId] > 0)
+                   || State.phase !== 'PLAYING';
       for (const id in State.players){
         const p = State.players[id];
         let g = this.actors[id];
@@ -1447,20 +1760,34 @@ const Render = {
           g.remove(g.label); g.label = this.nameSprite(p.name, id===State.myId?'#ffb000':'#c7d4e4');
           g.add(g.label); g.labelFor = p.name;
         }
+        let want = 1;
+        if (!seeAll && M0 && id !== State.myId){
+          const d0 = dist(M0.x, M0.y, p.x, p.y);
+          want = (d0 <= SI.vision.range && los(M0.x, M0.y, p.x, p.y))
+            ? clamp((SI.vision.range - d0) / SI.vision.fade, 0, 1) : 0;
+        }
+        g.fade += (want - g.fade) * 0.22;
+        if (g.fade < 0.004) g.fade = 0;
+        g.visible = g.fade > 0.02;
+
+        /* transform updates even while hidden, so nothing pops in stale */
         const tx = safeNum(p.x, SI.spawn.col) - C/2, tz = safeNum(p.y, SI.spawn.row) - R/2;
         const dx = tx - g.position.x, dz = tz - g.position.z;
         const moving = Math.abs(dx) > 0.006 || Math.abs(dz) > 0.006;
-        g.position.x += dx * 0.28; g.position.z += dz * 0.28;
+        g.position.x += dx * (g.visible ? 0.28 : 1);
+        g.position.z += dz * (g.visible ? 0.28 : 1);
+        if (!g.visible) continue;
+        for (const fm of g.fadeMats) fm.opacity = g.fade;
 
         if (p.out){
           g.rotation.z = Math.PI/2.1; g.position.y = -0.22; g.scale.set(1,0.55,1);
           g.dot.visible = false; g.visor.material.color.setHex(0x33414f);
-          g.label.material.opacity = 0.35;
+          g.label.material.opacity = g.fade * 0.4;
         } else {
           g.rotation.z *= 0.82; g.scale.set(1,1,1);
           g.position.y = moving ? Math.abs(Math.sin(now*0.011))*0.055 : 0;
           g.visor.material.color.setHex(0x7fe4ff);
-          g.label.material.opacity = 1;
+          g.label.material.opacity = g.fade;
           if (p.working){
             g.dot.visible = true;
             g.dot.position.y = 1.12 + Math.sin(now*0.009)*0.07;
@@ -1485,14 +1812,24 @@ const Render = {
 
       let loud=false, any=false;
       for (const k in State.fx){ any=true; const d=D.sab.get(k); if(d && d.alarm==='loud') loud=true; }
+      const grade = (SI.shift.acts[State.act]||SI.shift.acts[0]).grade;
+      const restFar = SI.render.fogFar - grade*22;   /* the walls come in */
       if (loud){
         this.alarm.intensity = 1.6 + Math.sin(now*0.006)*1.5;
         this.fog.far += ((SI.render.fogBreach) - this.fog.far)*0.05;
         document.body.classList.add('breach');
       } else {
         this.alarm.intensity *= 0.9;
-        this.fog.far += (SI.render.fogFar - this.fog.far)*0.04;
+        this.fog.far += (restFar - this.fog.far)*0.04;
         document.body.classList.remove('breach');
+      }
+      if (this.keyLight){
+        this.keyLight.intensity = 1.05 - grade*0.32;
+        this.keyLight.color.setRGB(0.74+grade*0.20, 0.84-grade*0.18, 1.0-grade*0.36);
+      }
+      if (this._grade !== State.act){
+        this._grade = State.act;
+        document.body.setAttribute('data-act', String(State.act));
       }
       if (this.bridgeRing) this.bridgeRing.material.color.setHex(State.masterUnlock ? 0x3ddc97 : 0x594010);
 
@@ -1841,6 +2178,7 @@ const UI = {
 
   toLobby(code, mode){
     State.phase = 'LOBBY';
+    this._shownReveal = false;
     this.screen('lobby');
     txt('lobby-code', code); txt('lobby-mode', mode);
     shown('host-opts', State.isHost);
@@ -1870,10 +2208,52 @@ const UI = {
     if (rg) rg.innerHTML = SI.roles.map(r=>
       '<button class="role-card" data-role="'+r.id+'" aria-pressed="'+(r.id===this.role)+'">'+
       '<span class="rn" style="color:'+r.color+'">'+esc(r.name)+'</span>'+
-      '<span class="rb">'+esc(r.blurb)+'</span></button>').join('');
+      '<span class="rb">'+esc(r.blurb)+'</span>'+
+      '<span class="rb" style="color:'+r.color+';opacity:.85;margin-top:5px">Q · '+
+      esc(r.power.label)+' — '+esc(r.power.desc)+'</span></button>').join('');
     const sw = $('swatches');
     if (sw) sw.innerHTML = SI.colors.map(c=>
       '<button class="sw" data-color="'+c+'" style="background:'+c+'" aria-pressed="'+(c===this.color)+'" aria-label="colour '+c+'"></button>').join('');
+  },
+
+  reveal(){
+    const M = me(); if(!M) return;
+    const r = roleOf(M);
+    const el = $('reveal'); if(!el) return;
+    if (M.saboteur){
+      txt('rv-name','ROGUE ADMIN');
+      css('rv-name','color','var(--breach)');
+      txt('rv-side','INSIDER THREAT · COVER: '+r.name.toUpperCase());
+      css('rv-side','color','var(--breach)');
+      html('rv-obj',
+        '· Revoke operator credentials when nobody is watching.<br>'+
+        '· Run faults to bleed <b>SLA Integrity</b> to zero.<br>'+
+        '· Every console you touch writes a <b>badge record</b>. So does every revocation — but yours is <b>unsigned</b>.<br>'+
+        '· Purge the logs before the bridge reads them.<br>'+
+        '· You still hold '+r.name+' credentials. <b>Use them in front of people.</b>');
+    } else {
+      txt('rv-name', r.name.toUpperCase());
+      css('rv-name','color', r.color);
+      txt('rv-side','NOC OPERATIONS · CREW');
+      css('rv-side','color','var(--ink-dim)');
+      html('rv-obj',
+        '· Close your queue. Every commit restores <b>SLA Integrity</b>.<br>'+
+        '· When all queues clear, converge on the <b>bridge table</b> and hold it for the Master IPL.<br>'+
+        '· '+esc(r.blurb)+' Your power is <b>Q · '+esc(r.power.label)+'</b> — '+esc(r.power.desc)+'<br>'+
+        '· The <b>access log</b> records who badged where. Read it at the bridge.<br>'+
+        '· The night gets worse. The SLA ceiling falls with it.');
+    }
+    el.classList.add('on');
+    this._revealOpen = true;
+    clearTimeout(this._revealT);
+    this._revealT = setTimeout(()=>this.closeReveal(), 11000);
+  },
+  closeReveal(){
+    if (!this._revealOpen) return;
+    this._revealOpen = false;
+    clearTimeout(this._revealT);
+    const el = $('reveal'); if(el) el.classList.remove('on');
+    Aud.play('click');
   },
 
   applyPhase(){
@@ -1884,7 +2264,10 @@ const UI = {
     shown('bridge', p==='DISCUSSION'||p==='VOTING'||p==='REVEAL');
     shown('results', p==='END');
     document.body.classList.toggle('cine', p==='DISCUSSION'||p==='VOTING'||p==='REVEAL'||p==='END');
-    if (p==='PLAYING'){ this.screen(null); this._sig={}; }
+    if (p==='PLAYING'){
+      this.screen(null); this._sig={};
+      if (!this._shownReveal){ this._shownReveal = true; this.reveal(); }
+    }
     if (p==='DISCUSSION'){
       txt('bridge-phase','EMERGENCY BRIDGE');
       css('bridge-phase','color','var(--breach)');
@@ -1917,11 +2300,42 @@ const UI = {
       '<div class="lbl" style="margin-bottom:4px">'+(won?'<span style="color:var(--jade)">SHIFT WON</span>':'<span style="color:var(--breach)">SHIFT LOST</span>')+' · Final Roster</div>'+
       State.cast.map(c=>'<div class="rost"><span><span style="color:'+c.color+'">■</span> '+esc(c.name)+
         (c.rogue?' <span style="color:var(--breach)">ROGUE ADMIN</span>':'')+'</span>'+
-        '<span class="tag">'+(c.rogue?'—':c.done+'/'+c.total+' closed')+(c.out?' · locked out':'')+'</span></div>').join(''));
+        '<span class="tag">'+(c.rogue?'—':c.done+'/'+c.total+' closed')+(c.out?' · locked out':'')+'</span></div>').join('')+
+      '<div class="lbl" style="margin-top:10px;padding-top:9px;border-top:1px solid var(--rule)">'+
+      esc(Record.line())+'</div>');
+  },
+
+  logRows(){
+    const rows = State.log.slice(-30).reverse().map(e=>{
+      let who = '—';
+      const M0 = me(), forensic = !!(M0 && M0.out);
+      if (e.k==='REVOKE'){
+        who = (e.who && (forensic || !e.hidden))
+          ? '<b style="color:var(--violet)">'+esc((State.players[e.who]||{}).name||'?')+'</b>'
+          : '<b style="color:var(--breach)">UNSIGNED</b>';
+      }
+      else if (e.who) who = '<b>'+esc((State.players[e.who]||{}).name||'?')+'</b>';
+      const verb = e.k==='BADGE' ? ' badged ' : e.k==='COMMIT' ? ' committed ' :
+                   e.k==='REVOKE' ? ' credential revoked at ' : '';
+      const body = e.k==='FAULT' ? esc(e.zl) : who + verb + esc(e.zl);
+      return '<div class="logrow k-'+e.k+'"><span class="lt">'+esc(e.t)+
+        '</span><span class="lk">'+e.k+'</span><span class="lv">'+body+'</span></div>';
+    }).join('');
+    return rows || '<div class="logrow"><span class="lv" style="color:var(--ink-dim)">No records this shift.</span></div>';
   },
 
   bridge(){
     txt('bridge-clock', Math.max(0, Math.ceil(State.timer)));
+    const lsig = State.log.length + ':' + State.phase;
+    if (this._sig.log !== lsig){ this._sig.log = lsig; html('bridge-log', this.logRows()); }
+    const tsig = State.testimony.length + ':' + State.phase;
+    if (this._sig.talk !== tsig){
+      this._sig.talk = tsig;
+      html('bridge-talk', State.testimony.length
+        ? State.testimony.map(t=>'<div class="talk"><span class="sp" style="color:'+t.color+'">'+
+            esc(t.who)+'</span><span class="ln">'+esc(t.line)+'</span></div>').join('')
+        : '<div class="talk"><span class="ln" style="color:var(--ink-dim)">The floor is silent.</span></div>');
+    }
     const body = $('bridge-body'); if(!body) return;
     const M = me();
     if (State.phase==='REVEAL'){
@@ -1975,15 +2389,70 @@ const UI = {
 
   hud(){
     const M = me(); if(!M) return;
-    /* SLA */
+    const act = SI.shift.acts[State.act] || SI.shift.acts[0];
+    /* SLA, with the falling ceiling drawn on the track */
     const sla = Math.ceil(State.sla);
-    if (this._sig.sla !== sla){
-      this._sig.sla = sla;
+    if (this._sig.sla !== sla+':'+State.act){
+      this._sig.sla = sla+':'+State.act;
       txt('sla-num', sla+'%');
       css('sla-bar','width', State.sla+'%');
       const col = State.sla<25 ? 'var(--breach)' : State.sla<55 ? 'var(--amber)' : 'var(--cyan)';
       css('sla-bar','background', col); css('sla-num','color', col);
       klass('d-sla','crit', State.sla<25);
+      let capEl = $('sla-cap');
+      if (!capEl){
+        const tr = $('sla-track');
+        if (tr){ capEl = document.createElement('div'); capEl.id='sla-cap'; tr.appendChild(capEl); _dom.set('sla-cap',capEl); }
+      }
+      if (capEl) capEl.style.left = act.cap+'%';
+    }
+    /* shift clock */
+    const stamp = shiftTime();
+    if (this._sig.clock !== act.name+stamp){
+      this._sig.clock = act.name+stamp;
+      txt('clock-time', stamp);
+      txt('clock-act', act.name + ' · CEILING ' + act.cap + '%');
+    }
+    /* ghost */
+    klass('d-ghost','on', !!M.out);
+    /* role power — the rogue keeps their cover role's power, and should use it */
+    const pw = roleOf(M).power;
+    const pcd = Math.ceil(M.powerCd||0);
+    const psig = (pw?pw.id:'-')+pcd+(State.powerFx.HOTPATCH>0?'H':'');
+    if (this._sig.power !== psig){
+      this._sig.power = psig;
+      txt('power-label', pw ? pw.label : '—');
+      txt('power-cd', pcd>0 ? pcd+'s' : 'READY');
+      const b = $('power-btn'); if(b) b.disabled = !pw || pcd>0 || M.out;
+    }
+    if (this._sig.audit !== M.auditResult){
+      this._sig.audit = M.auditResult;
+      klass('audit-out','on', !!M.auditResult);
+      txt('audit-out', M.auditResult || '');
+    }
+    /* the contested finale */
+    klass('d-ipl','on', !!State.masterUnlock);
+    if (State.masterUnlock){
+      const z = D.zone.get('ZX-MASTER');
+      let crew=0, rogue=0;
+      if (z){
+        const c = Game.zoneCenter(z);
+        for (const id in State.players){
+          const q = State.players[id];
+          if (q.out || dist(q.x,q.y,c[0],c[1]) > SI.ipl.radius) continue;
+          if (q.saboteur && (M.saboteur || M.out)) rogue++;
+          else crew++;              /* crew cannot tell who is draining it */
+        }
+      }
+      const pct = (State.iplCharge/SI.ipl.need)*100;
+      css('ipl-bar','width', pct+'%');
+      const falling = this._lastIpl !== undefined && State.iplCharge < this._lastIpl - 0.01;
+      this._lastIpl = State.iplCharge;
+      klass('d-ipl','contested', falling);
+      const note = falling ? 'SOMETHING IS DRAINING THE OVERRIDE'
+        : crew ? (crew+' operator'+(crew>1?'s':'')+' on the console · '+Math.round(pct)+'%')
+        : 'No operator on the console';
+      if (this._sig.ipl !== note){ this._sig.ipl = note; txt('ipl-note', note); }
     }
     /* role card */
     if (this._sig.role !== M.role+M.saboteur){
@@ -2102,9 +2571,10 @@ const UI = {
     if (!act && !M.out){
       const bz = D.zone.get('ZX-BRIDGE');
       if (bz && Game.near(M,bz,1.9)){
-        if (State.masterUnlock && !M.saboteur){
-          act = {label:'EXECUTE MASTER IPL', color:'var(--jade)',
-                 go:()=>TaskEngine.begin('ZX-MASTER','ZX-MASTER')};
+        if (State.masterUnlock){
+          act = M.saboteur
+            ? {label:'DRAINING THE OVERRIDE · '+Math.round(State.iplCharge)+'%', color:'var(--breach)', dead:true}
+            : {label:'HOLDING THE CONSOLE · '+Math.round(State.iplCharge)+'%', color:'var(--jade)', dead:true};
         } else {
           const cd = perk(M,'bridgeCooldown', State.bridgeCd);
           act = cd>0 ? {label:'BRIDGE COOLING '+Math.ceil(cd)+'s', color:'var(--ink-dim)', dead:true}
@@ -2170,7 +2640,15 @@ const Input = {
 
 window.addEventListener('keydown', e=>{
   const k = (e.key||'').toLowerCase();
+  if (UI._revealOpen){ e.preventDefault(); Aud.arm(); UI.closeReveal(); return; }
   if (k==='escape' && TaskEngine.open){ TaskEngine.abort(); return; }
+  if (k==='q' && !Input.typing() && State.phase==='PLAYING' && !TaskEngine.open){
+    e.preventDefault(); Aud.arm();
+    const M0 = me();
+    if (M0 && !M0.out && (M0.powerCd||0) <= 0){ Aud.play('click'); Net.act('POWER'); }
+    else Aud.play('fail');
+    return;
+  }
   if (Input.typing()){
     if (k==='enter'){
       const a=document.activeElement;
@@ -2288,6 +2766,11 @@ function wire(){
   });
 
   on('b-abort','click', ()=>{ Aud.play('click'); TaskEngine.abort(); });
+  on('power-btn','click', ()=>{
+    const M0 = me();
+    if (M0 && !M0.out && (M0.powerCd||0)<=0){ Aud.play('click'); Net.act('POWER'); }
+  });
+  on('reveal','pointerdown', ()=>{ Aud.arm(); UI.closeReveal(); });
   on('b-again','click', ()=>location.reload());
 
   on('sab-list','click', e=>{
@@ -2356,6 +2839,7 @@ function boot(){
   notes.push(typeof Peer!=='undefined' ? '<span class="ok">p2p ready</span>' : 'p2p off');
   notes.push(D.zone.size+' zones · '+D.doors.length+' bulkheads');
   html('boot-log', notes.join(' · '));
+  txt('menu-record', Record.line());
   if (missing.length) console.warn('[boot] unavailable:', missing.join(', '));
 
   requestAnimationFrame(t=>{ _last = t; requestAnimationFrame(loop); });

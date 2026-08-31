@@ -10,6 +10,7 @@ Single-file, no build step, no install.
 - `src/game-body.html` — styles + markup. `src/game.js` — the game.
   `dist/*` is assembled from these two; edit the sources, not the build.
 - `src/smart-intent.js` — the standalone manifest + boot compiler.
+- `docs/gdd.html` — the design bible: pillars, act structure, economies, tuning reference.
 - `docs/AUDIT-v1.md` — architectural audit of the v1 prototype this replaces.
 
 ## Running it
