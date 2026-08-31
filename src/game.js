@@ -1,0 +1,2370 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAINFRAME: BREACH PROTOCOL  v2.0
+   Monolithic build. Studio: NOVA · ARCH · PIXEL · CORE · BOLT, under PRIME.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+/* ═══ SECTION 0 — SMART INTENT MANIFEST ════════════════════════════════════
+   Single source of truth. compile() validates every cross-reference at boot
+   and throws loudly rather than degrading into NaN at frame 4000.          */
+const SI = {
+  version: '2.0.0',
+
+  tiles: {
+    0:{key:'VOID',   walkable:false, opaque:true },
+    1:{key:'FLOOR',  walkable:true,  opaque:false, room:'NOC'},
+    2:{key:'DECK',   walkable:true,  opaque:false, room:'DC'},
+    3:{key:'DESK',   walkable:false, opaque:false, prop:'desk'},
+    4:{key:'RACK',   walkable:false, opaque:true,  prop:'rack'},
+    5:{key:'WALL',   walkable:false, opaque:true,  prop:'wall'},
+    6:{key:'DOOR',   walkable:true,  opaque:false, prop:'door', lockable:true},
+    7:{key:'BRIDGE', walkable:false, opaque:false, prop:'table'},
+    8:{key:'GLASS',  walkable:false, opaque:false, prop:'glass'},
+    9:{key:'CHAIR',  walkable:true,  opaque:false, prop:'chair'}
+  },
+
+  map:{ cols:26, rows:16, grid:[
+    [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    [5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,2,2,2,2,2,2,2,5],
+    [5,1,3,1,3,1,3,1,3,1,3,1,3,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,9,1,9,1,9,1,9,1,9,1,9,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,3,1,3,1,3,1,3,1,3,1,3,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,9,1,9,1,9,1,9,1,9,1,9,1,1,1,1,6,2,2,2,2,2,2,2,5],
+    [5,1,3,1,3,1,3,1,3,1,3,1,3,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,9,1,9,1,9,1,9,1,9,1,9,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,5,2,4,2,4,2,4,2,5],
+    [5,1,1,1,9,7,9,1,1,1,1,1,1,1,1,1,1,6,2,2,2,2,2,2,2,5],
+    [5,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,5,5,5,5],
+    [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    [0,0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  ]},
+
+  spawn:{ col:14.5, row:8.5, spread:1.6 },
+
+  /* anchor = the console tile (solid). stand = resolved by compile(). */
+  zones:[
+    {id:'TZ-ACK1',  anchor:[2,2],  task:'ACK_ALERT',     label:'Terminal NOC-A1'},
+    {id:'TZ-ACK2',  anchor:[4,2],  task:'ACK_ALERT',     label:'Terminal NOC-A2'},
+    {id:'TZ-ACK3',  anchor:[6,2],  task:'ACK_ALERT',     label:'Terminal NOC-A3'},
+    {id:'TZ-ACK4',  anchor:[8,6],  task:'ACK_ALERT',     label:'Terminal NOC-B4'},
+    {id:'TZ-INC1',  anchor:[2,4],  task:'FILE_INCIDENT', label:'Incident Desk 1'},
+    {id:'TZ-INC2',  anchor:[6,4],  task:'FILE_INCIDENT', label:'Incident Desk 2'},
+    {id:'TZ-INC3',  anchor:[10,4], task:'FILE_INCIDENT', label:'Incident Desk 3'},
+    {id:'TZ-RTE1',  anchor:[12,2], task:'ROUTE_CHECK',   label:'Routing Console A'},
+    {id:'TZ-RTE2',  anchor:[12,6], task:'ROUTE_CHECK',   label:'Routing Console B'},
+    {id:'TZ-KIL1',  anchor:[19,2], task:'KILL_ABEND',    label:'Rack SYS-01'},
+    {id:'TZ-KIL2',  anchor:[21,4], task:'KILL_ABEND',    label:'Rack SYS-02'},
+    {id:'TZ-KIL3',  anchor:[23,6], task:'KILL_ABEND',    label:'Rack SYS-03'},
+    {id:'TZ-IPL1',  anchor:[19,6], task:'REBOOT_LPAR',   label:'LPAR Control A'},
+    {id:'TZ-IPL2',  anchor:[21,8], task:'REBOOT_LPAR',   label:'LPAR Control B'},
+    {id:'TZ-TAP1',  anchor:[10,2], task:'TAPE_RESTORE',  label:'Backup Console', stage:1, pairs:'TZ-TAP2'},
+    {id:'TZ-TAP2',  anchor:[23,2], task:'TAPE_RESTORE',  label:'Tape Library',   stage:2, pairs:'TZ-TAP1'},
+    {id:'ZX-BRIDGE',anchor:[5,9],  task:null, kind:'CALL_BRIDGE', label:'Bridge Table'},
+    {id:'ZX-MASTER',anchor:[5,9],  task:'MASTER_IPL', kind:'MASTER_IPL', label:'Master Console'}
+  ],
+
+  tasks:{
+    ACK_ALERT:    {label:'Acknowledge Alert',    gen:'ackFeed',    dur:11, restore:12},
+    FILE_INCIDENT:{label:'File Incident Ticket', gen:'triage',     dur:16, restore:18},
+    KILL_ABEND:   {label:'Cancel Abending Job',  gen:'spool',      dur:13, restore:15},
+    REBOOT_LPAR:  {label:'IPL Recovery Sequence',gen:'sequence',   dur:18, restore:22},
+    ROUTE_CHECK:  {label:'Verify Routing Table', gen:'routes',     dur:16, restore:15},
+    TAPE_RESTORE: {label:'Restore From Tape',    gen:'tape',       dur:15, restore:20, twoStage:true},
+    MASTER_IPL:   {label:'Execute Master Reboot',gen:'master',     dur:14, restore:0}
+  },
+
+  roles:[
+    {id:'SYS',name:'SysAdmin',      color:'#ffb000',blurb:'Repairs any fault, 50% faster.',
+     abilities:[{hook:'fixSpeed',mul:1.5},{hook:'canFixAnyZoneType',value:true}]},
+    {id:'NOC',name:'NOC Analyst',   color:'#4ec9e8',blurb:'Sees the bleed and its source.',
+     abilities:[{hook:'revealDrainSource',value:true},{hook:'sabotageAlertLead',sec:3}]},
+    {id:'DBA',name:'Database Admin',color:'#3ddc97',blurb:'Closes tickets in half the time.',
+     abilities:[{hook:'taskDuration',mul:0.5}]},
+    {id:'MGR',name:'Problem Manager',color:'#a77bff',blurb:'Convenes the bridge on demand. Double vote.',
+     abilities:[{hook:'bridgeCooldown',mul:0},{hook:'voteWeight',add:1}]}
+  ],
+
+  colors:['#e05a4d','#4a90d9','#3ddc97','#ffb000','#a77bff','#26c6b8','#e8579b','#ff7a45'],
+
+  sabotage:[
+    {id:'SAB-ABEND',icon:'⚠',label:'Trigger Abend',    cd:26,effect:'DRAIN',     drain:2.6,counter:'REBOOT_LPAR',need:1,alarm:'loud'},
+    {id:'SAB-BOMB', icon:'◈',label:'Plant Logic Bomb', cd:42,effect:'DRAIN',     drain:0.75,counter:'ACK_ALERT',need:2,alarm:'silent'},
+    {id:'SAB-LOCK', icon:'⌧',label:'Corrupt Zones',    cd:34,effect:'LOCK_ZONES',dur:38,count:3,counter:null,alarm:'soft'},
+    {id:'SAB-DOOR', icon:'⛔',label:'Seal Bulkheads',   cd:30,effect:'LOCK_DOORS',dur:14,counter:null,alarm:'soft'},
+    {id:'SAB-SPOOF',icon:'📡',label:'Spoof False Alert',cd:38,effect:'FAKE',      dur:13,counter:null,alarm:'loud'}
+  ],
+
+  rules:{
+    slaIdle:0.10, slaMax:100, tasksPerCrew:4,
+    playerSpeed:5.0, botSpeed:4.5,
+    interact:1.35, revokeRange:1.7, reportRange:4.2,
+    revokeCd:22, bridgeCd:40, discussion:15, voting:30, reveal:4.5,
+    startGrace:14
+  },
+
+  ai:{
+    states:['PATROL','PATH','WORK','FAKE_WORK','HUNT','FLEE','ALIBI'],
+    transitions:{
+      PATROL:['PATH','HUNT','ALIBI'], PATH:['WORK','FAKE_WORK','HUNT','FLEE','PATROL'],
+      WORK:['PATH','FLEE','PATROL'],  FAKE_WORK:['PATH','HUNT','FLEE'],
+      HUNT:['FLEE','PATH','PATROL'],  FLEE:['PATH','ALIBI','PATROL'],
+      ALIBI:['PATH','PATROL']
+    },
+    roster:[
+      {id:'BOT-A',name:'ALPHA',  color:'#8a97a8',spawn:[8,5]},
+      {id:'BOT-B',name:'BETA',   color:'#7c8a9c',spawn:[19,5]},
+      {id:'BOT-C',name:'DELTA',  color:'#96a3b4',spawn:[12,3]},
+      {id:'BOT-D',name:'GAMMA',  color:'#6e7b8d',spawn:[4,8]},
+      {id:'BOT-E',name:'EPSILON',color:'#5f6c7e',spawn:[20,3]}
+    ],
+    tune:{workMin:4,workMax:7.5,huntPatience:8,fleeDur:5.5,alibiDur:4.5,reportChance:0.5,sabChance:0.006}
+  },
+
+  audio:{
+    voices:{
+      ui:     {kind:'poly',osc:'square',  env:[0.005,0.09,0,0.09], vol:-20},
+      confirm:{kind:'poly',osc:'triangle',env:[0.008,0.18,0.15,0.4],vol:-14},
+      fault:  {kind:'fm',  osc:'sawtooth',env:[0.005,0.3,0,0.3],   vol:-13},
+      siren:  {kind:'mono',osc:'square',  env:[0.01,0.25,0.35,0.3],vol:-17},
+      drone:  {kind:'fm',  osc:'sine',    env:[2,1,1,3],           vol:-60}
+    },
+    cues:{
+      click:  {voice:'ui',     note:'C5',  dur:'32n', gap:0.035},
+      hover:  {voice:'ui',     note:'G4',  dur:'64n', gap:0.03, vel:0.35},
+      ok:     {voice:'confirm',note:['C4','E4','G4'], dur:'8n', gap:0.11},
+      fail:   {voice:'fault',  note:'C2',  dur:'8n',  gap:0.11},
+      vote:   {voice:'confirm',note:'C5',  dur:'16n', gap:0.09},
+      alarm:  {voice:'siren',  note:'E3',  dur:'4n',  gap:0.28, sweep:'A2'},
+      revoke: {voice:'fault',  note:'C3',  dur:'2n',  gap:0.45, sweep:'C1'},
+      sting:  {voice:'fault',  note:'C1',  dur:'2n',  gap:0.55},
+      unlock: {voice:'confirm',note:['G4','C5','E5'],dur:'4n', gap:0.35}
+    },
+    drone:{note:'C2',calm:-24,alert:-13,calmNote:'C2',alertNote:'C1',ramp:2}
+  },
+
+  net:{
+    prefix:'MFBP-', tickHz:15,
+    /* The S1 fix, expressed as data: these keys are structurally excluded
+       from any inbound merge, so a peer can never inherit host identity. */
+    localOnly:['myId','isHost','isOffline','peer','conns','hostConn','forceRole'],
+    publicPlayer:['name','role','color','x','y','out','doneCount','working','wa','wb'],
+    privatePlayer:['saboteur','tasks','done','sabCd','revokeCd','stage']
+  },
+
+  render:{
+    bg:0x060a14, fogNear:34, fogFar:76, fogBreach:26,
+    camOffset:[19,21,19], half:10.2, lerp:0.085
+  },
+
+  endings:{
+    CREW_IPL:   {t:'OPERATIONS NORMALIZED',w:'Master IPL executed. The mainframe holds.',side:'CREW',c:'#3ddc97'},
+    CREW_VOTE:  {t:'CREDENTIALS REVOKED',  w:'The insider threat has been removed from the floor.',side:'CREW',c:'#3ddc97'},
+    SAB_SLA:    {t:'MAINFRAME COMPROMISED',w:'SLA integrity reached zero. Operations are offline.',side:'ROGUE',c:'#ff3b3b'},
+    SAB_PURGE:  {t:'FLOOR LOCKED OUT',     w:'Too few operators remain to hold the shift.',side:'ROGUE',c:'#ff3b3b'}
+  }
+};
+
+const HOOKS = new Set(['fixSpeed','canFixAnyZoneType','revealDrainSource',
+  'sabotageAlertLead','taskDuration','bridgeCooldown','voteWeight']);
+
+/* ── compile: derive everything once, validate everything once ──────────── */
+const D = (function compile(){
+  const d = {walk:new Set(),opaque:new Set(),lockable:new Set(),zone:new Map(),
+             byTask:new Map(),role:new Map(),sab:new Map(),doors:[]};
+  for (const [code,t] of Object.entries(SI.tiles)){
+    const n = Number(code);
+    if (t.walkable) d.walk.add(n);
+    if (t.opaque)   d.opaque.add(n);
+    if (t.lockable) d.lockable.add(n);
+  }
+  const G = SI.map.grid;
+  d.tileAt   = (c,r) => (G[r] && G[r][c] !== undefined) ? G[r][c] : 0;
+  d.walkable = (c,r) => d.walk.has(d.tileAt(c,r));
+  d.opaqueAt = (c,r) => d.opaque.has(d.tileAt(c,r));
+
+  for (let r=0;r<SI.map.rows;r++) for (let c=0;c<SI.map.cols;c++)
+    if (d.lockable.has(d.tileAt(c,r))) d.doors.push([c,r]);
+
+  const NB = [[0,-1],[0,1],[-1,0],[1,0],[-1,-1],[1,-1],[-1,1],[1,1]];
+  for (const z of SI.zones){
+    const [ac,ar] = z.anchor;
+    if (d.walkable(ac,ar)) z.stand = [ac,ar];
+    else {
+      const n = NB.map(o=>[ac+o[0],ar+o[1]]).find(p=>d.walkable(p[0],p[1]));
+      if (!n) throw new Error('[SI] Zone '+z.id+' has no walkable neighbour.');
+      z.stand = n;
+    }
+    if (z.task && !SI.tasks[z.task]) throw new Error('[SI] Zone '+z.id+' -> unknown task '+z.task);
+    if (z.pairs && !SI.zones.some(o=>o.id===z.pairs)) throw new Error('[SI] Zone '+z.id+' -> unknown pair');
+    d.zone.set(z.id,z);
+    if (z.task && !z.kind){ if(!d.byTask.has(z.task)) d.byTask.set(z.task,[]); d.byTask.get(z.task).push(z); }
+  }
+  for (const r of SI.roles){
+    for (const a of r.abilities) if(!HOOKS.has(a.hook)) throw new Error('[SI] Role '+r.id+' -> unknown hook '+a.hook);
+    d.role.set(r.id,r);
+  }
+  for (const s of SI.sabotage){
+    if (s.counter && !SI.tasks[s.counter]) throw new Error('[SI] Sabotage '+s.id+' -> unknown counter');
+    d.sab.set(s.id,s);
+  }
+  for (const [id,c] of Object.entries(SI.audio.cues))
+    if(!SI.audio.voices[c.voice]) throw new Error('[SI] Cue '+id+' -> unknown voice '+c.voice);
+  for (const from in SI.ai.transitions){
+    if (!SI.ai.states.includes(from)) throw new Error('[SI] Unknown AI state '+from);
+    for (const to of SI.ai.transitions[from])
+      if(!SI.ai.states.includes(to)) throw new Error('[SI] '+from+' -> unknown '+to);
+  }
+  /* assignable zones = everything with a task that isn't a fixed-function console */
+  d.assignable = SI.zones.filter(z=>z.task && !z.kind && z.stage!==2);
+  return d;
+})();
+
+/* ═══ SECTION 1 — UTILITIES ════════════════════════════════════════════════
+   Guardrail #5 made structural: every DOM touch goes through these, so a
+   missing node is a no-op instead of a TypeError.                          */
+const _dom = new Map();
+function $(id){
+  if (_dom.has(id)){ const c=_dom.get(id); if(c && c.isConnected) return c; }
+  const el = document.getElementById(id);
+  if (el) _dom.set(id,el);
+  return el;
+}
+const txt  = (id,v)=>{ const e=$(id); if(e) e.textContent = v; };
+const html = (id,v)=>{ const e=$(id); if(e) e.innerHTML = v; };
+const css  = (id,k,v)=>{ const e=$(id); if(e) e.style[k] = v; };
+const shown= (id,on)=>{ const e=$(id); if(e) e.hidden = !on; };
+const klass= (id,k,on)=>{ const e=$(id); if(e) e.classList.toggle(k,!!on); };
+const on   = (id,ev,fn,o)=>{ const e=$(id); if(e) e.addEventListener(ev,fn,o); };
+
+const clamp = (v,lo,hi)=> v<lo?lo:(v>hi?hi:v);
+/* Guardrail #3, done properly: Math.max(0,NaN) is NaN. Reject first. */
+const safeInt = (v,lo,hi,fb)=>{
+  const n = Math.floor(Number(v));
+  return Number.isFinite(n) ? clamp(n,lo,hi) : fb;
+};
+const safeNum = (v,fb)=> Number.isFinite(Number(v)) ? Number(v) : fb;
+const dist = (ax,ay,bx,by)=> Math.hypot(ax-bx,ay-by);
+const pick = a => a[(Math.random()*a.length)|0];
+const shuffle = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];} return b; };
+const esc = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+let _toastT = 0;
+function toast(msg,kind){
+  const t = $('toast'); if(!t) return;
+  t.textContent = msg;
+  t.style.borderColor = kind==='bad'?'var(--breach)':kind==='good'?'var(--jade)':'var(--rule-hi)';
+  t.style.color       = kind==='bad'?'var(--breach)':kind==='good'?'var(--jade)':'var(--ink-hi)';
+  t.classList.add('on');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(()=>t.classList.remove('on'), 2600);
+}
+let _shakeT = 0;
+function shake(){
+  document.body.classList.add('shake');
+  clearTimeout(_shakeT);
+  _shakeT = setTimeout(()=>document.body.classList.remove('shake'), 360);
+}
+function blurActive(){
+  const a = document.activeElement;
+  if (a && typeof a.blur === 'function' && a !== document.body) a.blur();
+}
+
+/* ── LINE OF SIGHT (Bresenham over the opaque set) ──────────────────────── */
+function los(x0,y0,x1,y1){
+  let cx = safeInt(x0,0,SI.map.cols-1,0), cy = safeInt(y0,0,SI.map.rows-1,0);
+  const tx = safeInt(x1,0,SI.map.cols-1,0), ty = safeInt(y1,0,SI.map.rows-1,0);
+  let dx = Math.abs(tx-cx), sx = cx<tx?1:-1;
+  let dy = -Math.abs(ty-cy), sy = cy<ty?1:-1;
+  let err = dx+dy, steps = 0;
+  while (steps++ < 64){
+    if (cx===tx && cy===ty) return true;
+    if (D.opaqueAt(cx,cy)) return false;
+    const e2 = 2*err;
+    if (e2 >= dy){ err += dy; cx += sx; }
+    if (e2 <= dx){ err += dx; cy += sy; }
+  }
+  return false;
+}
+
+/* ── BFS PATHFINDING (parent map, not path-per-node) ────────────────────── */
+const _prev = new Int32Array(SI.map.cols*SI.map.rows);
+const _seen = new Uint8Array(SI.map.cols*SI.map.rows);
+const _queue = new Int32Array(SI.map.cols*SI.map.rows);
+const DIRS = [[0,-1],[1,0],[0,1],[-1,0]];
+function findPath(sx,sy,ex,ey,doorsSealed){
+  const C = SI.map.cols, R = SI.map.rows;
+  let s0 = safeInt(sx,0,C-1,1), s1 = safeInt(sy,0,R-1,1);
+  let e0 = safeInt(ex,0,C-1,1), e1 = safeInt(ey,0,R-1,1);
+  const passable = (c,r)=>{
+    if (!D.walkable(c,r)) return false;
+    if (doorsSealed && D.lockable.has(D.tileAt(c,r))) return false;
+    return true;
+  };
+  if (!passable(s0,s1)){
+    const n = DIRS.map(d=>[s0+d[0],s1+d[1]]).find(p=>passable(p[0],p[1]));
+    if (n){ s0=n[0]; s1=n[1]; } else return [];
+  }
+  /* Goal-blocked is resolved BEFORE the search, not by returning it anyway. */
+  if (!passable(e0,e1)){
+    const n = DIRS.map(d=>[e0+d[0],e1+d[1]]).find(p=>passable(p[0],p[1]));
+    if (!n) return [];
+    e0=n[0]; e1=n[1];
+  }
+  if (s0===e0 && s1===e1) return [];
+  _seen.fill(0);
+  let head=0, tail=0;
+  const start = s1*C+s0, goal = e1*C+e0;
+  _seen[start]=1; _prev[start]=-1; _queue[tail++]=start;
+  let found=false;
+  while (head<tail){
+    const cur = _queue[head++];
+    if (cur===goal){ found=true; break; }
+    const cc = cur%C, cr = (cur/C)|0;
+    for (let i=0;i<4;i++){
+      const nc = cc+DIRS[i][0], nr = cr+DIRS[i][1];
+      if (nc<0||nc>=C||nr<0||nr>=R) continue;
+      const ni = nr*C+nc;
+      if (_seen[ni] || !passable(nc,nr)) continue;
+      _seen[ni]=1; _prev[ni]=cur; _queue[tail++]=ni;
+    }
+  }
+  if (!found) return [];
+  const out=[];
+  for (let n=goal; n!==-1; n=_prev[n]) out.push({x:n%C, y:(n/C)|0});
+  out.pop();          /* drop the start cell */
+  return out.reverse();
+}
+
+/* ═══ SECTION 2 — AUDIO (fixed graph, per-voice throttle) ══════════════════
+   Guardrail #2: the graph is wired once at unlock and NEVER re-patched.
+   Sabotage crossfades a pre-wired parallel path's wet amount instead.      */
+const Aud = {
+  ok:false, armed:false, V:{}, bus:{}, drone:null, _last:{}, _pool:[],
+  arm(){
+    if (this.armed || typeof Tone === 'undefined') return;
+    this.armed = true;
+    Tone.start().then(()=>this._build()).catch(()=>{ this.armed=false; });
+  },
+  _build(){
+    if (this.ok) return;
+    try{
+      const A = SI.audio;
+      this.bus.out   = new Tone.Gain(0.9).toDestination();
+      this.bus.verb  = new Tone.Reverb({decay:2.4,wet:1}).connect(this.bus.out);
+      this.bus.clean = new Tone.Gain(1).connect(this.bus.out);
+      /* Parallel grit path, permanently wired, silent until sabotage. */
+      this.bus.crushGain = new Tone.Gain(0).connect(this.bus.out);
+      this.bus.crush = new Tone.BitCrusher(4).connect(this.bus.crushGain);
+      this.bus.dist  = new Tone.Distortion(0.75).connect(this.bus.crush);
+      this.bus.split = new Tone.Gain(1);
+      this.bus.split.connect(this.bus.clean);
+      this.bus.split.connect(this.bus.dist);
+
+      for (const [id,v] of Object.entries(A.voices)){
+        const env = {attack:v.env[0],decay:v.env[1],sustain:v.env[2],release:v.env[3]};
+        let s;
+        if (v.kind==='poly')      s = new Tone.PolySynth(Tone.Synth,{oscillator:{type:v.osc},envelope:env});
+        else if (v.kind==='fm')   s = new Tone.FMSynth({harmonicity:3,modulationIndex:9,oscillator:{type:v.osc},envelope:env});
+        else                      s = new Tone.MonoSynth({oscillator:{type:v.osc},envelope:env});
+        s.volume.value = v.vol;
+        s.connect(id==='drone' ? this.bus.verb : this.bus.split);
+        this.V[id] = s;
+        this._last[id] = 0;
+      }
+      this.drone = this.V.drone;
+      /* Attack first at -60, THEN ramp up: no 0 dB pop at boot. */
+      this.drone.triggerAttack(A.drone.note);
+      this.drone.volume.rampTo(A.drone.calm, 3);
+      this.ok = true;
+    } catch(e){ console.warn('[audio] unavailable:', e && e.message); this.ok=false; }
+  },
+  /* Throttle is per VOICE, not per cue — two cues sharing a synth can no
+     longer be scheduled at an identical timestamp. */
+  play(id){
+    if (!this.ok) return;
+    const c = SI.audio.cues[id]; if(!c) return;
+    const s = this.V[c.voice];   if(!s) return;
+    try{
+      const now = Tone.now();
+      const last = this._last[c.voice] || 0;
+      if (now - last < (c.gap||0.05)) return;
+      const t = Math.max(now, last + (c.gap||0.05)) + 0.001;
+      this._last[c.voice] = t;
+      s.triggerAttackRelease(c.note, c.dur, t, c.vel||0.9);
+      if (c.sweep && s.frequency) s.frequency.exponentialRampToValueAtTime(
+        Tone.Frequency(c.sweep).toFrequency(), t + 0.4);
+    } catch(e){ /* a dropped cue must never take the frame with it */ }
+  },
+  mood(alert){
+    if (!this.ok) return;
+    try{
+      const A = SI.audio.drone;
+      this.drone.volume.rampTo(alert?A.alert:A.calm, A.ramp);
+      this.drone.frequency.rampTo(alert?A.alertNote:A.calmNote, A.ramp);
+      this.bus.crushGain.gain.rampTo(alert?0.55:0, 1.2);
+    } catch(e){}
+  }
+};
+
+/* ═══ SECTION 3 — STATE & NETWORK ══════════════════════════════════════════
+   Host-authoritative. Peers send intent, never truth. The host is a client of
+   itself: its own Start click runs the same reducer as a received message.  */
+const State = {
+  myId:null, isHost:false, isOffline:false, forceRole:'RANDOM',
+  phase:'MENU', sla:100, timer:0, caller:'', callerId:null,
+  players:{}, tasksDone:0, tasksNeeded:0, masterUnlock:false,
+  fx:{}, lockedZones:{}, doorsSealed:false, votes:{}, weights:{},
+  bridgeCd:0, grace:0, ending:null, cast:[], ejected:null, ejectWasRogue:false,
+  useBots:true
+};
+
+function blankPlayer(o){
+  return Object.assign({
+    name:'OPERATOR', role:'SYS', color:SI.colors[0], x:SI.spawn.col, y:SI.spawn.row,
+    out:false, saboteur:false, tasks:[], done:[], stage:{}, doneCount:0,
+    revokeCd:0, sabCd:{}, working:false, wa:0, wb:0, isBot:false,
+    voteDelay:0, suspect:{}, ready:false
+  }, o||{});
+}
+const me = () => State.players[State.myId] || null;
+const roleOf = p => D.role.get(p && p.role) || SI.roles[0];
+function perk(p, hook, fallback){
+  const r = roleOf(p); let v = fallback;
+  for (const a of r.abilities){
+    if (a.hook !== hook) continue;
+    if (a.mul   !== undefined) v = fallback * a.mul;
+    if (a.add   !== undefined) v = fallback + a.add;
+    if (a.sec   !== undefined) v = a.sec;
+    if (a.value !== undefined) v = a.value;
+  }
+  return v;
+}
+
+const Net = {
+  peer:null, conns:{}, hostConn:null, _acc:0, code:'',
+  /* ── offline ── */
+  startSolo(){
+    State.myId='LOCAL'; State.isHost=true; State.isOffline=true;
+    State.players.LOCAL = blankPlayer({name:'YOU', ready:false});
+    this.code='SOLO'; UI.toLobby('SOLO','Offline');
+  },
+  /* ── host ── */
+  startHost(){
+    if (typeof Peer === 'undefined'){ UI.netFail('PeerJS did not load.'); return; }
+    const code = Math.random().toString(36).slice(2,8).toUpperCase();
+    this.code = code;
+    let opened=false;
+    try { this.peer = new Peer(SI.net.prefix+code); } catch(e){ UI.netFail('Peer init failed.'); return; }
+    const guard = setTimeout(()=>{ if(!opened) UI.netFail('Signalling broker unreachable.'); }, 9000);
+    this.peer.on('open', id=>{
+      opened=true; clearTimeout(guard);
+      State.myId=id; State.isHost=true; State.isOffline=false;
+      State.players[id] = blankPlayer({name:'HOST'});
+      UI.toLobby(code,'Hosting');
+    });
+    this.peer.on('error', e=>{ clearTimeout(guard); UI.netFail('Peer error: '+(e && e.type ? e.type : 'unknown')); });
+    this.peer.on('connection', c=>{
+      c.on('open', ()=>{
+        this.conns[c.peer]=c;
+        c.on('data', d=>this._fromClient(c.peer,d));
+        c.on('close',()=>{ delete this.conns[c.peer]; delete State.players[c.peer]; UI.roster(); this.flush(true); });
+      });
+      c.on('error',()=>{});
+    });
+  },
+  /* ── client ── */
+  join(code){
+    if (typeof Peer === 'undefined'){ UI.netFail('PeerJS did not load.'); return; }
+    let opened=false;
+    try { this.peer = new Peer(); } catch(e){ UI.netFail('Peer init failed.'); return; }
+    const guard = setTimeout(()=>{ if(!opened) UI.netFail('Could not reach the host.'); }, 11000);
+    this.peer.on('open', id=>{
+      State.myId=id; State.isHost=false; State.isOffline=false;
+      this.hostConn = this.peer.connect(SI.net.prefix+code,{reliable:true});
+      this.hostConn.on('open', ()=>{
+        opened=true; clearTimeout(guard);
+        this.hostConn.send({t:'JOIN'});
+        this.code=code; UI.toLobby(code,'Connected');
+      });
+      this.hostConn.on('data', d=>this._fromHost(d));
+      this.hostConn.on('error',()=>{});
+    });
+    this.peer.on('error', e=>{ clearTimeout(guard); UI.netFail('Peer error: '+(e && e.type ? e.type : 'unknown')); });
+  },
+
+  _fromClient(pid,m){
+    if (!State.isHost || !m || typeof m.t !== 'string') return;
+    if (m.t==='JOIN'){
+      if (State.phase!=='LOBBY' && State.phase!=='MENU') return;
+      State.players[pid] = blankPlayer({name:'OP-'+pid.slice(-3).toUpperCase(), role:'NOC', color:SI.colors[1]});
+      UI.roster(); this.flush(true); return;
+    }
+    const p = State.players[pid]; if(!p) return;
+    if (m.t==='PROFILE'){
+      if (typeof m.name==='string') p.name = m.name.slice(0,12).toUpperCase() || 'OPERATOR';
+      if (D.role.has(m.role)) p.role = m.role;
+      if (SI.colors.indexOf(m.color)>=0) p.color = m.color;
+      p.ready = true; UI.roster(); this.flush(true); return;
+    }
+    if (m.t==='INTENT'){ p.ax = clamp(safeNum(m.ax,0),-1,1); p.ay = clamp(safeNum(m.ay,0),-1,1); return; }
+    if (m.t==='ACT'){ Game.act(pid, String(m.a||''), m.p); return; }
+  },
+  _fromHost(m){
+    if (!m || typeof m.t !== 'string') return;
+    if (m.t==='SNAP') applySnapshot(m);
+    else if (m.t==='CUE') Aud.play(m.c);
+    else if (m.t==='FX'){ if(m.c==='shake') shake(); }
+    else if (m.t==='PROFILE_OPEN') UI.toProfile();
+  },
+
+  /* Redaction is the whole point: isSaboteur never leaves the host except to
+     its owner, and identity keys are structurally excluded from the wire. */
+  buildSnapshot(forId){
+    const pub = {};
+    for (const id in State.players){
+      const p = State.players[id], o = {};
+      for (const k of SI.net.publicPlayer) o[k] = p[k];
+      o.doneCount = p.done.length;
+      o.taskTotal = p.tasks.length;
+      pub[id] = o;
+    }
+    const target = State.players[forId];
+    const priv = {};
+    if (target) for (const k of SI.net.privatePlayer) priv[k] = target[k];
+    const sees = target ? perk(target,'revealDrainSource',false) : false;
+    const fx = {};
+    for (const k in State.fx){
+      const def = D.sab.get(k);
+      if (def && def.alarm==='silent' && !sees) continue;
+      fx[k] = {t:State.fx[k].t, fixes:State.fx[k].fixes, need:State.fx[k].need};
+    }
+    return {t:'SNAP', phase:State.phase, sla:State.sla, timer:State.timer,
+      caller:State.caller, tasksDone:State.tasksDone, tasksNeeded:State.tasksNeeded,
+      masterUnlock:State.masterUnlock, lockedZones:State.lockedZones,
+      doorsSealed:State.doorsSealed, votes:State.votes, weights:State.weights,
+      bridgeCd:State.bridgeCd, ending:State.ending, cast:State.cast,
+      ejected:State.ejected, ejectWasRogue:State.ejectWasRogue,
+      players:pub, fx:fx, you:priv, youId:forId};
+  },
+  flush(force){
+    if (!State.isHost || State.isOffline) return;
+    for (const id in this.conns){
+      try { this.conns[id].send(this.buildSnapshot(id)); } catch(e){}
+    }
+  },
+  tick(dt){
+    if (!State.isHost || State.isOffline) return;
+    this._acc += dt;
+    const step = 1/SI.net.tickHz;
+    if (this._acc >= step){ this._acc = 0; this.flush(false); }
+  },
+  cue(c){
+    Aud.play(c);
+    if (State.isHost && !State.isOffline)
+      for (const id in this.conns){ try{ this.conns[id].send({t:'CUE',c:c}); }catch(e){} }
+  },
+  fx(c){
+    if (c==='shake') shake();
+    if (State.isHost && !State.isOffline)
+      for (const id in this.conns){ try{ this.conns[id].send({t:'FX',c:c}); }catch(e){} }
+  },
+  act(a,p){
+    if (State.isHost) Game.act(State.myId,a,p);
+    else if (this.hostConn){ try{ this.hostConn.send({t:'ACT',a:a,p:p}); }catch(e){} }
+  },
+  intent(ax,ay){
+    if (State.isHost || !this.hostConn) return;
+    try{ this.hostConn.send({t:'INTENT',ax:ax,ay:ay}); }catch(e){}
+  },
+  profile(d){
+    if (State.isHost){ Object.assign(State.players[State.myId], d, {ready:true}); UI.roster(); this.flush(true); }
+    else if (this.hostConn){ try{ this.hostConn.send(Object.assign({t:'PROFILE'},d)); }catch(e){} }
+  }
+};
+
+/* The S1-① fix. Identity keys are never merged from the wire. */
+function applySnapshot(s){
+  const before = State.phase;
+  State.phase=s.phase; State.sla=s.sla; State.timer=s.timer; State.caller=s.caller;
+  State.tasksDone=s.tasksDone; State.tasksNeeded=s.tasksNeeded;
+  State.masterUnlock=s.masterUnlock; State.lockedZones=s.lockedZones||{};
+  State.doorsSealed=s.doorsSealed; State.votes=s.votes||{}; State.weights=s.weights||{};
+  State.bridgeCd=s.bridgeCd; State.ending=s.ending; State.cast=s.cast||[];
+  State.ejected=s.ejected; State.ejectWasRogue=s.ejectWasRogue; State.fx=s.fx||{};
+
+  const local = me();
+  const keep = local ? {x:local.x, y:local.y} : null;
+  const next = {};
+  for (const id in s.players){
+    const src = s.players[id];
+    const p = State.players[id] || blankPlayer();
+    for (const k of SI.net.publicPlayer) if (src[k]!==undefined) p[k]=src[k];
+    p.taskTotal = src.taskTotal;
+    next[id] = p;
+  }
+  State.players = next;
+  const mine = State.players[State.myId];
+  if (mine && s.you) for (const k of SI.net.privatePlayer) if (s.you[k]!==undefined) mine[k]=s.you[k];
+  /* soft reconciliation: trust local prediction unless we have drifted badly */
+  if (mine && keep && !mine.out && dist(keep.x,keep.y,mine.x,mine.y) < 1.6){ mine.x=keep.x; mine.y=keep.y; }
+  if (before !== State.phase) UI.applyPhase();
+}
+
+/* ═══ SECTION 4 — AI OPERATORS ═════════════════════════════════════════════
+   Guardrail #1: every state is pre-allocated in a frozen registry with an
+   explicit enter/execute/exit, and every transition is checked against the
+   manifest's table BEFORE any entity exists.                               */
+let AI_DT = 0;                       /* explicit delta — never a stale clock */
+const YK = (typeof YUKA !== 'undefined') ? YUKA : null;
+
+function botTarget(bot){
+  const p = State.players[bot.botId]; if(!p) return null;
+  if (p.saboteur){
+    const z = pick(D.assignable);            /* mimes a plausible work route */
+    return {zone:z, stand:z.stand, fake:true};
+  }
+  for (const zid of p.tasks){
+    if (p.done.indexOf(zid) >= 0) continue;
+    const z = D.zone.get(zid); if(!z) continue;
+    if (z.stage===1 && p.stage[zid]===1){
+      const pairZone = D.zone.get(z.pairs);
+      if (pairZone) return {zone:pairZone, stand:pairZone.stand, finishes:zid};
+    }
+    return {zone:z, stand:z.stand};
+  }
+  if (State.masterUnlock){
+    const mz = D.zone.get('ZX-MASTER');
+    if (mz) return {zone:mz, stand:mz.stand, master:true};
+  }
+  return null;
+}
+function repath(bot, cx, cy){
+  const p = State.players[bot.botId]; if(!p) return;
+  bot.path = findPath(p.x, p.y, cx, cy, State.doorsSealed);
+  bot.leg = 0;
+}
+function stepAlong(bot, dt){
+  const p = State.players[bot.botId]; if(!p) return true;
+  if (!bot.path || bot.leg >= bot.path.length) return true;
+  const node = bot.path[bot.leg];
+  const tx = node.x + 0.5, ty = node.y + 0.5;
+  const dx = tx - p.x, dy = ty - p.y;
+  const d = Math.hypot(dx,dy);
+  if (d < 0.12){ bot.leg++; return bot.leg >= bot.path.length; }
+  const step = Math.min(SI.rules.botSpeed * dt, d);
+  const nx = p.x + (dx/d)*step, ny = p.y + (dy/d)*step;
+  if (Number.isFinite(nx) && Number.isFinite(ny)){ p.x = nx; p.y = ny; }
+  return false;
+}
+function loneTargetFor(p, id){
+  let best=null, bd=SI.rules.revokeRange + 2.2;
+  for (const oid in State.players){
+    if (oid===id) continue;
+    const o = State.players[oid];
+    if (o.out || o.saboteur) continue;
+    const d = dist(p.x,p.y,o.x,o.y);
+    if (d < bd && los(p.x,p.y,o.x,o.y)){
+      /* only hunt someone who is genuinely isolated */
+      let witnesses = 0;
+      for (const wid in State.players){
+        if (wid===id || wid===oid) continue;
+        const w = State.players[wid];
+        if (!w.out && dist(o.x,o.y,w.x,w.y) < 6 && los(o.x,o.y,w.x,w.y)) witnesses++;
+      }
+      if (witnesses===0){ bd=d; best=oid; }
+    }
+  }
+  return best;
+}
+
+const StateBase = YK ? YK.State : function(){};
+function mkState(name, impl){
+  const s = YK ? new YK.State() : {};
+  s.name = name;
+  s.enter   = impl.enter   || function(){};
+  s.execute = impl.execute || function(){};
+  s.exit    = impl.exit    || function(){};
+  return s;
+}
+
+const AI_STATES = Object.freeze({
+  PATROL: mkState('PATROL',{
+    enter(b){ const p=State.players[b.botId]; if(!p) return;
+      let c,r,guard=0;
+      do { c=1+((Math.random()*(SI.map.cols-2))|0); r=1+((Math.random()*(SI.map.rows-2))|0); }
+      while (!D.walkable(c,r) && guard++ < 40);
+      repath(b,c,r); b.t = 8; },
+    execute(b){ b.t -= AI_DT;
+      if (stepAlong(b,AI_DT) || b.t<=0) b.fsm.changeTo('PATH'); },
+    exit(){}
+  }),
+
+  PATH: mkState('PATH',{
+    enter(b){
+      const tgt = botTarget(b);
+      b.goal = tgt;
+      if (!tgt){ b.fsm.changeTo('PATROL'); return; }
+      repath(b, tgt.stand[0], tgt.stand[1]);
+      b.t = 26; b.seal = State.doorsSealed;
+      const p0 = State.players[b.botId];
+      if (!b.path.length && p0 && !Game.near(p0, tgt.zone)){ b.fsm.changeTo('PATROL'); return; }
+    },
+    execute(b){
+      const p = State.players[b.botId]; if(!p || p.out) return;
+      b.t -= AI_DT;
+      if (b.seal !== State.doorsSealed && b.goal){        /* bulkheads changed */
+        b.seal = State.doorsSealed; repath(b, b.goal.stand[0], b.goal.stand[1]);
+      }
+      if (p.saboteur){
+        const victim = loneTargetFor(p, b.botId);
+        if (victim && p.revokeCd <= 0 && State.grace <= 0){ b.prey = victim; b.fsm.changeTo('HUNT'); return; }
+        if (State.grace<=0 && Math.random() < SI.ai.tune.sabChance) Game.botSabotage(b.botId);
+      } else if (State.phase==='PLAYING' && State.bridgeCd<=0 && Math.random()<0.02){
+        for (const oid in State.players){
+          const o = State.players[oid];
+          if (o.out && dist(p.x,p.y,o.x,o.y) < SI.rules.reportRange && los(p.x,p.y,o.x,o.y)){
+            if (Math.random() < SI.ai.tune.reportChance){ Game.act(b.botId,'BRIDGE'); return; }
+          }
+        }
+      }
+      if (stepAlong(b,AI_DT) || b.t<=0)
+        b.fsm.changeTo(p.saboteur ? 'FAKE_WORK' : 'WORK');
+    },
+    exit(){}
+  }),
+
+  WORK: mkState('WORK',{
+    enter(b){
+      const p = State.players[b.botId]; if(!p) return;
+      const T = SI.ai.tune;
+      b.t = T.workMin + Math.random()*(T.workMax-T.workMin);
+      p.working = true;
+      if (b.goal && b.goal.zone){ p.wa = b.goal.zone.anchor[0]; p.wb = b.goal.zone.anchor[1]; }
+    },
+    execute(b){
+      const p = State.players[b.botId]; if(!p || p.out){ b.fsm.changeTo('PATH'); return; }
+      b.t -= AI_DT;
+      if (b.t > 0) return;
+      const g = b.goal;
+      if (g && g.master) Game.act(b.botId,'MASTER');
+      else if (g && g.zone) Game.act(b.botId,'DONE', g.finishes || g.zone.id);
+      b.fsm.changeTo('PATH');
+    },
+    exit(b){ const p=State.players[b.botId]; if(p) p.working=false; }
+  }),
+
+  FAKE_WORK: mkState('FAKE_WORK',{
+    enter(b){
+      const p = State.players[b.botId]; if(!p) return;
+      b.t = 3 + Math.random()*4; p.working = true;
+      if (b.goal && b.goal.zone){ p.wa = b.goal.zone.anchor[0]; p.wb = b.goal.zone.anchor[1]; }
+    },
+    execute(b){
+      const p = State.players[b.botId]; if(!p || p.out){ b.fsm.changeTo('PATH'); return; }
+      b.t -= AI_DT;
+      const victim = loneTargetFor(p, b.botId);
+      if (victim && p.revokeCd<=0 && State.grace<=0){ b.prey=victim; b.fsm.changeTo('HUNT'); return; }
+      if (b.t<=0) b.fsm.changeTo('PATH');
+    },
+    exit(b){ const p=State.players[b.botId]; if(p) p.working=false; }
+  }),
+
+  HUNT: mkState('HUNT',{
+    enter(b){ b.t = SI.ai.tune.huntPatience; b.rp = 0;
+      const t = State.players[b.prey]; const p = State.players[b.botId];
+      if (t && p) repath(b, Math.floor(t.x), Math.floor(t.y)); },
+    execute(b){
+      const p = State.players[b.botId], t = State.players[b.prey];
+      if (!p || !t || t.out || p.out || p.revokeCd>0){ b.fsm.changeTo('PATH'); return; }
+      b.t -= AI_DT; b.rp -= AI_DT;
+      if (b.t <= 0){ b.fsm.changeTo('PATH'); return; }
+      if (dist(p.x,p.y,t.x,t.y) <= SI.rules.revokeRange && los(p.x,p.y,t.x,t.y)){
+        Game.act(b.botId,'REVOKE',b.prey);
+        b.fsm.changeTo('FLEE'); return;
+      }
+      /* re-path on a cadence — pursuit still routes around geometry */
+      if (b.rp <= 0){ b.rp = 0.55; repath(b, Math.floor(t.x), Math.floor(t.y)); }
+      stepAlong(b, AI_DT);
+    },
+    exit(b){ b.prey = null; }
+  }),
+
+  FLEE: mkState('FLEE',{
+    enter(b){
+      b.t = SI.ai.tune.fleeDur;
+      const p = State.players[b.botId]; if(!p) return;
+      let c,r,guard=0;
+      do { c=1+((Math.random()*(SI.map.cols-2))|0); r=1+((Math.random()*(SI.map.rows-2))|0); }
+      while ((!D.walkable(c,r) || dist(c,r,p.x,p.y) < 7) && guard++ < 60);
+      repath(b,c,r);
+    },
+    execute(b){ b.t -= AI_DT;
+      const done = stepAlong(b,AI_DT);
+      if (b.t<=0 || done) b.fsm.changeTo('ALIBI'); },
+    exit(){}
+  }),
+
+  ALIBI: mkState('ALIBI',{
+    enter(b){ b.t = SI.ai.tune.alibiDur;
+      const p=State.players[b.botId]; if(p) p.working = true; },
+    execute(b){ b.t -= AI_DT; if(b.t<=0) b.fsm.changeTo('PATH'); },
+    exit(b){ const p=State.players[b.botId]; if(p) p.working=false; }
+  })
+});
+
+/* Minimal FSM used when YUKA is unavailable — identical surface. */
+function MiniFSM(owner){ this.owner=owner; this.map={}; this.cur=null; }
+MiniFSM.prototype.add = function(n,s){ this.map[n]=s; };
+MiniFSM.prototype.changeTo = function(n){
+  const nxt = this.map[n]; if(!nxt) return;
+  if (this.cur){
+    const legal = SI.ai.transitions[this.cur.name] || [];
+    if (legal.indexOf(n) < 0) return;               /* manifest-checked */
+    this.cur.exit(this.owner);
+  }
+  this.cur = nxt; nxt.enter(this.owner);
+};
+MiniFSM.prototype.update = function(){ if(this.cur) this.cur.execute(this.owner); };
+
+function Bot(id){
+  this.botId=id; this.path=[]; this.leg=0; this.t=0; this.goal=null; this.prey=null;
+  this.fsm = new MiniFSM(this);
+  for (const n of SI.ai.states) this.fsm.add(n, AI_STATES[n]);
+  this.fsm.cur = AI_STATES.PATH; AI_STATES.PATH.enter(this);
+}
+
+const Bots = {
+  list:[], em:null, clock:null,
+  spawn(){
+    this.list.length = 0;
+    if (YK){
+      this.em = new YK.EntityManager();
+      this.clock = new YK.Time();
+    }
+    if (!State.isHost || !State.useBots) return;
+    for (const b of SI.ai.roster){
+      const sc = D.walkable(b.spawn[0],b.spawn[1]) ? b.spawn : [SI.spawn.col|0, SI.spawn.row|0];
+      State.players[b.id] = blankPlayer({
+        name:b.name, color:b.color, role:pick(SI.roles).id,
+        x:sc[0]+0.5, y:sc[1]+0.5, isBot:true
+      });
+      this.list.push(new Bot(b.id));
+    }
+  },
+  reset(){
+    for (const bot of this.list){
+      bot.path=[]; bot.leg=0; bot.goal=null; bot.prey=null;
+      bot.fsm.cur = AI_STATES.PATH; AI_STATES.PATH.enter(bot);
+    }
+  },
+  update(dt){
+    if (!State.isHost) return;
+    AI_DT = dt;
+    if (this.clock) this.clock.update();          /* kept in step, never relied on */
+    for (const bot of this.list){
+      const p = State.players[bot.botId];
+      if (!p || p.out) continue;
+      try { bot.fsm.update(); } catch(e){ console.warn('[ai]',e && e.message); }
+      p.x = clamp(safeNum(p.x, SI.spawn.col), 0.5, SI.map.cols-1.5);
+      p.y = clamp(safeNum(p.y, SI.spawn.row), 0.5, SI.map.rows-1.5);
+    }
+  }
+};
+
+/* ═══ SECTION 5 — HOST GAME LOGIC ══════════════════════════════════════════
+   Every mutation lands here. Every client action is validated against
+   ownership, proximity, phase and cooldown before it touches State.        */
+const Game = {
+  zoneCenter(z){ return [z.stand[0]+0.5, z.stand[1]+0.5]; },
+  near(p,z,range){
+    const c = this.zoneCenter(z);
+    return dist(p.x,p.y,c[0],c[1]) <= (range || SI.rules.interact) + 0.35;
+  },
+  /* which physical zone a task id currently wants, honouring two-stage */
+  activeZoneFor(p, zid){
+    const z = D.zone.get(zid); if(!z) return null;
+    if (z.stage===1 && p.stage[zid]===1) return D.zone.get(z.pairs) || z;
+    return z;
+  },
+
+  start(){
+    if (!State.isHost) return;
+    Bots.spawn();
+    const ids = Object.keys(State.players);
+
+    /* saboteur selection, with the lobby test override honoured */
+    let sabId = null;
+    if (ids.length >= 2){
+      if (State.forceRole==='ROGUE') sabId = State.myId;
+      else if (State.forceRole==='CREW'){
+        const others = ids.filter(i=>i!==State.myId);
+        sabId = others.length ? pick(others) : null;
+      } else sabId = pick(ids);
+    }
+
+    State.tasksDone=0; State.tasksNeeded=0; State.sla=SI.rules.slaMax;
+    State.fx={}; State.lockedZones={}; State.doorsSealed=false;
+    State.masterUnlock=false; State.bridgeCd=0; State.votes={}; State.weights={};
+    State.ending=null; State.cast=[]; State.ejected=null;
+    State.grace = SI.rules.startGrace;
+
+    for (const id of ids){
+      const p = State.players[id];
+      p.out=false; p.done=[]; p.stage={}; p.suspect={}; p.working=false;
+      p.x = SI.spawn.col + (Math.random()-0.5)*SI.spawn.spread*2;
+      p.y = SI.spawn.row + (Math.random()-0.5)*SI.spawn.spread*2;
+      p.revokeCd = 12;
+      p.sabCd = {};
+      for (const s of SI.sabotage) p.sabCd[s.id] = 12;
+      p.saboteur = (id === sabId);
+      if (p.saboteur) p.tasks = [];
+      else {
+        p.tasks = shuffle(D.assignable).slice(0, SI.rules.tasksPerCrew).map(z=>z.id);
+        State.tasksNeeded += p.tasks.length;
+      }
+      p.taskTotal = p.tasks.length;
+    }
+    Bots.reset();
+    State.phase='PLAYING';
+    Net.cue('unlock');
+    UI.applyPhase();              /* host applies locally FIRST, then tells peers */
+    Net.flush(true);
+  },
+
+  /* ── the per-frame host authority ── */
+  tick(dt){
+    if (!State.isHost) return;
+    try{
+      if (State.phase==='PLAYING'){
+        if (State.grace>0) State.grace = Math.max(0, State.grace-dt);
+
+        let drain = SI.rules.slaIdle;
+        for (const k in State.fx){
+          const def = D.sab.get(k); if(!def) continue;
+          if (def.effect==='DRAIN') drain += def.drain;
+        }
+        State.sla = clamp(State.sla - drain*dt, 0, SI.rules.slaMax);
+        if (State.sla <= 0){ this.finish('SAB_SLA'); return; }
+
+        /* timed effects */
+        for (const k in State.fx){
+          const e = State.fx[k];
+          if (e.t > 0){
+            e.t -= dt;
+            if (e.t <= 0) this.clearEffect(k);
+          }
+        }
+        State.doorsSealed = !!State.fx['SAB-DOOR'];
+        for (const zid in State.lockedZones){
+          State.lockedZones[zid] -= dt;
+          if (State.lockedZones[zid] <= 0) delete State.lockedZones[zid];
+        }
+        if (State.bridgeCd>0) State.bridgeCd = Math.max(0, State.bridgeCd-dt);
+        for (const id in State.players){
+          const p = State.players[id];
+          if (p.revokeCd>0) p.revokeCd = Math.max(0,p.revokeCd-dt);
+          for (const s in p.sabCd) if (p.sabCd[s]>0) p.sabCd[s] = Math.max(0,p.sabCd[s]-dt);
+          /* integrate remote intent — the host owns every position */
+          if (!p.isBot && id!==State.myId && !p.out) this.integrate(p, dt);
+        }
+        Bots.update(dt);
+        if (!State.masterUnlock && State.tasksNeeded>0 && State.tasksDone>=State.tasksNeeded){
+          State.masterUnlock = true; Net.cue('unlock');
+          toast('ALL QUEUES CLEAR — MASTER IPL UNLOCKED','good');
+        }
+      }
+      else if (State.phase==='DISCUSSION'){
+        State.timer -= dt;
+        if (State.timer<=0){ State.phase='VOTING'; State.timer=SI.rules.voting; UI.applyPhase(); Net.flush(true); }
+      }
+      else if (State.phase==='VOTING'){
+        State.timer -= dt;
+        this.botVotes(dt);
+        if (State.timer<=0) this.resolve();
+      }
+      else if (State.phase==='REVEAL'){
+        State.timer -= dt;
+        if (State.timer<=0){
+          State.phase='PLAYING'; State.votes={}; State.weights={};
+          State.bridgeCd = SI.rules.bridgeCd; State.grace = 4;
+          UI.applyPhase(); Net.flush(true); this.checkEnd();
+        }
+      }
+      Net.tick(dt);
+    } catch(e){ console.error('[host]',e); }
+  },
+
+  integrate(p, dt){
+    const ax = clamp(safeNum(p.ax,0),-1,1), ay = clamp(safeNum(p.ay,0),-1,1);
+    if (!ax && !ay) return;
+    const mag = Math.hypot(ax,ay) || 1;
+    move(p, (ax/mag)*SI.rules.playerSpeed*dt, (ay/mag)*SI.rules.playerSpeed*dt);
+  },
+
+  /* ══ THE REDUCER ══ */
+  act(actorId, action, payload){
+    if (!State.isHost) return;
+    const a = State.players[actorId]; if(!a) return;
+
+    if (action==='VOTE'){
+      if (State.phase!=='VOTING' || a.out || State.votes[actorId]) return;
+      const tgt = String(payload||'skip');
+      if (tgt!=='skip' && (!State.players[tgt] || State.players[tgt].out)) return;
+      State.votes[actorId] = tgt;
+      State.weights[actorId] = Math.max(1, Math.round(perk(a,'voteWeight',1)));
+      Net.cue('vote');
+      let alive=0; for(const i in State.players) if(!State.players[i].out) alive++;
+      if (Object.keys(State.votes).length >= alive) this.resolve();
+      else Net.flush(true);
+      return;
+    }
+    if (State.phase!=='PLAYING' || a.out) return;
+
+    if (action==='DONE'){
+      const zid = String(payload||'');
+      if (a.saboteur) return;
+      if (a.tasks.indexOf(zid) < 0) return;              /* ownership */
+      if (a.done.indexOf(zid) >= 0) return;              /* idempotent */
+      const z = this.activeZoneFor(a, zid); if(!z) return;
+      if (State.lockedZones[z.id]) return;
+      if (!this.near(a,z)) return;                       /* proximity */
+      const def = D.zone.get(zid);
+      if (def && def.stage===1 && a.stage[zid]!==1){
+        a.stage[zid] = 1;                                /* stage one banked */
+        Net.cue('ok'); Net.flush(true); return;
+      }
+      a.done.push(zid); a.doneCount = a.done.length;
+      State.tasksDone++;
+      const t = SI.tasks[def ? def.task : 'ACK_ALERT'];
+      State.sla = clamp(State.sla + (t?t.restore:12), 0, SI.rules.slaMax);
+      Net.cue('ok'); Net.flush(true);
+      return;
+    }
+
+    if (action==='MASTER'){
+      if (a.saboteur || !State.masterUnlock) return;
+      const z = D.zone.get('ZX-MASTER');
+      if (!z || !this.near(a,z,1.9)) return;
+      this.finish('CREW_IPL');
+      return;
+    }
+
+    if (action==='SAB'){
+      if (!a.saboteur || State.grace>0) return;
+      const def = D.sab.get(String(payload||'')); if(!def) return;
+      if ((a.sabCd[def.id]||0) > 0) return;
+      if (State.fx[def.id]) return;
+      a.sabCd[def.id] = def.cd;
+      State.fx[def.id] = {t: def.dur || -1, fixes:0, need: def.need || 0};
+      if (def.effect==='LOCK_ZONES'){
+        for (const z of shuffle(D.assignable).slice(0, def.count||3))
+          State.lockedZones[z.id] = def.dur;
+      }
+      if (def.effect==='LOCK_DOORS') State.doorsSealed = true;
+      if (def.alarm==='loud'){ Net.cue('alarm'); Net.fx('shake'); }
+      else if (def.alarm==='soft') Net.cue('fail');
+      Aud.mood(true);
+      Net.flush(true);
+      return;
+    }
+
+    if (action==='FIX'){
+      const key = String(payload||'');
+      const e = State.fx[key], def = D.sab.get(key);
+      if (!e || !def || !def.counter || a.saboteur) return;
+      const anyZone = perk(a,'canFixAnyZoneType',false);
+      const here = SI.zones.find(z => z.task && !z.kind && this.near(a,z) &&
+        (anyZone || z.task === def.counter));
+      if (!here) return;
+      e.fixes += Math.max(1, Math.round(perk(a,'fixSpeed',1)));
+      if (e.fixes >= e.need){ this.clearEffect(key); Net.cue('unlock'); }
+      else { Net.cue('ok'); toast('PARTIAL CONTAINMENT · '+e.fixes+'/'+e.need); }
+      Net.flush(true);
+      return;
+    }
+
+    if (action==='REVOKE'){
+      if (!a.saboteur || a.revokeCd>0 || State.grace>0) return;
+      const t = State.players[String(payload||'')];
+      if (!t || t.out || t.saboteur) return;
+      if (dist(a.x,a.y,t.x,t.y) > SI.rules.revokeRange + 0.4) return;
+      if (!los(a.x,a.y,t.x,t.y)) return;
+      t.out = true; t.working = false;
+      a.revokeCd = SI.rules.revokeCd;
+      /* anyone with eyes on it forms a real suspicion */
+      for (const wid in State.players){
+        const w = State.players[wid];
+        if (wid===actorId || w.out || !w.isBot) continue;
+        if (dist(w.x,w.y,t.x,t.y) < 7 && los(w.x,w.y,t.x,t.y))
+          w.suspect[actorId] = (w.suspect[actorId]||0) + 5;
+      }
+      for (const bot of Bots.list){
+        const bp = State.players[bot.botId];
+        if (bp && !bp.saboteur && !bp.out && dist(bp.x,bp.y,t.x,t.y) < 6) bot.fsm.changeTo('FLEE');
+      }
+      Net.cue('revoke'); Net.fx('shake'); Net.flush(true);
+      this.checkEnd();
+      return;
+    }
+
+    if (action==='BRIDGE'){
+      const cd = perk(a,'bridgeCooldown', State.bridgeCd);
+      if (cd > 0) return;
+      const bz = D.zone.get('ZX-BRIDGE');
+      let ok = bz && this.near(a,bz,1.9);
+      if (!ok){
+        for (const oid in State.players){
+          const o = State.players[oid];
+          if (o.out && dist(a.x,a.y,o.x,o.y) <= SI.rules.reportRange && los(a.x,a.y,o.x,o.y)){ ok=true; break; }
+        }
+      }
+      if (!ok) return;
+      State.phase='DISCUSSION'; State.timer=SI.rules.discussion;
+      State.votes={}; State.weights={}; State.caller=a.name; State.callerId=actorId;
+      State.bridgeCd = SI.rules.bridgeCd;
+      for (const id in State.players){
+        const p = State.players[id];
+        p.voteDelay = 0; p.working=false;
+        if (!p.out){
+          p.x = SI.spawn.col + (Math.random()-0.5)*SI.spawn.spread*2;
+          p.y = SI.spawn.row + (Math.random()-0.5)*SI.spawn.spread*2;
+        }
+      }
+      Net.cue('sting'); Net.cue('alarm'); Net.fx('shake');
+      UI.applyPhase(); Net.flush(true);
+      return;
+    }
+  },
+
+  botSabotage(botId){
+    const p = State.players[botId]; if(!p||!p.saboteur) return;
+    const ready = SI.sabotage.filter(s => (p.sabCd[s.id]||0)<=0 && !State.fx[s.id]);
+    if (!ready.length) return;
+    this.act(botId,'SAB', pick(ready).id);
+  },
+
+  botVotes(dt){
+    for (const id in State.players){
+      const p = State.players[id];
+      if (!p.isBot || p.out || State.votes[id]) continue;
+      if (!p.voteDelay) p.voteDelay = 3 + Math.random()*9;
+      p.voteDelay -= dt;
+      if (p.voteDelay > 0) continue;
+      let v = 'skip';
+      const alive = Object.keys(State.players).filter(k=>!State.players[k].out && k!==id);
+      if (!alive.length){ this.act(id,'VOTE','skip'); continue; }
+      if (p.saboteur){
+        const crew = alive.filter(k=>!State.players[k].saboteur);
+        if (crew.length) v = pick(crew);
+      } else {
+        let best=null, bs=0;
+        for (const k of alive) if ((p.suspect[k]||0) > bs){ bs=p.suspect[k]; best=k; }
+        if (best) v = best;
+        else if (Math.random() > 0.55) v = pick(alive);
+      }
+      this.act(id,'VOTE',v);
+    }
+  },
+
+  resolve(){
+    const tally = {};
+    for (const voter in State.votes){
+      const t = State.votes[voter];
+      tally[t] = (tally[t]||0) + (State.weights[voter]||1);
+    }
+    let top=null, topN=0, tied=false;
+    for (const k in tally){
+      if (tally[k] > topN){ topN=tally[k]; top=k; tied=false; }
+      else if (tally[k]===topN) tied=true;
+    }
+    State.ejected = null; State.ejectWasRogue = false;
+    if (top && top!=='skip' && !tied && State.players[top]){
+      State.players[top].out = true;
+      State.ejected = State.players[top].name;
+      State.ejectWasRogue = !!State.players[top].saboteur;
+      Net.cue('revoke');
+    } else {
+      State.ejected = tied ? 'TIE' : 'SKIP';
+    }
+    for (const id in State.players){
+      const p = State.players[id];
+      p.revokeCd = 12; p.voteDelay = 0;
+      for (const s of SI.sabotage) p.sabCd[s.id] = Math.max(p.sabCd[s.id]||0, 10);
+    }
+    State.phase='REVEAL'; State.timer=SI.rules.reveal;
+    UI.applyPhase(); Net.flush(true);
+  },
+
+  clearEffect(key){
+    delete State.fx[key];
+    if (key==='SAB-DOOR') State.doorsSealed = false;
+    if (key==='SAB-LOCK') State.lockedZones = {};
+    let loud=false;
+    for (const k in State.fx){ const d=D.sab.get(k); if(d && d.effect==='DRAIN') loud=true; }
+    Aud.mood(loud);
+  },
+
+  checkEnd(){
+    let crew=0, sab=0;
+    for (const id in State.players){
+      const p = State.players[id];
+      if (p.out) continue;
+      if (p.saboteur) sab++; else crew++;
+    }
+    if (sab===0 && State.tasksNeeded>0) this.finish('CREW_VOTE');
+    else if (sab>0 && sab>=crew) this.finish('SAB_PURGE');
+  },
+
+  finish(key){
+    if (State.ending) return;
+    State.ending = key;
+    State.cast = Object.keys(State.players).map(id=>{
+      const p = State.players[id];
+      return {name:p.name, color:p.color, role:roleOf(p).name,
+              rogue:!!p.saboteur, out:!!p.out, done:p.done.length, total:p.tasks.length};
+    });
+    State.phase='END';
+    Net.cue('sting'); Aud.mood(false);
+    UI.applyPhase(); Net.flush(true);
+  }
+};
+
+/* Shared movement + collision. One implementation for players and intent. */
+function move(p, dx, dy){
+  if (!Number.isFinite(p.x) || !Number.isFinite(p.y)){ p.x=SI.spawn.col; p.y=SI.spawn.row; return; }
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return;
+  const R = 0.30;
+  const passable = (cx,cy)=>{
+    for (const o of [[-R,-R],[R,-R],[-R,R],[R,R]]){
+      const c = Math.floor(cx+o[0]), r = Math.floor(cy+o[1]);
+      if (!D.walkable(c,r)) return false;
+      if (State.doorsSealed && D.lockable.has(D.tileAt(c,r))) return false;
+    }
+    return true;
+  };
+  const nx = clamp(p.x+dx, 0.5, SI.map.cols-1.5);
+  const ny = clamp(p.y+dy, 0.5, SI.map.rows-1.5);
+  if (passable(nx,ny)){ p.x=nx; p.y=ny; return; }
+  if (passable(nx,p.y)){ p.x=nx; return; }          /* wall-slide */
+  if (passable(p.x,ny)){ p.y=ny; }
+}
+
+/* ═══ SECTION 6 — RENDERING ════════════════════════════════════════════════
+   Static geometry is instanced. Screens and rack LEDs carry PER-INSTANCE
+   colour, so the flicker is genuinely per-mesh instead of one shared
+   material value written N times a frame.                                  */
+const Render = {
+  ok:false, scene:null, cam:null, gl:null, root:null,
+  actors:{}, screens:null, leds:null, screenN:0, ledN:0,
+  keyLight:null, alarm:null, follow:null, fog:null, doorMesh:[], _dummy:null, _col:null,
+
+  init(){
+    if (typeof THREE === 'undefined') return false;
+    const host = $('stage'); if(!host) return false;
+    try{
+      this._dummy = new THREE.Object3D();
+      this._col = new THREE.Color();
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(SI.render.bg);
+      this.fog = new THREE.Fog(SI.render.bg, SI.render.fogNear, SI.render.fogFar);
+      this.scene.fog = this.fog;
+
+      const asp = window.innerWidth/window.innerHeight, h = SI.render.half;
+      this.cam = new THREE.OrthographicCamera(-h*asp, h*asp, h, -h, 0.1, 200);
+      const o = SI.render.camOffset;
+      this.cam.position.set(o[0],o[1],o[2]);
+      this.cam.lookAt(0,0,0);
+
+      this.gl = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+      this.gl.setPixelRatio(Math.min(window.devicePixelRatio||1, 1.75));
+      this.gl.setSize(window.innerWidth, window.innerHeight);
+      this.gl.shadowMap.enabled = true;
+      this.gl.shadowMap.type = THREE.PCFSoftShadowMap;
+      host.appendChild(this.gl.domElement);
+
+      this.scene.add(new THREE.HemisphereLight(0x8fb4e0, 0x1a2438, 1.15));
+      this.scene.add(new THREE.AmbientLight(0x4a6690, 0.35));
+      this.keyLight = new THREE.DirectionalLight(0xbcd6ff, 1.05);
+      this.keyLight.position.set(16,26,12);
+      this.keyLight.castShadow = true;
+      this.keyLight.shadow.mapSize.set(1024,1024);
+      const s = this.keyLight.shadow.camera;
+      s.left=-20; s.right=20; s.top=18; s.bottom=-18; s.near=1; s.far=70;
+      this.scene.add(this.keyLight);
+
+      this.alarm = new THREE.PointLight(0xff2020, 0, 26, 2);
+      this.alarm.position.set(0,4,0); this.scene.add(this.alarm);
+      this.follow = new THREE.PointLight(0xffb000, 1.5, 14, 2);
+      this.follow.position.set(0,3,0); this.scene.add(this.follow);
+
+      this.build();
+      window.addEventListener('resize', ()=>this.resize());
+      this.ok = true;
+      return true;
+    } catch(e){ console.error('[render]',e); return false; }
+  },
+
+  build(){
+    const G = SI.map.grid, C = SI.map.cols, R = SI.map.rows;
+    const OX = C/2, OZ = R/2;
+    const wx = c => c - OX + 0.5, wz = r => r - OZ + 0.5;
+    const buckets = {floorN:[],floorD:[],wall:[],rack:[],desk:[],chair:[],glass:[],door:[]};
+    const screens=[], leds=[]; let table=null;
+
+    for (let r=0;r<R;r++) for (let c=0;c<C;c++){
+      const t = D.tileAt(c,r); if (t===0) continue;
+      const x = wx(c), z = wz(r);
+      if (t===2) buckets.floorD.push([x,z]); else if (t!==8) buckets.floorN.push([x,z]);
+      if (t===5) buckets.wall.push([x,z]);
+      else if (t===8) buckets.glass.push([x,z]);
+      else if (t===6){ buckets.door.push([x,z]); }
+      else if (t===4){ buckets.rack.push([x,z]);
+        leds.push([x-0.22,1.18,z+0.34]); leds.push([x+0.02,0.86,z+0.34]); leds.push([x+0.20,1.42,z+0.34]); }
+      else if (t===3){ buckets.desk.push([x,z]); screens.push([x,0.30,z-0.16]); }
+      else if (t===9) buckets.chair.push([x,z]);
+      else if (t===7) table = [x,z];
+    }
+
+    const M = {
+      floorN:new THREE.MeshStandardMaterial({color:0x223052, roughness:0.85, metalness:0.15}),
+      floorD:new THREE.MeshStandardMaterial({color:0x1c2740, roughness:0.6,  metalness:0.35}),
+      wall:  new THREE.MeshStandardMaterial({color:0x2d3a54, roughness:0.75}),
+      rack:  new THREE.MeshStandardMaterial({color:0x1e2a3f, roughness:0.35, metalness:0.7}),
+      desk:  new THREE.MeshStandardMaterial({color:0x303d5a, roughness:0.7}),
+      chair: new THREE.MeshStandardMaterial({color:0x3a4763, roughness:0.9}),
+      glass: new THREE.MeshStandardMaterial({color:0x3d5675, roughness:0.1, metalness:0.6,
+              transparent:true, opacity:0.28}),
+      door:  new THREE.MeshStandardMaterial({color:0x3a2f18, roughness:0.5, metalness:0.4,
+              emissive:0x2a1c00, emissiveIntensity:1})
+    };
+    const inst = (geo, mat, list, y, sy, shadow) => {
+      if (!list.length) return null;
+      const m = new THREE.InstancedMesh(geo, mat, list.length);
+      m.castShadow = !!shadow; m.receiveShadow = true;
+      for (let i=0;i<list.length;i++){
+        this._dummy.position.set(list[i][0], y, list[i][1]);
+        this._dummy.scale.set(1, sy||1, 1);
+        this._dummy.updateMatrix();
+        m.setMatrixAt(i, this._dummy.matrix);
+      }
+      m.instanceMatrix.needsUpdate = true;
+      this.scene.add(m);
+      return m;
+    };
+    const boxF = new THREE.BoxGeometry(0.97,0.12,0.97);
+    inst(boxF, M.floorN, buckets.floorN, -0.56, 1, false);
+    inst(boxF, M.floorD, buckets.floorD, -0.56, 1, false);
+    inst(new THREE.BoxGeometry(1,1.7,1),      M.wall,  buckets.wall,  0.35, 1, true);
+    inst(new THREE.BoxGeometry(0.78,2.15,0.78),M.rack, buckets.rack,  0.58, 1, true);
+    inst(new THREE.BoxGeometry(0.88,0.44,0.6), M.desk, buckets.desk, -0.28, 1, true);
+    inst(new THREE.BoxGeometry(0.34,0.09,0.34),M.chair,buckets.chair,-0.24, 1, true);
+    inst(new THREE.BoxGeometry(1,2.4,0.12),    M.glass,buckets.glass, 0.7,  1, false);
+    this.doorMesh.push(inst(new THREE.BoxGeometry(0.9,1.7,0.24), M.door, buckets.door, 0.35, 1, true));
+
+    if (table){
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.86,0.9,0.36,22), M.desk);
+      t.position.set(table[0],-0.32,table[1]); t.castShadow=true; t.receiveShadow=true;
+      this.scene.add(t);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72,0.035,8,32),
+        new THREE.MeshBasicMaterial({color:0xffb000}));
+      ring.rotation.x = -Math.PI/2; ring.position.set(table[0],-0.13,table[1]);
+      this.scene.add(ring); this.bridgeRing = ring;
+    }
+
+    /* per-instance emissive: BasicMaterial + instanceColor */
+    const mkGlow = (geo, list) => {
+      const m = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({toneMapped:false}), list.length);
+      for (let i=0;i<list.length;i++){
+        this._dummy.position.set(list[i][0],list[i][1],list[i][2]);
+        this._dummy.updateMatrix(); m.setMatrixAt(i,this._dummy.matrix);
+        m.setColorAt(i, this._col.setHex(0x00a2ff));
+      }
+      m.instanceMatrix.needsUpdate = true;
+      if (m.instanceColor) m.instanceColor.needsUpdate = true;
+      this.scene.add(m); return m;
+    };
+    this.screens = screens.length ? mkGlow(new THREE.BoxGeometry(0.58,0.36,0.05), screens) : null;
+    this.screenN = screens.length;
+    this.leds = leds.length ? mkGlow(new THREE.BoxGeometry(0.11,0.07,0.11), leds) : null;
+    this.ledN = leds.length;
+  },
+
+  nameSprite(text, color){
+    const cv = document.createElement('canvas');
+    cv.width=256; cv.height=64;
+    const g = cv.getContext('2d');
+    g.font = '600 34px "IBM Plex Mono", monospace';
+    g.textAlign='center'; g.textBaseline='middle';
+    g.fillStyle='rgba(6,10,20,.72)'; g.fillRect(0,14,256,36);
+    g.fillStyle=color; g.fillText(String(text).slice(0,12), 128, 33);
+    const tex = new THREE.CanvasTexture(cv);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:true}));
+    sp.scale.set(2.1,0.52,1); sp.position.y = 1.55;
+    return sp;
+  },
+
+  actor(p, isMe){
+    const g = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({color:new THREE.Color(p.color), roughness:0.55, metalness:0.1});
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.30,0.44,14), mat);
+    body.position.y=0.2; body.castShadow=true; g.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.24,14,12), mat);
+    head.position.y=0.63; head.castShadow=true; g.add(head);
+    const visor = new THREE.Mesh(new THREE.BoxGeometry(0.33,0.14,0.13),
+      new THREE.MeshBasicMaterial({color:0x7fe4ff, toneMapped:false}));
+    visor.position.set(0,0.64,0.17); g.add(visor); g.visor = visor;
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.085,10,8),
+      new THREE.MeshBasicMaterial({color:0xffb000, toneMapped:false}));
+    dot.position.y=1.12; dot.visible=false; g.add(dot); g.dot = dot;
+    const label = this.nameSprite(p.name, isMe ? '#ffb000' : '#c7d4e4');
+    g.add(label); g.label = label; g.labelFor = p.name;
+    if (isMe){
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.42,0.03,8,26),
+        new THREE.MeshBasicMaterial({color:0xffb000, toneMapped:false}));
+      ring.rotation.x=-Math.PI/2; ring.position.y=-0.44; g.add(ring);
+    }
+    g.matColor = mat;
+    this.scene.add(g);
+    return g;
+  },
+
+  frame(now){
+    if (!this.ok) return;
+    try{
+      const C = SI.map.cols, R = SI.map.rows;
+      for (const id in this.actors){
+        if (!State.players[id]){ this.scene.remove(this.actors[id]); delete this.actors[id]; }
+      }
+      for (const id in State.players){
+        const p = State.players[id];
+        let g = this.actors[id];
+        if (!g){ g = this.actors[id] = this.actor(p, id===State.myId); }
+        if (g.labelFor !== p.name){
+          g.remove(g.label); g.label = this.nameSprite(p.name, id===State.myId?'#ffb000':'#c7d4e4');
+          g.add(g.label); g.labelFor = p.name;
+        }
+        const tx = safeNum(p.x, SI.spawn.col) - C/2, tz = safeNum(p.y, SI.spawn.row) - R/2;
+        const dx = tx - g.position.x, dz = tz - g.position.z;
+        const moving = Math.abs(dx) > 0.006 || Math.abs(dz) > 0.006;
+        g.position.x += dx * 0.28; g.position.z += dz * 0.28;
+
+        if (p.out){
+          g.rotation.z = Math.PI/2.1; g.position.y = -0.22; g.scale.set(1,0.55,1);
+          g.dot.visible = false; g.visor.material.color.setHex(0x33414f);
+          g.label.material.opacity = 0.35;
+        } else {
+          g.rotation.z *= 0.82; g.scale.set(1,1,1);
+          g.position.y = moving ? Math.abs(Math.sin(now*0.011))*0.055 : 0;
+          g.visor.material.color.setHex(0x7fe4ff);
+          g.label.material.opacity = 1;
+          if (p.working){
+            g.dot.visible = true;
+            g.dot.position.y = 1.12 + Math.sin(now*0.009)*0.07;
+            g.rotation.y = Math.atan2((p.wa - C/2 + 0.5) - g.position.x, (p.wb - R/2 + 0.5) - g.position.z);
+          } else {
+            g.dot.visible = false;
+            if (moving) g.rotation.y = Math.atan2(dx,dz);
+          }
+        }
+      }
+
+      const M = me();
+      if (M){
+        const cx = safeNum(M.x,SI.spawn.col) - C/2, cz = safeNum(M.y,SI.spawn.row) - R/2;
+        const o = SI.render.camOffset, L = SI.render.lerp;
+        this.cam.position.x += ((cx+o[0]) - this.cam.position.x)*L;
+        this.cam.position.z += ((cz+o[2]) - this.cam.position.z)*L;
+        this.cam.lookAt(this.cam.position.x-o[0], 0, this.cam.position.z-o[2]);
+        this.follow.position.set(cx, 2.6, cz);
+        this.alarm.position.set(cx, 4.2, cz);
+      }
+
+      let loud=false, any=false;
+      for (const k in State.fx){ any=true; const d=D.sab.get(k); if(d && d.alarm==='loud') loud=true; }
+      if (loud){
+        this.alarm.intensity = 1.6 + Math.sin(now*0.006)*1.5;
+        this.fog.far += ((SI.render.fogBreach) - this.fog.far)*0.05;
+        document.body.classList.add('breach');
+      } else {
+        this.alarm.intensity *= 0.9;
+        this.fog.far += (SI.render.fogFar - this.fog.far)*0.04;
+        document.body.classList.remove('breach');
+      }
+      if (this.bridgeRing) this.bridgeRing.material.color.setHex(State.masterUnlock ? 0x3ddc97 : 0x594010);
+
+      /* genuine per-instance flicker */
+      if (this.screens){
+        for (let i=0;i<this.screenN;i++){
+          const v = 0.55 + Math.sin(now*0.004 + i*1.7)*0.22 + (Math.random()<0.012 ? -0.45 : 0);
+          this._col.setRGB(0.02, 0.5*v, 0.95*v);
+          this.screens.setColorAt(i, this._col);
+        }
+        if (this.screens.instanceColor) this.screens.instanceColor.needsUpdate = true;
+      }
+      if (this.leds){
+        for (let i=0;i<this.ledN;i++){
+          const on = Math.random() > 0.07;
+          if (any && i%3===0) this._col.setRGB(on?1:0.15, 0.06, 0.06);
+          else this._col.setRGB(0.05, on?0.85:0.1, on?0.55:0.08);
+          this.leds.setColorAt(i, this._col);
+        }
+        if (this.leds.instanceColor) this.leds.instanceColor.needsUpdate = true;
+      }
+      for (const dm of this.doorMesh){
+        if (dm && dm.material) dm.material.emissive.setHex(State.doorsSealed ? 0x8a0000 : 0x2a1c00);
+      }
+      this.gl.render(this.scene, this.cam);
+    } catch(e){ console.warn('[frame]', e && e.message); }
+  },
+
+  resize(){
+    if (!this.ok || !this.cam || !this.gl) return;
+    const asp = window.innerWidth/window.innerHeight, h = SI.render.half;
+    this.cam.left=-h*asp; this.cam.right=h*asp; this.cam.top=h; this.cam.bottom=-h;
+    this.cam.updateProjectionMatrix();
+    this.gl.setSize(window.innerWidth, window.innerHeight);
+  }
+};
+
+/* ═══ SECTION 7 — TASK ENGINE ══════════════════════════════════════════════
+   Every puzzle is generated per attempt from a rule the player can read in
+   the modal. Nothing has a fixed answer, so nothing is memorisable.        */
+const TaskEngine = {
+  open:false, owner:null, zone:null, left:0, max:0, _tick:0, _clean:[], _ac:null,
+
+  begin(zoneId, ownerTaskId){
+    const M = me(); if(!M || this.open) return;
+    const z = D.zone.get(zoneId); if(!z) return;
+    const ownerZ = D.zone.get(ownerTaskId) || z;
+    const def = SI.tasks[ownerZ.task]; if(!def) return;
+    if (State.lockedZones[z.id]){ toast('ZONE CORRUPTED — CANNOT COMMIT','bad'); Aud.play('fail'); return; }
+
+    const stage2 = !!(ownerZ.stage===1 && M.stage[ownerTaskId]===1);
+    const gen = this[def.gen]; if(typeof gen !== 'function') return;
+
+    this.open=true; this.owner=ownerTaskId; this.zone=z;
+    this._ac = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    this.max = Math.max(5, Math.round(def.dur * perk(M,'taskDuration',1)));
+    this.left = this.max;
+
+    txt('task-title', def.label + (ownerZ.stage===1 ? (stage2?' · STAGE 2':' · STAGE 1') : ''));
+    txt('task-zone', 'ZONE ' + z.label.toUpperCase());
+    this.clock();
+    const body = $('task-body'); if(body) body.innerHTML = '';
+    Aud.play('click');
+    try { gen.call(this, body, stage2); } catch(e){ console.error('[task]',e); this.abort(); return; }
+    shown('task-modal', true);
+    blurActive();
+
+    clearInterval(this._tick);
+    this._tick = setInterval(()=>{
+      this.left--; this.clock();
+      if (this.left<=0){ this.fail('TASK TIMED OUT'); }
+    }, 1000);
+  },
+  _sig(){ return this._ac ? {signal:this._ac.signal} : undefined; },
+  clock(){
+    const pct = Math.max(0,(this.left/this.max)*100);
+    css('task-clock-bar','width', pct+'%');
+    const bar = $('task-clock-bar');
+    if (bar) bar.className = pct<28 ? 'urgent' : pct<55 ? 'warn' : '';
+    txt('task-clock-txt', Math.max(0,this.left)+'s');
+  },
+  sweep(){
+    if (this._ac){ try{ this._ac.abort(); }catch(e){} this._ac = null; }
+    for (const c of this._clean){ try{ c(); }catch(e){} }
+    this._clean.length = 0;
+    clearInterval(this._tick); this._tick = 0;
+  },
+  close(){
+    this.sweep();
+    this.open=false; this.owner=null; this.zone=null;
+    shown('task-modal', false);
+    blurActive();
+    Input.consume();
+  },
+  abort(){ this.close(); },
+  fail(msg){ Aud.play('fail'); toast(msg||'TASK FAILED','bad'); this.close(); },
+  succeed(){
+    const owner = this.owner;
+    Aud.play('ok'); this.close();
+    if (owner === 'ZX-MASTER'){ Net.act('MASTER'); return; }
+    Net.act('DONE', owner);
+    toast('COMMITTED ✓','good');
+  },
+
+  /* ── generators ─────────────────────────────────────────────────────── */
+  ackFeed(body, s2){
+    const CODES=['S0C7','S322','S806','S0C4','U4038','S80A','S013'];
+    const target = pick(CODES);
+    const noise = CODES.filter(c=>c!==target);
+    const SUB=['PAYROLL','CICSPRD','DB2MAIN','BATCHRP','IMSCTL','TSOUSR'];
+    body.innerHTML =
+      '<p style="font-size:13px;color:var(--ink-dim);margin-bottom:10px">Console is scrolling. Acknowledge every line carrying '+
+      '<b style="color:var(--amber);font-size:16px">'+target+'</b> — and nothing else.</p>'+
+      '<div class="term" id="feed"><div class="term-head">SYSLOG · NODE7 · LIVE</div><div id="feed-rows"></div></div>'+
+      '<div class="lbl" style="margin-top:9px">Acknowledged <span id="ack-n">0</span> / 3</div>';
+    let got=0;
+    const draw = ()=>{
+      const rows=[]; const hits = 1 + ((Math.random()*2)|0);
+      for (let i=0;i<7;i++) rows.push({c: i<hits ? target : pick(noise), j: pick(SUB)+((Math.random()*90+10)|0)});
+      const sh = shuffle(rows);
+      const el = $('feed-rows'); if(!el) return;
+      el.innerHTML = sh.map(r=>'<div class="term-line'+(r.c===target?' hot':'')+'" data-hit="'+(r.c===target?1:0)+'">'+
+        '<span>'+esc(r.j)+'</span><span class="code">ABEND '+esc(r.c)+'</span></div>').join('');
+    };
+    draw();
+    const iv = setInterval(draw, 1100);
+    this._clean.push(()=>clearInterval(iv));
+    body.addEventListener('click', e=>{
+      const row = e.target.closest ? e.target.closest('.term-line') : null;
+      if (!row) return;
+      if (row.dataset.hit==='1'){
+        got++; Aud.play('click'); txt('ack-n',got); row.style.opacity='.3';
+        if (got>=3) this.succeed();
+      } else { Aud.play('fail'); this.left = Math.max(1,this.left-2); toast('WRONG ALERT · −2s','bad'); }
+    }, this._sig());
+  },
+
+  triage(body){
+    const SUBS=[{n:'PAYROLL01',g:'Mainframe-Ops'},{n:'CICSPRD',g:'Online-Systems'},
+                {n:'DB2MAIN',g:'DBA-Core'},{n:'MQSERIES',g:'Middleware'}];
+    const IMP=[{n:'PRODUCTION OUTAGE',p:'P1'},{n:'DEGRADED SERVICE',p:'P2'},{n:'SINGLE USER',p:'P3'}];
+    const sub = pick(SUBS), imp = pick(IMP);
+    const pris = shuffle(['P1','P2','P3']);
+    const grps = shuffle(SUBS.map(s=>s.g));
+    body.innerHTML =
+      '<div style="background:var(--steel-2);border:1px solid var(--rule);padding:11px;margin-bottom:12px;text-align:left">'+
+        '<div class="lbl">Inbound Alert</div>'+
+        '<div class="sign" style="font-size:19px;color:var(--amber);margin:4px 0">'+esc(sub.n)+' · ABEND</div>'+
+        '<div style="font-size:12px;color:var(--ink)">Impact: <b style="color:var(--ink-hi)">'+esc(imp.n)+'</b></div>'+
+      '</div>'+
+      '<div class="term" style="max-height:none;margin-bottom:12px"><div class="term-head">Runbook · Triage Matrix</div>'+
+        '<div style="padding:8px 11px;font-size:12px;line-height:1.7;color:var(--ink)">'+
+        IMP.map(i=>'· '+i.n+' → <b style="color:var(--amber)">'+i.p+'</b>').join('<br>')+'<br>'+
+        SUBS.map(s=>'· '+s.n+' → <b style="color:var(--amber)">'+s.g+'</b>').join('<br>')+
+        '</div></div>'+
+      '<div class="formrow"><span class="lbl">Priority</span><select id="f-pri">'+
+        pris.map(p=>'<option>'+p+'</option>').join('')+'</select></div>'+
+      '<div class="formrow"><span class="lbl">Assignment Group</span><select id="f-grp">'+
+        grps.map(g=>'<option>'+esc(g)+'</option>').join('')+'</select></div>'+
+      '<button class="btn go" id="f-sub">Submit Ticket</button>';
+    on('f-sub','click',()=>{
+      const p=$('f-pri'), g=$('f-grp');
+      if (p && g && p.value===imp.p && g.value===sub.g) this.succeed();
+      else { Aud.play('fail'); this.left=Math.max(1,this.left-3); toast('INCORRECT TRIAGE · −3s','bad'); }
+    });
+  },
+
+  spool(body){
+    const NAMES=['PAYROLL01','BATCHRPT','NIGHTLY1','DBMAINT','CICSPRD','ARCHIVE9','SORTJOB4'];
+    const jobs = shuffle(NAMES).slice(0,6);
+    const bad = (Math.random()*jobs.length)|0;
+    const code = pick(['S0C7','S322','U4038','S806']);
+    body.innerHTML =
+      '<p style="font-size:13px;color:var(--ink-dim);margin-bottom:10px">One job is looping in an abend state and holding the initiator. Cancel it.</p>'+
+      '<div class="term" style="max-height:none"><div class="term-head">SYS1.SPOOL · DISPLAY ACTIVE</div>'+
+      jobs.map((j,i)=>'<div class="term-line" data-bad="'+(i===bad?1:0)+'"><span>'+esc(j)+'</span>'+
+        '<span class="code" style="'+(i===bad?'color:var(--breach)':'')+'">'+(i===bad?'ABEND '+code:'ACTIVE')+'</span></div>').join('')+
+      '</div>';
+    body.addEventListener('click', e=>{
+      const row = e.target.closest ? e.target.closest('.term-line') : null;
+      if (!row) return;
+      if (row.dataset.bad==='1') this.succeed();
+      else { Aud.play('fail'); this.left=Math.max(1,this.left-3); toast('THAT JOB IS HEALTHY · −3s','bad'); }
+    }, this._sig());
+  },
+
+  sequence(body){
+    const ALL=['QUIESCE','DRAIN','DEALLOC','SYNC','IPL','VARY ONLINE'];
+    const order = shuffle(ALL).slice(0,4);
+    const shown = shuffle(order);
+    let step=0;
+    body.innerHTML =
+      '<div class="term" style="max-height:none;margin-bottom:12px"><div class="term-head">LPAR Recovery Runbook</div>'+
+      '<div style="padding:8px 11px;font-size:13px;line-height:1.8;color:var(--ink)">'+
+      order.map((o,i)=>'<span style="color:var(--ink-dim)">'+(i+1)+'.</span> <b style="color:var(--amber)">'+o+'</b>').join('<br>')+
+      '</div></div>'+
+      '<p class="lbl" style="margin-bottom:6px">Execute in runbook order</p>'+
+      '<div class="pick" id="seq">'+shown.map(s=>'<button data-k="'+esc(s)+'">'+esc(s)+'</button>').join('')+'</div>';
+    on('seq','click', e=>{
+      const b = e.target.closest ? e.target.closest('button') : null;
+      if (!b || b.disabled) return;
+      if (b.dataset.k === order[step]){
+        b.classList.add('ok'); b.disabled=true; step++; Aud.play('click');
+        if (step>=order.length) setTimeout(()=>this.succeed(), 260);
+      } else {
+        Aud.play('fail'); b.classList.add('no');
+        setTimeout(()=>b.classList.remove('no'),320);
+        step=0; this.left=Math.max(1,this.left-3);
+        const btns = b.parentNode.querySelectorAll('button');
+        for (const x of btns){ x.classList.remove('ok'); x.disabled=false; }
+        toast('SEQUENCE RESET · −3s','bad');
+      }
+    });
+  },
+
+  routes(body){
+    const GW=['GW-NOC-01','GW-PRD-02','GW-DMZ-03','GW-COR-04'];
+    const nets=[]; const used={};
+    for (let i=0;i<3;i++){
+      const oct = 8 + ((Math.random()*240)|0);
+      const gw = pick(GW);
+      nets.push({cidr:'10.'+oct+'.0.0/16', gw:gw, tag:'VLAN'+(100+((Math.random()*80)|0))});
+      used[gw]=1;
+    }
+    body.innerHTML =
+      '<div class="term" style="max-height:none;margin-bottom:12px"><div class="term-head">Authoritative Route Table</div>'+
+      '<div style="padding:8px 11px;font-size:12px;line-height:1.8;color:var(--ink)">'+
+      nets.map(n=>'· <b style="color:var(--amber)">'+n.cidr+'</b> is served by <b style="color:var(--amber)">'+n.gw+'</b>').join('<br>')+
+      '</div></div>'+
+      '<p class="lbl" style="margin-bottom:6px">Restore each segment to its gateway</p>'+
+      shuffle(nets).map(n=>'<div class="formrow"><span class="lbl">'+n.cidr+' · '+n.tag+'</span>'+
+        '<select data-want="'+esc(n.gw)+'">'+shuffle(GW).map(g=>'<option>'+g+'</option>').join('')+'</select></div>').join('')+
+      '<button class="btn go" id="rt-go">Commit Routes</button>';
+    on('rt-go','click',()=>{
+      const sels = body.querySelectorAll('select');
+      let ok=true;
+      for (const s of sels) if (s.value !== s.dataset.want) ok=false;
+      if (ok) this.succeed();
+      else { Aud.play('fail'); this.left=Math.max(1,this.left-3); toast('ROUTES REJECTED · −3s','bad'); }
+    });
+  },
+
+  tape(body, s2){
+    if (!s2){
+      const hh = 1 + ((Math.random()*4)|0);
+      const incident = '0'+hh+':40';
+      const sets=[];
+      for (let i=0;i<5;i++){
+        const m = 5 + ((Math.random()*50)|0);
+        sets.push({id:'BK'+(1000+((Math.random()*8999)|0)), t:'0'+hh+':'+(m<10?'0':'')+m});
+      }
+      sets.sort((a,b)=>a.t<b.t?-1:1);
+      const valid = sets.filter(s=>s.t < incident);
+      const best = valid.length ? valid[valid.length-1] : sets[0];
+      body.innerHTML =
+        '<p style="font-size:13px;color:var(--ink-dim);margin-bottom:10px">Corruption entered the volume at '+
+        '<b style="color:var(--breach)">'+incident+'</b>. Mount the newest clean backup — the latest set taken <i>before</i> that time.</p>'+
+        '<div class="term" style="max-height:none"><div class="term-head">Catalogue · Node 7</div>'+
+        sets.map(s=>'<div class="term-line" data-id="'+s.id+'"><span>'+s.id+'</span><span class="code">'+s.t+'</span></div>').join('')+
+        '</div>';
+      body.addEventListener('click', e=>{
+        const row = e.target.closest ? e.target.closest('.term-line') : null;
+        if (!row) return;
+        if (row.dataset.id === best.id) this.succeed();
+        else { Aud.play('fail'); this.left=Math.max(1,this.left-3); toast('THAT SET IS DIRTY · −3s','bad'); }
+      }, this._sig());
+      return;
+    }
+    /* stage two — physically seek the tape */
+    const zw = 12 + Math.random()*7;
+    const zs = 8 + Math.random()*(80-zw);
+    body.innerHTML =
+      '<p style="font-size:13px;color:var(--ink-dim);margin-bottom:6px">Park the head inside the restore window. Click or press <b style="color:var(--amber)">SPACE</b>.</p>'+
+      '<div id="seek-track"><div id="seek-zone"></div><div id="seek-head"></div></div>'+
+      '<button class="btn" id="seek-go">Engage Head</button>';
+    css('seek-zone','left', zs+'%'); css('seek-zone','width', zw+'%');
+    let pos=0, dir=1, raf=0, stopped=false;
+    const speed = 0.85 + Math.random()*0.5;
+    const step = ()=>{
+      pos += dir*speed;
+      if (pos>=100){ pos=100; dir=-1; } if (pos<=0){ pos=0; dir=1; }
+      css('seek-head','left', pos+'%');
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    this._clean.push(()=>cancelAnimationFrame(raf));
+    const engage = ()=>{
+      if (stopped) return; stopped=true;
+      cancelAnimationFrame(raf);
+      if (pos>=zs && pos<=zs+zw) this.succeed();
+      else { stopped=false; Aud.play('fail'); this.left=Math.max(1,this.left-3);
+             toast('MISSED THE WINDOW · −3s','bad'); raf=requestAnimationFrame(step); }
+    };
+    on('seek-go','click',engage);
+    this._seek = engage;
+    this._clean.push(()=>{ this._seek=null; });
+  },
+
+  master(body){
+    let held=0; const NEED=2.4; let raf=0, down=false;
+    body.innerHTML =
+      '<p style="font-size:13px;color:var(--ink);margin-bottom:10px;text-align:center">'+
+      'Every queue on the floor is clear. Hold to force the master reset.</p>'+
+      '<svg id="hold-ring" width="132" height="132" viewBox="0 0 132 132">'+
+      '<circle cx="66" cy="66" r="56" fill="none" stroke="#1f2a3d" stroke-width="9"></circle>'+
+      '<circle id="ring-fg" cx="66" cy="66" r="56" fill="none" stroke="#3ddc97" stroke-width="9" '+
+      'stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352" transform="rotate(-90 66 66)"></circle>'+
+      '</svg>'+
+      '<button class="btn go" id="hold-btn">Hold · Execute Master IPL</button>';
+    const loop = ()=>{
+      held += down ? 0.016 : -0.03;
+      held = clamp(held, 0, NEED);
+      const fg = $('ring-fg');
+      if (fg) fg.setAttribute('stroke-dashoffset', String(352 - (held/NEED)*352));
+      if (held >= NEED){ cancelAnimationFrame(raf); this.succeed(); return; }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    this._clean.push(()=>cancelAnimationFrame(raf));
+    const b = $('hold-btn');
+    if (b){
+      b.addEventListener('pointerdown',()=>{down=true;});
+      b.addEventListener('pointerup',  ()=>{down=false;});
+      b.addEventListener('pointerleave',()=>{down=false;});
+    }
+    this._hold = v => { down = v; };
+    this._clean.push(()=>{ this._hold=null; });
+  }
+};
+
+/* ═══ SECTION 8 — UI ═══════════════════════════════════════════════════════
+   Every list is rebuilt only when its signature changes, so the HUD is not
+   re-parsing innerHTML sixty times a second.                               */
+const UI = {
+  role:'SYS', color:SI.colors[0], target:null, _sig:{},
+
+  screen(id){
+    for (const s of ['menu','lobby','profile']) shown(s, s===id);
+  },
+  netFail(msg){
+    txt('boot-log', msg + ' · Solo Shift still works.');
+    const b = $('boot-log'); if(b) b.className='err';
+    toast(msg,'bad');
+    this.screen('menu');
+  },
+
+  toLobby(code, mode){
+    State.phase = 'LOBBY';
+    this.screen('lobby');
+    txt('lobby-code', code); txt('lobby-mode', mode);
+    shown('host-opts', State.isHost);
+    shown('b-deploy', State.isHost);
+    const w = $('lobby-wait'); if(w) w.hidden = State.isHost;
+    txt('lobby-hint', State.isOffline ? 'Offline shift — no peers required'
+      : State.isHost ? 'Share this with your operators' : 'Connected to host');
+    this.roster();
+  },
+  roster(){
+    const el = $('lobby-roster'); if(!el) return;
+    const rows = Object.keys(State.players).map(id=>{
+      const p = State.players[id];
+      return '<div class="rost"><span><span style="color:'+p.color+'">■</span> '+esc(p.name)+
+        (id===State.myId?' <span class="tag">you</span>':'')+'</span>'+
+        '<span class="tag">'+esc(roleOf(p).name)+'</span></div>';
+    }).join('');
+    const sig = rows.length + ':' + Object.keys(State.players).length;
+    if (this._sig.roster === rows) return;
+    this._sig.roster = rows;
+    el.innerHTML = rows || '<div class="rost"><span class="tag">no operators yet</span></div>';
+  },
+
+  toProfile(){
+    this.screen('profile');
+    const rg = $('role-grid');
+    if (rg) rg.innerHTML = SI.roles.map(r=>
+      '<button class="role-card" data-role="'+r.id+'" aria-pressed="'+(r.id===this.role)+'">'+
+      '<span class="rn" style="color:'+r.color+'">'+esc(r.name)+'</span>'+
+      '<span class="rb">'+esc(r.blurb)+'</span></button>').join('');
+    const sw = $('swatches');
+    if (sw) sw.innerHTML = SI.colors.map(c=>
+      '<button class="sw" data-color="'+c+'" style="background:'+c+'" aria-pressed="'+(c===this.color)+'" aria-label="colour '+c+'"></button>').join('');
+  },
+
+  applyPhase(){
+    const p = State.phase;
+    blurActive();
+    if (TaskEngine.open && p!=='PLAYING') TaskEngine.close();
+    shown('hud', p==='PLAYING');
+    shown('bridge', p==='DISCUSSION'||p==='VOTING'||p==='REVEAL');
+    shown('results', p==='END');
+    document.body.classList.toggle('cine', p==='DISCUSSION'||p==='VOTING'||p==='REVEAL'||p==='END');
+    if (p==='PLAYING'){ this.screen(null); this._sig={}; }
+    if (p==='DISCUSSION'){
+      txt('bridge-phase','EMERGENCY BRIDGE');
+      css('bridge-phase','color','var(--breach)');
+      txt('bridge-sub','Convened by '+State.caller);
+      Aud.play('alarm');
+    }
+    if (p==='VOTING'){
+      txt('bridge-phase','IDENTIFY THE ROGUE');
+      css('bridge-phase','color','var(--amber)');
+      txt('bridge-sub','Cast your revocation vote');
+    }
+    if (p==='REVEAL'){
+      txt('bridge-phase', State.ejectWasRogue ? 'CREDENTIALS REVOKED' : 'ACCESS RETAINED');
+      css('bridge-phase','color', State.ejectWasRogue ? 'var(--jade)' : 'var(--ink-dim)');
+      txt('bridge-sub','');
+    }
+    this._sig.bridge = null;
+    if (p==='END') this.results();
+  },
+
+  results(){
+    const e = SI.endings[State.ending] || SI.endings.SAB_SLA;
+    const M = me();
+    const won = M ? ((e.side==='ROGUE') === !!M.saboteur) : false;
+    txt('result-title', e.t);
+    css('result-title','color', e.c);
+    txt('result-why', e.w);
+    txt('result-code','INC'+String(1000000+((Math.random()*8999999)|0)));
+    html('result-cast',
+      '<div class="lbl" style="margin-bottom:4px">'+(won?'<span style="color:var(--jade)">SHIFT WON</span>':'<span style="color:var(--breach)">SHIFT LOST</span>')+' · Final Roster</div>'+
+      State.cast.map(c=>'<div class="rost"><span><span style="color:'+c.color+'">■</span> '+esc(c.name)+
+        (c.rogue?' <span style="color:var(--breach)">ROGUE ADMIN</span>':'')+'</span>'+
+        '<span class="tag">'+(c.rogue?'—':c.done+'/'+c.total+' closed')+(c.out?' · locked out':'')+'</span></div>').join(''));
+  },
+
+  bridge(){
+    txt('bridge-clock', Math.max(0, Math.ceil(State.timer)));
+    const body = $('bridge-body'); if(!body) return;
+    const M = me();
+    if (State.phase==='REVEAL'){
+      const sig='rev';
+      if (this._sig.bridge!==sig){
+        this._sig.bridge=sig;
+        let line;
+        if (State.ejected==='SKIP') line='No consensus. Nobody was deprovisioned.';
+        else if (State.ejected==='TIE') line='The vote was tied. Nobody was deprovisioned.';
+        else line = esc(State.ejected)+' was deprovisioned. '+
+          (State.ejectWasRogue ? 'Their credentials were the breach.' : 'They were not the insider threat.');
+        body.innerHTML = '<p style="text-align:center;font-size:15px;color:'+
+          (State.ejectWasRogue?'var(--jade)':'var(--ink)')+'">'+line+'</p>';
+      }
+      return;
+    }
+    if (State.phase==='DISCUSSION'){
+      const sig='disc'+Object.keys(State.players).length;
+      if (this._sig.bridge!==sig){
+        this._sig.bridge=sig;
+        body.innerHTML = '<p class="lbl" style="text-align:center;margin-bottom:10px">Who was where. Voting opens shortly.</p>'+
+          Object.keys(State.players).map(id=>{
+            const q=State.players[id];
+            return '<div class="rost"><span><span style="color:'+q.color+'">■</span> '+esc(q.name)+'</span>'+
+              '<span class="tag">'+(q.out?'locked out':esc(roleOf(q).name))+'</span></div>';
+          }).join('');
+      }
+      return;
+    }
+    /* VOTING */
+    const mine = M ? State.votes[State.myId] : null;
+    const tally = {};
+    for (const v in State.votes){ const t=State.votes[v]; tally[t]=(tally[t]||0)+(State.weights[v]||1); }
+    const sig = JSON.stringify(tally)+'|'+mine+'|'+Object.keys(State.players).length;
+    if (this._sig.bridge===sig) return;
+    this._sig.bridge=sig;
+    const rows = Object.keys(State.players).map(id=>{
+      const q = State.players[id];
+      const n = tally[id]||0;
+      return '<button class="vote-row'+(q.out?' out':'')+(mine===id?' mine':'')+'" data-vote="'+id+'"'+
+        ((q.out||mine||(M&&M.out))?' disabled':'')+'>'+
+        '<span class="who" style="color:'+q.color+'">'+esc(q.name)+'</span>'+
+        '<span class="tally">'+(mine===id?'<span style="color:var(--jade);font-size:11px;letter-spacing:.1em">YOUR VOTE</span> ':'')+
+        new Array(n+1).join('<i></i>')+'</span></button>';
+    }).join('');
+    body.innerHTML = rows +
+      '<button class="vote-row" data-vote="skip"'+((mine||(M&&M.out))?' disabled':'')+'>'+
+      '<span class="who" style="color:var(--ink-dim)">SKIP VOTE</span>'+
+      '<span class="tally">'+new Array((tally.skip||0)+1).join('<i></i>')+'</span></button>';
+  },
+
+  hud(){
+    const M = me(); if(!M) return;
+    /* SLA */
+    const sla = Math.ceil(State.sla);
+    if (this._sig.sla !== sla){
+      this._sig.sla = sla;
+      txt('sla-num', sla+'%');
+      css('sla-bar','width', State.sla+'%');
+      const col = State.sla<25 ? 'var(--breach)' : State.sla<55 ? 'var(--amber)' : 'var(--cyan)';
+      css('sla-bar','background', col); css('sla-num','color', col);
+      klass('d-sla','crit', State.sla<25);
+    }
+    /* role card */
+    if (this._sig.role !== M.role+M.saboteur){
+      this._sig.role = M.role+M.saboteur;
+      txt('role-name', M.saboteur ? 'ROGUE ADMIN' : roleOf(M).name.toUpperCase());
+      css('role-name','color', M.saboteur ? 'var(--breach)' : roleOf(M).color);
+      txt('role-perk', M.saboteur ? 'Revoke credentials. Do not get caught.' : roleOf(M).blurb);
+    }
+    /* alert banner */
+    let banner=null;
+    for (const k in State.fx){
+      const def = D.sab.get(k); if(!def) continue;
+      if (def.alarm==='silent' && !perk(M,'revealDrainSource',false)) continue;
+      banner = {def:def, e:State.fx[k]}; break;
+    }
+    const bsig = banner ? banner.def.id+banner.e.fixes : 'none';
+    if (this._sig.alert !== bsig){
+      this._sig.alert = bsig;
+      klass('d-alert','on', !!banner);
+      if (banner){
+        txt('alert-title', banner.def.label.toUpperCase());
+        const cz = banner.def.counter;
+        html('alert-fix', cz
+          ? 'Contain at any <b>'+esc(SI.tasks[cz].label)+'</b> console · <b>'+banner.e.fixes+'/'+banner.e.need+'</b> secured'
+          : 'Will clear on its own in <b>'+Math.ceil(Math.max(0,banner.e.t))+'s</b>');
+      }
+    }
+    /* queue + sabotage panel */
+    shown('d-tasks', !M.saboteur);
+    klass('d-sab','on', !!M.saboteur);
+    if (M.saboteur){
+      const sig = SI.sabotage.map(s=>Math.ceil(M.sabCd[s.id]||0)+(State.fx[s.id]?'A':'-')).join('|')+(State.grace>0?'G':'');
+      if (this._sig.sab !== sig){
+        this._sig.sab = sig;
+        html('sab-list', SI.sabotage.map(s=>{
+          const cd = Math.ceil(M.sabCd[s.id]||0);
+          const live = !!State.fx[s.id];
+          const blocked = cd>0 || live || State.grace>0;
+          return '<button class="sab-btn" data-sab="'+s.id+'"'+(blocked?' disabled':'')+'>'+
+            '<span>'+s.icon+' '+esc(s.label)+'</span>'+
+            '<span class="cd">'+(live?'LIVE':State.grace>0?Math.ceil(State.grace)+'s':cd>0?cd+'s':'READY')+'</span></button>';
+        }).join(''));
+      }
+    } else {
+      const sig = M.tasks.map(t=>t+(M.done.indexOf(t)>=0?'D':M.stage[t]===1?'H':'-')+(State.lockedZones[t]?'L':'')).join('|')
+        +'|'+State.masterUnlock+'|'+this.target;
+      if (this._sig.tasks !== sig){
+        this._sig.tasks = sig;
+        txt('task-head', State.masterUnlock ? 'FINAL DIRECTIVE' : 'MY QUEUE');
+        if (State.masterUnlock){
+          html('task-list','<div class="task-line active"><div class="pip"></div>'+
+            '<span class="txt" style="color:var(--jade)">Execute Master IPL at the bridge table</span></div>');
+        } else {
+          html('task-list', M.tasks.map(t=>{
+            const z = D.zone.get(t); if(!z) return '';
+            const done = M.done.indexOf(t)>=0;
+            const half = M.stage[t]===1;
+            const lock = !!State.lockedZones[t];
+            const zz = half && z.pairs ? D.zone.get(z.pairs) : z;
+            const cls = done?'done':lock?'locked':(this.target && this.target.owner===t)?'active':'';
+            return '<div class="task-line '+cls+'"><div class="pip"></div><span class="txt">'+
+              esc(zz?zz.label:z.label)+(half?' · stage 2':'')+(lock?' · corrupted':'')+'</span></div>';
+          }).join(''));
+        }
+        txt('glob-num', State.tasksDone+' / '+State.tasksNeeded);
+        css('glob-bar','width', (State.tasksNeeded? (State.tasksDone/State.tasksNeeded*100):0)+'%');
+      }
+    }
+    const mood = Object.keys(State.fx).some(k=>{ const d=D.sab.get(k); return d && d.effect==='DRAIN'; });
+    if (this._sig.mood !== mood){ this._sig.mood = mood; Aud.mood(mood); }
+    this.prompt(M);
+  },
+
+  /* resolve the single best interaction and describe it */
+  prompt(M){
+    let act=null;
+    if (M.out){ act=null; }
+    else if (M.saboteur){
+      for (const id in State.players){
+        if (id===State.myId) continue;
+        const o = State.players[id];
+        if (o.out || o.saboteur) continue;
+        if (dist(M.x,M.y,o.x,o.y) <= SI.rules.revokeRange && los(M.x,M.y,o.x,o.y)){
+          act = M.revokeCd>0
+            ? {label:'RECHARGING '+Math.ceil(M.revokeCd)+'s', color:'var(--ink-dim)', dead:true}
+            : State.grace>0
+            ? {label:'UPLINK COLD '+Math.ceil(State.grace)+'s', color:'var(--ink-dim)', dead:true}
+            : {label:'REVOKE ACCESS · '+o.name, color:'var(--breach)', go:()=>Net.act('REVOKE',id)};
+          break;
+        }
+      }
+    }
+    if (!act && !M.out && !M.saboteur){
+      for (const k in State.fx){
+        const def = D.sab.get(k); if(!def || !def.counter) continue;
+        const anyZone = perk(M,'canFixAnyZoneType',false);
+        const z = SI.zones.find(z2 => z2.task && !z2.kind && Game.near(M,z2) &&
+          (anyZone || z2.task===def.counter));
+        if (z){ act = {label:'CONTAIN · '+def.label.toUpperCase(), color:'var(--jade)',
+                       go:()=>Net.act('FIX',k)}; break; }
+      }
+    }
+    if (!act && !M.out){
+      for (const id in State.players){
+        if (id===State.myId) continue;
+        const o = State.players[id];
+        if (!o.out) continue;
+        if (dist(M.x,M.y,o.x,o.y) <= SI.rules.reportRange && los(M.x,M.y,o.x,o.y)){
+          const cd = perk(M,'bridgeCooldown', State.bridgeCd);
+          act = cd>0 ? {label:'BRIDGE COOLING '+Math.ceil(cd)+'s', color:'var(--ink-dim)', dead:true}
+                     : {label:'REPORT · '+o.name+' IS OFFLINE', color:'var(--breach)', go:()=>Net.act('BRIDGE')};
+          break;
+        }
+      }
+    }
+    if (!act && !M.out){
+      const bz = D.zone.get('ZX-BRIDGE');
+      if (bz && Game.near(M,bz,1.9)){
+        if (State.masterUnlock && !M.saboteur){
+          act = {label:'EXECUTE MASTER IPL', color:'var(--jade)',
+                 go:()=>TaskEngine.begin('ZX-MASTER','ZX-MASTER')};
+        } else {
+          const cd = perk(M,'bridgeCooldown', State.bridgeCd);
+          act = cd>0 ? {label:'BRIDGE COOLING '+Math.ceil(cd)+'s', color:'var(--ink-dim)', dead:true}
+                     : {label:'CONVENE EMERGENCY BRIDGE', color:'var(--breach)', go:()=>Net.act('BRIDGE')};
+        }
+      }
+    }
+    if (!act && !M.out && !M.saboteur){
+      for (const t of M.tasks){
+        if (M.done.indexOf(t)>=0) continue;
+        const z = Game.activeZoneFor(M,t);
+        if (z && Game.near(M,z)){
+          act = State.lockedZones[z.id]
+            ? {label:'ZONE CORRUPTED', color:'var(--breach)', dead:true}
+            : {label:'EXECUTE · '+z.label.toUpperCase(), color:'var(--ink-hi)',
+               go:()=>TaskEngine.begin(z.id,t), owner:t};
+          break;
+        }
+      }
+    }
+    this.target = act;
+    const show = !!act && !TaskEngine.open && State.phase==='PLAYING';
+    klass('d-prompt','on', show);
+    if (show && this._sig.prompt !== act.label){
+      this._sig.prompt = act.label;
+      txt('prompt-txt', act.label);
+      css('prompt-txt','color', act.color);
+    }
+    if (!show) this._sig.prompt = null;
+  },
+
+  fire(){
+    const a = this.target;
+    if (!a || a.dead || !a.go) return;
+    Aud.play('click');
+    a.go();
+  }
+};
+
+/* ═══ SECTION 9 — INPUT, LOOP, BOOT ════════════════════════════════════════
+   Guardrail #4: held keys live in a Set (so releasing S never cancels a held
+   W), keys are lowercased, and every phase change blurs the focused node so
+   WASD can never be trapped in a text field.                               */
+const Input = {
+  held:new Set(), ax:0, ay:0, act:false, _pad:{x:0,y:0},
+  refresh(){
+    let x=0,y=0;
+    if (this.held.has('a')||this.held.has('arrowleft'))  x-=1;
+    if (this.held.has('d')||this.held.has('arrowright')) x+=1;
+    if (this.held.has('w')||this.held.has('arrowup'))    y-=1;
+    if (this.held.has('s')||this.held.has('arrowdown'))  y+=1;
+    this.ax = clamp(x + this._pad.x, -1, 1);
+    this.ay = clamp(y + this._pad.y, -1, 1);
+  },
+  consume(){ this.act=false; },
+  typing(){
+    const a = document.activeElement;
+    if (!a) return false;
+    const t = (a.tagName||'').toUpperCase();
+    return t==='INPUT' || t==='SELECT' || t==='TEXTAREA' || a.isContentEditable;
+  }
+};
+
+window.addEventListener('keydown', e=>{
+  const k = (e.key||'').toLowerCase();
+  if (k==='escape' && TaskEngine.open){ TaskEngine.abort(); return; }
+  if (Input.typing()){
+    if (k==='enter'){
+      const a=document.activeElement;
+      if (a && a.id==='join-code'){ const b=$('b-connect'); if(b) b.click(); }
+      if (a && a.id==='callsign'){ const b=$('b-confirm'); if(b) b.click(); }
+    }
+    return;
+  }
+  if (k===' '||k==='spacebar'){
+    e.preventDefault();
+    Aud.arm();
+    if (TaskEngine.open){
+      if (TaskEngine._hold) TaskEngine._hold(true);
+      else if (TaskEngine._seek) TaskEngine._seek();
+      return;
+    }
+    if (!Input.act){ Input.act = true; UI.fire(); }
+    return;
+  }
+  if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].indexOf(k)>=0){
+    e.preventDefault(); Input.held.add(k); Input.refresh();
+  }
+});
+window.addEventListener('keyup', e=>{
+  const k = (e.key||'').toLowerCase();
+  if (k===' '||k==='spacebar'){ Input.act=false; if(TaskEngine._hold) TaskEngine._hold(false); return; }
+  Input.held.delete(k); Input.refresh();
+});
+window.addEventListener('blur', ()=>{ Input.held.clear(); Input.refresh(); Input.act=false; });
+
+/* ── main loop ── */
+let _last = 0, _sendAcc = 0, _lastAx = 0, _lastAy = 0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  try{
+    const raw = (ts - _last)/1000; _last = ts;
+    const dt = Number.isFinite(raw) ? clamp(raw, 0, 0.1) : 0;
+
+    if (State.phase==='PLAYING'){
+      const M = me();
+      if (M && !M.out && !TaskEngine.open){
+        if (Input.ax || Input.ay){
+          const mag = Math.hypot(Input.ax, Input.ay) || 1;
+          move(M, (Input.ax/mag)*SI.rules.playerSpeed*dt, (Input.ay/mag)*SI.rules.playerSpeed*dt);
+        }
+        if (State.isHost){ M.ax = Input.ax; M.ay = Input.ay; }
+      }
+      /* intent is rate-limited and only sent on change or on the tick */
+      _sendAcc += dt;
+      if (!State.isHost && (_sendAcc > 1/SI.net.tickHz || Input.ax!==_lastAx || Input.ay!==_lastAy)){
+        _sendAcc = 0; _lastAx = Input.ax; _lastAy = Input.ay;
+        Net.intent(Input.ax, Input.ay);
+      }
+    }
+
+    Game.tick(dt);
+
+    if (State.phase==='PLAYING') UI.hud();
+    else if (State.phase==='DISCUSSION'||State.phase==='VOTING'||State.phase==='REVEAL') UI.bridge();
+
+    Render.frame(ts);
+  } catch(e){ console.error('[loop]', e); }
+}
+
+/* ── wiring ── */
+function wire(){
+  on('b-solo','click', ()=>{ Aud.arm(); Aud.play('click'); Net.startSolo(); });
+  on('b-host','click', ()=>{ Aud.arm(); Aud.play('click'); txt('boot-log','Opening signalling channel…'); Net.startHost(); });
+  on('b-join','click', ()=>{ Aud.arm(); Aud.play('click'); shown('join-box', true); const f=$('join-code'); if(f) f.focus(); });
+  on('b-connect','click', ()=>{
+    const f=$('join-code'); const c = f ? f.value.trim().toUpperCase() : '';
+    if (c.length<4){ toast('ENTER THE ROOM CODE','bad'); return; }
+    Aud.arm(); Aud.play('click'); txt('boot-log','Connecting to '+c+'…'); Net.join(c);
+  });
+
+  on('o-bots','change', e=>{ State.useBots = !!e.target.checked; });
+  on('o-force','click', e=>{
+    const b = e.target.closest ? e.target.closest('button') : null; if(!b) return;
+    State.forceRole = b.dataset.force;
+    for (const x of e.currentTarget.querySelectorAll('button'))
+      x.setAttribute('aria-pressed', String(x===b));
+    Aud.play('hover');
+  });
+  on('b-deploy','click', ()=>{
+    Aud.play('click');
+    if (State.isHost && !State.isOffline)
+      for (const id in Net.conns){ try{ Net.conns[id].send({t:'PROFILE_OPEN'}); }catch(e){} }
+    UI.toProfile();
+  });
+
+  on('role-grid','click', e=>{
+    const b = e.target.closest ? e.target.closest('.role-card') : null; if(!b) return;
+    UI.role = b.dataset.role; Aud.play('hover');
+    for (const x of e.currentTarget.querySelectorAll('.role-card'))
+      x.setAttribute('aria-pressed', String(x===b));
+  });
+  on('swatches','click', e=>{
+    const b = e.target.closest ? e.target.closest('.sw') : null; if(!b) return;
+    UI.color = b.dataset.color; Aud.play('hover');
+    for (const x of e.currentTarget.querySelectorAll('.sw'))
+      x.setAttribute('aria-pressed', String(x===b));
+  });
+  on('b-confirm','click', ()=>{
+    Aud.play('click');
+    const f = $('callsign');
+    const name = (f && f.value.trim() ? f.value.trim() : 'OPERATOR').toUpperCase().slice(0,12);
+    Net.profile({name:name, role:UI.role, color:UI.color});
+    blurActive();
+    if (State.isHost){
+      const b=$('b-confirm'); if(b){ b.textContent='LAUNCHING SHIFT…'; b.disabled=true; }
+      setTimeout(()=>Game.start(), 700);
+    } else {
+      const b=$('b-confirm'); if(b){ b.textContent='AWAITING HOST…'; b.disabled=true; }
+    }
+  });
+
+  on('b-abort','click', ()=>{ Aud.play('click'); TaskEngine.abort(); });
+  on('b-again','click', ()=>location.reload());
+
+  on('sab-list','click', e=>{
+    const b = e.target.closest ? e.target.closest('.sab-btn') : null;
+    if (!b || b.disabled) return;
+    Aud.play('click'); Net.act('SAB', b.dataset.sab);
+  });
+  on('bridge-body','click', e=>{
+    const b = e.target.closest ? e.target.closest('.vote-row') : null;
+    if (!b || b.disabled) return;
+    Aud.play('vote'); Net.act('VOTE', b.dataset.vote);
+  });
+
+  const pad = $('pad');
+  if (pad){
+    for (const b of pad.querySelectorAll('button')){
+      const ax = b.dataset.ax, v = Number(b.dataset.v||0);
+      const set = on_ => {
+        if (ax==='x') Input._pad.x = on_ ? v : 0;
+        if (ax==='y') Input._pad.y = on_ ? v : 0;
+        Input.refresh();
+      };
+      if (ax){
+        b.addEventListener('pointerdown', e=>{ e.preventDefault(); set(true); });
+        b.addEventListener('pointerup',   ()=>set(false));
+        b.addEventListener('pointerleave',()=>set(false));
+        b.addEventListener('pointercancel',()=>set(false));
+      } else {
+        b.addEventListener('pointerdown', e=>{
+          e.preventDefault(); Aud.arm();
+          if (TaskEngine.open){ if(TaskEngine._hold) TaskEngine._hold(true); else if(TaskEngine._seek) TaskEngine._seek(); }
+          else UI.fire();
+        });
+        b.addEventListener('pointerup', ()=>{ if(TaskEngine._hold) TaskEngine._hold(false); });
+      }
+    }
+  }
+  document.addEventListener('pointerdown', ()=>Aud.arm(), {once:true});
+  for (const b of document.querySelectorAll('.btn'))
+    b.addEventListener('pointerenter', ()=>Aud.play('hover'));
+}
+
+/* ── boot ── */
+function boot(){
+  const missing = [];
+  if (typeof THREE === 'undefined') missing.push('three.js');
+  if (typeof YUKA  === 'undefined') missing.push('yuka.js');
+  if (typeof Tone  === 'undefined') missing.push('tone.js');
+  if (typeof Peer  === 'undefined') missing.push('peerjs');
+
+  wire();
+  txt('menu-build','v'+SI.version);
+
+  if (typeof THREE === 'undefined'){
+    html('boot-log','<span class="err">FATAL · three.js did not load. The renderer cannot start.</span>');
+    return;
+  }
+  if (!Render.init()){
+    html('boot-log','<span class="err">FATAL · WebGL context unavailable.</span>');
+    return;
+  }
+  const notes = [];
+  notes.push('<span class="ok">renderer online</span>');
+  notes.push(typeof YUKA!=='undefined' ? '<span class="ok">yuka fsm</span>' : 'fsm fallback');
+  notes.push(typeof Tone!=='undefined' ? '<span class="ok">audio armed</span>' : 'audio off');
+  notes.push(typeof Peer!=='undefined' ? '<span class="ok">p2p ready</span>' : 'p2p off');
+  notes.push(D.zone.size+' zones · '+D.doors.length+' bulkheads');
+  html('boot-log', notes.join(' · '));
+  if (missing.length) console.warn('[boot] unavailable:', missing.join(', '));
+
+  requestAnimationFrame(t=>{ _last = t; requestAnimationFrame(loop); });
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+/* expose a little surface for console debugging, nothing more */
+window.MBP = {SI:SI, D:D, State:State, Game:Game, Render:Render};
+
+})();
