@@ -20,7 +20,7 @@
     "$chroma_note": "Lossy WebP drifted the mint field; measured border deviation reached 44. tol=50 with merge_gap=0 is the only setting that separates all 12 poses."
   },
   "ICONS_SOURCE": {
-    "min_area": 300,
+    "min_area": 200,
     "merge_gap": 0,
     "$layout_note": "Board reads as 16 regions in three rows: 6 metallic (silver, red, yellow, green, cyan, blue) / 5 (magenta, black, palm, green-hills, snowy-mountain) / 5 (magenta MECHANICAL object, palm, evergreen, green-hills, snowy-mountain). Row 3 is the only COMPLETE four-icon landscape set - it is the one that includes evergreen - so row 2's three landscapes are the redundant variants the handoff says to ignore, along with the magenta mechanical object.",
     "selection": [
@@ -45,7 +45,13 @@
       "r11"
     ],
     "$skip_note": "r8-r10 redundant landscape variants; r11 the extra magenta mechanical object.",
-    "overrides": {}
+    "overrides": {},
+    "chroma_key": [
+      125,
+      253,
+      178
+    ],
+    "chroma_tolerance": 20
   },
   "ENEMIES_ITEMS_SOURCE": {
     "min_area": 300,
@@ -217,6 +223,8 @@
       252,
       177
     ],
-    "chroma_tolerance": 21
+    "chroma_tolerance": 21,
+    "chroma_policy": "edge-and-enclosed",
+    "$chroma_policy_note": "Safe here and required. Batch-1 inspection confirmed no strip uses mint as artwork (the forest is dark desaturated green), so mint enclosed between machine silhouettes is background bleed, not art. Edge-connected alone left 239 opaque chroma pixels in the datacenter strip."
   }
 }

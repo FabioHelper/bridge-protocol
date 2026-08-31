@@ -1,21 +1,13 @@
 {
   "counts": {
-    "checks": 148,
-    "errors": 3,
-    "skipped": 6,
-    "warnings": 60
+    "checks": 165,
+    "errors": 0,
+    "skipped": 10,
+    "warnings": 61
   },
   "generated_by": "tools/process_assets.py",
-  "ok": false,
+  "ok": true,
   "results": [
-    {
-      "actual": "",
-      "check": "file_present",
-      "expected": "",
-      "level": "ERROR",
-      "message": "board not supplied; its outputs are skipped",
-      "target": "04_icons_source.png"
-    },
     {
       "actual": "tol=50",
       "check": "chroma_calibration",
@@ -153,12 +145,148 @@
       "target": "hero.png"
     },
     {
-      "actual": "",
-      "check": "file_present",
-      "expected": "",
-      "level": "ERROR",
-      "message": "04_icons_source.png not supplied; outputs skipped",
+      "actual": "tol=20",
+      "check": "chroma_calibration",
+      "expected": "(125, 253, 178)",
+      "level": "OK",
+      "message": "",
       "target": "ICONS_SOURCE"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant icon variant (bbox (219, 123, 80, 79))",
+      "target": "ICONS_SOURCE:r8"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant icon variant (bbox (347, 124, 73, 78))",
+      "target": "ICONS_SOURCE:r9"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant icon variant (bbox (432, 124, 75, 78))",
+      "target": "ICONS_SOURCE:r10"
+    },
+    {
+      "actual": "",
+      "check": "region_unused",
+      "expected": "",
+      "level": "SKIPPED",
+      "message": "redundant icon variant (bbox (5, 233, 85, 85))",
+      "target": "ICONS_SOURCE:r11"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r0"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r1"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r2"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r3"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r4"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r5"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r6"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r7"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r12"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r13"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r14"
+    },
+    {
+      "actual": "exact 1:5",
+      "check": "crop_snap",
+      "expected": "80x80",
+      "level": "OK",
+      "message": "",
+      "target": "ICONS_SOURCE:r15"
+    },
+    {
+      "actual": "192x16",
+      "check": "emitted",
+      "expected": "",
+      "level": "OK",
+      "message": "",
+      "target": "operations-tiles.png"
     },
     {
       "actual": "tol=25",
@@ -1050,6 +1178,14 @@
     },
     {
       "actual": "",
+      "check": "chroma_policy",
+      "expected": "",
+      "level": "WARN",
+      "message": "board opted into 'edge-and-enclosed': chroma enclosed by artwork was also removed (25.86% of the board). Required for hollow shapes such as the aura rings; never enable it where mint is artwork.",
+      "target": "BACKGROUNDS_SOURCE"
+    },
+    {
+      "actual": "",
       "check": "bg_strips",
       "expected": "",
       "level": "WARN",
@@ -1150,6 +1286,14 @@
       "expected": "",
       "level": "OK",
       "message": "",
+      "target": "04_icons_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
       "target": "05_enemies_items_source.webp"
     },
     {
@@ -1183,14 +1327,6 @@
       "level": "OK",
       "message": "",
       "target": "09_backgrounds_source.webp"
-    },
-    {
-      "actual": "",
-      "check": "file_present",
-      "expected": "",
-      "level": "ERROR",
-      "message": "contracted output was not produced",
-      "target": "operations-tiles.png"
     }
   ]
 }

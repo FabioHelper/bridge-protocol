@@ -1,12 +1,12 @@
 {
   "counts": {
-    "checks": 215,
-    "errors": 1,
+    "checks": 216,
+    "errors": 0,
     "skipped": 0,
     "warnings": 0
   },
   "generated_by": "tools/validate_assets.py",
-  "ok": false,
+  "ok": true,
   "results": [
     {
       "actual": "",
@@ -905,9 +905,9 @@
       "target": "hud-top.png"
     },
     {
-      "actual": "480x30",
+      "actual": "480x42",
       "check": "dimensions",
-      "expected": "480x30",
+      "expected": "480x42",
       "level": "OK",
       "message": "",
       "target": "hud-top.png"
@@ -937,9 +937,9 @@
       "target": "hud-viewdata.png"
     },
     {
-      "actual": "16x16",
+      "actual": "108x59",
       "check": "dimensions",
-      "expected": "<=200x64",
+      "expected": "108x59",
       "level": "OK",
       "message": "",
       "target": "hud-viewdata.png"
@@ -969,9 +969,9 @@
       "target": "hud-minimap.png"
     },
     {
-      "actual": "124x56",
+      "actual": "92x59",
       "check": "dimensions",
-      "expected": "<=160x72",
+      "expected": "92x59",
       "level": "OK",
       "message": "",
       "target": "hud-minimap.png"
@@ -1001,9 +1001,9 @@
       "target": "hud-bottom.png"
     },
     {
-      "actual": "480x56",
+      "actual": "480x47",
       "check": "dimensions",
-      "expected": "480x56",
+      "expected": "480x47",
       "level": "OK",
       "message": "",
       "target": "hud-bottom.png"
@@ -1529,11 +1529,11 @@
       "target": "bg-near-datacenter.png"
     },
     {
-      "actual": "239",
+      "actual": "",
       "check": "chroma_residue",
-      "expected": "0",
-      "level": "ERROR",
-      "message": "239 opaque pixels within tolerance of the chroma key",
+      "expected": "",
+      "level": "OK",
+      "message": "",
       "target": "bg-near-datacenter.png"
     },
     {
@@ -1694,6 +1694,14 @@
       "expected": "",
       "level": "OK",
       "message": "",
+      "target": "04_icons_source.png"
+    },
+    {
+      "actual": "",
+      "check": "source_unmodified",
+      "expected": "",
+      "level": "OK",
+      "message": "",
       "target": "05_enemies_items_source.webp"
     },
     {
@@ -1729,5 +1737,5 @@
       "target": "09_backgrounds_source.webp"
     }
   ],
-  "track": "mixed"
+  "track": "production"
 }

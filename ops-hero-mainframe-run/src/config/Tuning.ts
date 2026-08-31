@@ -157,6 +157,16 @@ export const PARALLAX = {
   FAR_SKY_FACTOR: 0.1,
   MID_MOUNTAINS_FACTOR: 0.35,
   NEAR_DATACENTER_FACTOR: 0.65,
+  /**
+   * Local play-viewport y (relative to VIEWPORT.PLAY_Y) where the ground tiles visually begin in
+   * the camera's default settled state (measured off a flat-ground gameplay screenshot). The mid
+   * and near layers anchor their bottom edge here rather than at the viewport bottom, so the
+   * ground tiles don't cover most of the layer -- see Parallax.ts.
+   */
+  GROUND_LINE_Y: 102,
+  /** Mountains sit a little further back than the datacenter, so their band starts higher. */
+  MID_MOUNTAINS_ANCHOR_OFFSET_Y: -6,
+  NEAR_DATACENTER_ANCHOR_OFFSET_Y: 0,
 } as const;
 
 export const DEPTH = {
@@ -181,7 +191,7 @@ export const HUD = {
   STATUS_MESSAGE_HOLD_MS: 1800,
   PF_KEY_COUNT: 12,
   SCORE_DIGITS: 7,
-  COUNTER_DIGITS: 3,
+  COUNTER_DIGITS: 2,
   FONT_SIZE_PX: 8,
   HEADING_FONT_SIZE_PX: 8,
   POWER_METER_SEGMENTS: 10,

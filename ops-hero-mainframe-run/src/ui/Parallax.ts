@@ -16,17 +16,23 @@ interface LayerSpec {
   readonly texture: string;
   readonly factor: number;
   readonly depth: number;
-  readonly anchorBottom: boolean;
+  /** undefined = anchor to the sky at the viewport top; a number = anchor bottom-edge offset. */
+  readonly groundAnchorOffsetY: number | undefined;
 }
 
 const LAYER_SPECS: readonly LayerSpec[] = [
-  { texture: AssetKeys.BG_FAR_SKY, factor: PARALLAX.FAR_SKY_FACTOR, depth: DEPTH.BG_FAR, anchorBottom: false },
-  { texture: AssetKeys.BG_MID_MOUNTAINS, factor: PARALLAX.MID_MOUNTAINS_FACTOR, depth: DEPTH.BG_MID, anchorBottom: true },
+  { texture: AssetKeys.BG_FAR_SKY, factor: PARALLAX.FAR_SKY_FACTOR, depth: DEPTH.BG_FAR, groundAnchorOffsetY: undefined },
+  {
+    texture: AssetKeys.BG_MID_MOUNTAINS,
+    factor: PARALLAX.MID_MOUNTAINS_FACTOR,
+    depth: DEPTH.BG_MID,
+    groundAnchorOffsetY: PARALLAX.MID_MOUNTAINS_ANCHOR_OFFSET_Y,
+  },
   {
     texture: AssetKeys.BG_NEAR_DATACENTER,
     factor: PARALLAX.NEAR_DATACENTER_FACTOR,
     depth: DEPTH.BG_NEAR,
-    anchorBottom: true,
+    groundAnchorOffsetY: PARALLAX.NEAR_DATACENTER_ANCHOR_OFFSET_Y,
   },
 ];
 
@@ -36,7 +42,10 @@ class ParallaxLayer {
 
   constructor(scene: Phaser.Scene, spec: LayerSpec) {
     const height = scene.textures.get(spec.texture).getSourceImage().height;
-    const y = spec.anchorBottom ? VIEWPORT.PLAY_Y + VIEWPORT.PLAY_HEIGHT - height : VIEWPORT.PLAY_Y;
+    const y =
+      spec.groundAnchorOffsetY === undefined
+        ? VIEWPORT.PLAY_Y
+        : VIEWPORT.PLAY_Y + PARALLAX.GROUND_LINE_Y + spec.groundAnchorOffsetY - height;
 
     this.sprite = scene.add.tileSprite(0, y, VIEWPORT.LOGICAL_WIDTH, height, spec.texture);
     this.sprite.setOrigin(0, 0);
