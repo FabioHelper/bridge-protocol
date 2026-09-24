@@ -1,7 +1,7 @@
 # One-shot setup: puts the local MTX project on GitHub with the handoff docs and the Claude kit.
 # Run in PowerShell:
 #   irm https://raw.githubusercontent.com/FabioHelper/bridge-protocol/refs/heads/claude/mtx-remake-model-optimization-6y5taa/mtx-claude-kit/setup-mtx-repo.ps1 | iex
-# Safe to re-run: existing files are never overwritten (kit copies land as *.kit instead).
+# Safe to re-run: existing files are never overwritten (a differing kit file lands as *.kit instead).
 & {
     $Project   = 'C:\Users\Fabio D\Desktop\mtx'
     $Handoff   = 'C:\Users\Fabio D\Documents\Codex\2026-09-24\ins\outputs'
@@ -38,6 +38,7 @@
             if ($rel -eq 'README.md') { $rel = 'docs\CLAUDE-KIT.md' }
             $dest = Join-Path $Project $rel
             if (Test-Path -LiteralPath $dest) {
+                if ((Get-FileHash -LiteralPath $dest).Hash -eq (Get-FileHash -LiteralPath $_.FullName).Hash) { return }
                 $dest = "$dest.kit"
                 Write-Host "  $rel already exists - kit version saved as $rel.kit" -ForegroundColor Yellow
             }
@@ -62,7 +63,7 @@
         if (-not (git.exe config user.email)) { G config user.email 'fabiodutra19@gmail.com' }
 
         $files = @(git.exe -c core.quotePath=false ls-files --cached --others --exclude-standard)
-        $big = @($files | Where-Object { (Test-Path -LiteralPath $_) -and (Get-Item -LiteralPath $_).Length -gt 95MB })
+        $big = @($files | Where-Object { (Test-Path -LiteralPath $_) -and (Get-Item -LiteralPath $_ -Force).Length -gt 95MB })
         if ($big.Count -gt 0) {
             Stop-Setup ("These files exceed GitHub's 100 MB limit. Move them out of the folder or add them to .gitignore, then run this again:`n  " + ($big -join "`n  ")); return
         }
