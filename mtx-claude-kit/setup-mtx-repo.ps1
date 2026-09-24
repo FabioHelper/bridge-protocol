@@ -29,11 +29,13 @@
         Copy-Item -Path (Join-Path $Handoff '*') -Destination 'docs\handoff' -Recurse -Force
 
         Step 'Installing the Claude kit'
-        $tmp = Join-Path $env:TEMP ('mtx-kit-' + [guid]::NewGuid())
+        # Scratch clone lives inside the project (never committed) - avoids 8.3 short paths in %TEMP%.
+        $tmp = Join-Path $Project '.mtx-kit-tmp'
+        if (Test-Path -LiteralPath $tmp) { Remove-Item -LiteralPath $tmp -Recurse -Force }
         G clone --quiet --depth 1 --branch $KitBranch $KitRepo $tmp
-        $kit = Join-Path $tmp 'mtx-claude-kit'
+        $kit = (Get-Item -LiteralPath (Join-Path $tmp 'mtx-claude-kit')).FullName
         Get-ChildItem -LiteralPath $kit -Recurse -File -Force | ForEach-Object {
-            $rel = $_.FullName.Substring($kit.Length + 1)
+            $rel = $_.FullName.Substring($kit.Length).TrimStart('\', '/')
             if ($rel -eq 'setup-mtx-repo.ps1') { return }
             if ($rel -eq 'README.md') { $rel = 'docs\CLAUDE-KIT.md' }
             $dest = Join-Path $Project $rel
@@ -45,10 +47,10 @@
             New-Item -ItemType Directory -Force (Split-Path $dest) | Out-Null
             Copy-Item -LiteralPath $_.FullName -Destination $dest -Force
         }
-        Remove-Item -LiteralPath $tmp -Recurse -Force
+        Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue
 
         Step 'Making sure dependencies and build output are not uploaded (.gitignore)'
-        $want = @('node_modules/', 'dist/', 'coverage/', '.vite/', '*.log', '.env', '.env.*')
+        $want = @('.mtx-kit-tmp/', 'node_modules/', 'dist/', 'coverage/', '.vite/', '*.log', '.env', '.env.*')
         $gi = Join-Path $Project '.gitignore'
         $have = @()
         if (Test-Path -LiteralPath $gi) { $have = @(Get-Content -LiteralPath $gi) }
